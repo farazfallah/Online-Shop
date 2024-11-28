@@ -6,7 +6,6 @@ from core.models import BaseModel
 class Order(BaseModel):
     STATUS_CHOICES = [
         ('registered', 'Registered'),
-        ('pending', 'Pending'),
         ('confirmed', 'Awaiting Confirmation'),
         ('shipped', 'Shipped'),
         ('completed', 'Completed'),
