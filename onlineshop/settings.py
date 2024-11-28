@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'rest_framework'
     'orders',
     'customers',
     'product',
@@ -115,7 +116,11 @@ USE_I18N = True
 
 USE_TZ = True
 
+# OTP configuration
 
+MAX_OTP_TRY = 3
+
+AUTH_USER_MODEL = 'customers.customer'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
