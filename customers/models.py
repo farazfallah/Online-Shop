@@ -14,12 +14,13 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=15, blank=True, null=True, unique=True)
     image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.jpg')
     
-    otp = models.CharField(max_length=6, blank=True, null=True)
+    otp = models.CharField(max_length=4, blank=True, null=True)
     otp_expiry = models.DateTimeField(blank=True, null=True)
     max_otp_try = models.IntegerField(default=settings.MAX_OTP_TRY)
     otp_max_out = models.DateTimeField(blank=True, null=True)
+    otp_is_active = models.BooleanField(default=False)
     
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
     objects = CustomUserManager()
