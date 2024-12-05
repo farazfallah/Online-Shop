@@ -35,7 +35,7 @@
                                 <div aria-labelledby="responsive menu" class="offcanvas offcanvas-start"
                                      id="responsiveMenu" tabindex="-1">
                                     <div class="offcanvas-header">
-                                        <h5 class="offcanvas-title" id="offcanvasRightLabel">فروشگاه مهیار</h5>
+                                        <h5 class="offcanvas-title" id="offcanvasRightLabel">فروشگاه {{ site_info.site_name }}</h5>
                                         <button aria-label="Close" class="btn-close" data-bs-dismiss="offcanvas"
                                                 type="button"></button>
                                     </div>
@@ -277,7 +277,7 @@
                             </div>
                             <div class="top-header-call-title ms-3">
                                 <p class="text-muted">پشتیبانی 24 ساعته</p>
-                                <h6 class="text-center h5 pt-2">021-12345678</h6>
+                                <h6 class="text-center h5 pt-2">{{ site_info.site_number }}</h6>
                             </div>
                         </div>
                         <div class="d-flex align-items-center d-xl-none justify-content-end">
@@ -561,12 +561,58 @@
                 <div class="col-lg-3 col-xl-4">
                     <div class="d-flex align-items-center justify-content-end">
                         <div class="d-flex align-items-center justify-content-between top-header-call d-xl-flex d-none">
+                            {% if user.is_authenticated %}
+                            <div class="top-header-link d-lg-flex">
+                                <div class="dropdown text-end">
+                                    <a href="" data-bs-toggle="dropdown" aria-expanded="false" role="button"
+                                       class="btn btn-white auth-dropdown header-register border-0">
+                                        <div class="d-flex align-items-center">
+                                            <figure class="avatar">
+                                                <img src="{{ user.image.url }}" alt="{{ user.first_name }} {{ user.last_name }}">
+                                            </figure>
+                                            <span class="ms-3 d-md-block d-none font-18">{{ user.first_name }} {{ user.last_name }}<i
+                                                    class="bi bi-chevron-down arrow-auth font-12 ms-2"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu flex-column" style="min-width: 250px;">
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6"><i
+                                                class="bi bi-house-door me-2"></i>پروفایل</a>
+                                        </li>
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                class="bi bi-cart-check me-2"></i>سفارش های
+                                            من</a></li>
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                class="bi bi-pin-map me-2"></i>آدرس های
+                                            من</a></li>
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                class="bi bi-bell me-2"></i>پیام ها و
+                                            اطلاعیه ها</a></li>
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                class="bi bi-chat-dots me-2"></i>نظرات
+                                            من</a></li>
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                class="bi bi-question-circle me-2"></i>درخواست
+                                            پشتیبانی</a></li>
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                class="bi bi-heart me-2"></i>محصولات مورد
+                                            علاقه</a></li>
+                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                class="bi bi-gift me-2"></i>کد های تخفیف
+                                            من</a></li>
+                                        <li class="w-100"><a href="{% url 'logout' %}" class="dropdown-item fs-6 py-2 mct-hover"><i
+                                                class="bi bi-arrow-right-square me-2"></i>خروج از حساب کاربری</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            {% else %}
                             <div class="auth-link">
-                                <a href="">
+                                <a href="{% url 'login' %}">
                                     <i class="bi bi-person"></i>
                                     <span class="fw-bold">ورود / عضویت</span>
                                 </a>
                             </div>
+                            {% endif %}
                             <div class="cart-button ms-3">
                                 <a class="d-flex align-items-center h-100" data-bs-toggle="offcanvas"
                                    href="#offcanvasCart" role="button" aria-controls="offcanvasCart">
@@ -612,10 +658,10 @@
                         <nav class="navbar navbar-expand">
                             <ul class="navbar-nav flex-wrap">
                                 <li class="nav-item"><a href="" class="nav-link"><span
-                                        class="fw-bold">شماره  تماس:</span> 12345678-021</a></li>
+                                        class="fw-bold">شماره  تماس:</span>{{ site_info.site_number }}</a></li>
                                 <li class="nav-item"><a href="" class="nav-link"><span class="fw-bold">ایمیل : </span>
-                                    site@gmail.com</a></li>
-                                <li class="nav-item"><span class="nav-link"> هفت روز هفته ، 24 ساعت شبانه‌روز پاسخگوی شما هستیم.</span>
+                                    {{ site_info.site_email }}</a></li>
+                                <li class="nav-item"><span class="nav-link">{{ site_info.site_slogan }}</span>
                                 </li>
                             </ul>
                         </nav>
@@ -666,14 +712,26 @@
                 </div>
                 <div class="col-lg-3 col-sm-6 col-6 w-100-in-400">
                     <div class="footer-col-item">
+                        {% if site_info.instagram_link or site_info.twitter_link or site_info.telegram_link or site_info.youtube_link or site_info.linkedin_link %}
                         <span class="nav-link font-16 f-800 title-col-social">رسانه های خبری ما</span>
                         <div class="social-link">
-                            <a href="" class="bi bi-instagram"></a>
-                            <a href="" class="bi bi-twitter"></a>
-                            <a href="" class="bi bi-whatsapp"></a>
-                            <a href="" class="bi bi-youtube"></a>
-                            <a href="" class="bi bi-linkedin"></a>
+                            {% if site_info.instagram_link %}
+                                <a href="{{ site_info.instagram_link }}" class="bi bi-instagram"></a>
+                            {% endif %}
+                            {% if site_info.twitter_link %}
+                                <a href="{{ site_info.twitter_link }}" class="bi bi-twitter"></a>
+                            {% endif %}
+                            {% if site_info.telegram_link %}
+                                <a href="{{ site_info.telegram_link }}" class="bi bi-whatsapp"></a>
+                            {% endif %}
+                            {% if site_info.youtube_link %}
+                                <a href="{{ site_info.youtube_link }}" class="bi bi-youtube"></a>
+                            {% endif %}
+                            {% if site_info.linkedin_link %}
+                                <a href="{{ site_info.linkedin_link }}" class="bi bi-linkedin"></a>
+                            {% endif %}
                         </div>
+                        {% endif %}
                         <div class="footer-form title-col-social">
                             <h6 class="my-4">در خبرنامه پر تخفیف ما عضو شوید</h6>
                             <form action="">
@@ -714,7 +772,7 @@
         <div class="footer-description">
             <div class="row align-items-center gy-3">
                 <div class="col-lg-8">
-                    <h5 class="mb-3">فروشگاه اینترنتی مهیار ، بررسی انتخاب و خرید آنلاین</h5>
+                    <h5 class="mb-3">فروشگاه اینترنتی {{ site_info.site_name }} ، بررسی انتخاب و خرید آنلاین</h5>
                     <p class="text-muted font-14">یک خرید اینترنتی مطمئن، نیازمند فروشگاهی است که بتواند کالاهایی متنوع،
                         باکیفیت و دارای قیمت مناسب را در مدت زمانی کوتاه به دست مشتریان خود برساند و ضمانت بازگشت کالا
                         هم داشته باشد؛ ویژگی‌هایی که فروشگاه اینترنتی دیجی‌کالا سال‌هاست بر روی آن‌ها کار کرده و توانسته
@@ -739,7 +797,7 @@
                         ذکر منبع بلامانع است. کلیه حقوق این سایت متعلق به مهیار می‌باشد. </p>
                 </div>
                 <div class="col-lg-3">
-                    <p class="text-muted font-14 text-end">Copyright © 2022 - 2023 amir-rezaie.ir</p>
+                    <p class="text-muted font-14 text-end">{{ site_info.copyright_text }}</p>
                 </div>
             </div>
         </div>
@@ -847,11 +905,6 @@
             </svg>
         </div>
         <!-- end go to top -->
-
-        <!-- contact us floating -->
-        <div id="btncollapzion" class="btn_collapzion"></div>
-        <div class="" id="contactOverlay"></div>
-        <!-- end contact us floating -->
     </div>
 </section>
 
@@ -912,29 +965,6 @@
 <script src="{% static 'js/swiperInit.js' %}"></script>
 <script src="{% static 'js/megaMenu.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
-
-<!-- initial config contact button  -->
-<script>
-    $('#btncollapzion').Collapzion({
-        _child_attribute: [{
-            'label': 'پشتیبانی تلفنی',
-            'url': 'tel:0930555555555',
-            'icon': 'bi bi-telephone'
-        },
-            {
-                'label': 'پشتیبانی تلگرام',
-                'url': 'https://tlgrm.me',
-                'icon': 'bi bi-telegram'
-            },
-            {
-                'label': 'پشتیبانی واتس آپ',
-                'url': 'https://wa.me/444444444',
-                'icon': 'bi-whatsapp'
-            },
-
-        ],
-    });
-</script>
 
 </body>
 </html>

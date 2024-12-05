@@ -12,7 +12,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True, validators=[validate_email])
     phone = models.CharField(max_length=15, blank=True, null=True, unique=True)
-    image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.jpg')
+    image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.png')
     
     otp = models.CharField(max_length=4, blank=True, null=True)
     otp_expiry = models.DateTimeField(blank=True, null=True)

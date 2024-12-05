@@ -28,7 +28,7 @@
     </div>
     {% endif %}
 
-    <section class="content vh-100">
+    {% comment %} <section class="content vh-100">
         <div class="container-fluid h-100">
             <div class="auth h-100 d-flex align-items-center">
                 <div class="container-fluid">
@@ -85,7 +85,7 @@
     
                                         <!-- OTP Login -->
                                         <div class="tab-pane fade" id="otp-login" role="tabpanel" aria-labelledby="otp-tab">
-                                            <form action="{% url 'login_with_otp' %}" method="POST" id="form-otp-login" class="py-3">
+                                            <form method="POST" id="form-otp-login" class="py-3">
                                                 {% csrf_token %}
                                                 <div class="comment-item mb-4">
                                                     <input 
@@ -111,7 +111,7 @@
                                                 </div>
                                             </form>
                                             <div class="text-center mt-3">
-                                                <form action="{% url 'resend_otp' %}" method="POST">
+                                                <form method="POST">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="email" value="{{ email }}">
                                                     <button type="submit" class="btn btn-link text-decoration-none">ارسال مجدد کد</button>
@@ -127,7 +127,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> {% endcomment %}
     <section class="content vh-100">
         <div class="container-fluid h-100">
             <div class="auth h-100 d-flex align-items-center">
@@ -167,9 +167,10 @@
                                                 required>
                                             <label for="password" class="form-label label-float">رمز عبور خود را وارد کنید</label>
                                         </div>
-                                        <div class="text-center">
-                                            <button type="submit" class="btn main-color-one-bg w-100 py-3">ورود</button>
-                                        </div>
+                                        <button type="submit" class="btn main-color-one-bg w-100 py-3">
+                                            ورود
+                                        </button>
+                                        <div id="login-error" class="alert alert-danger text-center mt-3" style="display: none;"></div>                                        
                                     </form>
                                 </div>
                             </div>
@@ -180,37 +181,46 @@
         </div>
     </section>
     
-    <script>
-        document.getElementById('form-email-login').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-        
-            fetch(form.action, {
+<script>
+    document.getElementById('form-email-login').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const form = event.target;
+        const button = form.querySelector('button[type="submit"]');
+        const errorDiv = document.getElementById('login-error');
+    
+        // نمایش اسپینر
+        button.disabled = true;
+        button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+    
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+    
+        try {
+            const response = await fetch(form.action, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    const errorContainer = document.getElementById('login-error');
-                    errorContainer.textContent = data.error;
-                    errorContainer.style.display = 'block';
-                } else {
-                    window.location.href = data.redirect || '/';
-                }
-            })
-            .catch(err => {
-                console.error('Login error:', err);
+                body: JSON.stringify(data),
             });
-        });
-        
-    </script>
     
+            const result = await response.json();
+    
+            if (response.ok) {
+                window.location.href = result.redirect_url;
+            } else {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = result.error || 'مشکلی رخ داده است.';
+            }
+        } catch (error) {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'مشکلی در ارتباط با سرور رخ داده است.';
+        } finally {
+            button.disabled = false;
+            button.innerHTML = 'ورود';
+        }
+    });
+</script>
 
 <script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
@@ -218,5 +228,4 @@
 <script src="{% static 'js/app.js' %}"></script>
 
 </body>
-
 </html>
