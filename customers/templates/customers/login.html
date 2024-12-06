@@ -1,0 +1,227 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="FA-IR" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به سایت</title>
+
+    <link rel="stylesheet" href="{% static 'plugin/swiper/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/go-to-top/style.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/rasta-contact/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+
+</head>
+
+<body class="bg-auth">
+    {% if messages %}
+    <div class="messages mt-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} text-center" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% comment %} <section class="content vh-100">
+        <div class="container-fluid h-100">
+            <div class="auth h-100 d-flex align-items-center">
+                <div class="container-fluid">
+                    <div class="auth-items">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4">
+                                <div class="auth-form shadow-xl rounded-3 mt-5 bg-white">
+                                    <div class="auth-form-title header-logo d-flex align-items-center justify-content-between title-panel mb-4 slider-title-desc-center">
+                                        <h2 class="text-center h4 text-muted title-font">ورود</h2>
+                                        <a href="">
+                                            <img src="assets/image/logo.png" class="auth-logo" alt="">
+                                        </a>
+                                    </div>
+    
+                                    <!-- Tabs for Login Method -->
+                                    <ul class="nav nav-tabs mb-4" id="login-tabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-login" type="button" role="tab" aria-controls="email-login" aria-selected="true">ورود با ایمیل و رمز</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="otp-tab" data-bs-toggle="tab" data-bs-target="#otp-login" type="button" role="tab" aria-controls="otp-login" aria-selected="false">ورود با OTP</button>
+                                        </li>
+                                    </ul>
+    
+                                    <div class="tab-content" id="login-tabContent">
+    
+                                        <!-- Email and Password Login -->
+                                        <div class="tab-pane fade show active" id="email-login" role="tabpanel" aria-labelledby="email-tab">
+                                            <form action="{% url 'login_with_password' %}" method="POST" id="form-email-login" class="py-3">
+                                                {% csrf_token %}
+                                                <div class="comment-item mb-4">
+                                                    <input 
+                                                        type="email" 
+                                                        name="email" 
+                                                        class="form-control" 
+                                                        id="email" 
+                                                        required>
+                                                    <label for="email" class="form-label label-float">ایمیل خود را وارد کنید</label>
+                                                </div>
+                                                <div class="comment-item mb-4">
+                                                    <input 
+                                                        type="password" 
+                                                        name="password" 
+                                                        class="form-control" 
+                                                        id="password" 
+                                                        required>
+                                                    <label for="password" class="form-label label-float">رمز عبور خود را وارد کنید</label>
+                                                </div>
+                                                <div class="text-center">
+                                                    <button type="submit" class="btn main-color-one-bg w-100 py-3">ورود</button>
+                                                </div>
+                                            </form>
+                                        </div>
+    
+                                        <!-- OTP Login -->
+                                        <div class="tab-pane fade" id="otp-login" role="tabpanel" aria-labelledby="otp-tab">
+                                            <form method="POST" id="form-otp-login" class="py-3">
+                                                {% csrf_token %}
+                                                <div class="comment-item mb-4">
+                                                    <input 
+                                                        type="email" 
+                                                        name="email" 
+                                                        class="form-control" 
+                                                        id="otp-email" 
+                                                        required>
+                                                    <label for="otp-email" class="form-label label-float">ایمیل خود را وارد کنید</label>
+                                                </div>
+                                                <div class="comment-item mb-4">
+                                                    <input 
+                                                        type="text" 
+                                                        name="otp" 
+                                                        class="form-control" 
+                                                        id="otp" 
+                                                        placeholder="کد ارسال شده به ایمیل" 
+                                                        required>
+                                                    <label for="otp" class="form-label label-float">کد تایید</label>
+                                                </div>
+                                                <div class="text-center">
+                                                    <button type="submit" class="btn main-color-one-bg w-100 py-3">ورود</button>
+                                                </div>
+                                            </form>
+                                            <div class="text-center mt-3">
+                                                <form method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="email" value="{{ email }}">
+                                                    <button type="submit" class="btn btn-link text-decoration-none">ارسال مجدد کد</button>
+                                                </form>
+                                            </div>
+                                        </div>
+    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> {% endcomment %}
+    <section class="content vh-100">
+        <div class="container-fluid h-100">
+            <div class="auth h-100 d-flex align-items-center">
+                <div class="container-fluid">
+                    <div class="auth-items">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4">
+                                <div class="auth-form shadow-xl rounded-3 mt-5 bg-white">
+                                    <div class="auth-form-title header-logo d-flex align-items-center justify-content-between title-panel mb-4 slider-title-desc-center">
+                                        <h2 class="text-center h4 text-muted title-font">ورود</h2>
+                                        <a href="">
+                                            <img src="{{ site_info.logo.url }}" class="auth-logo" alt="{{ site_info.site_name }}">
+                                        </a>
+                                    </div>
+                                    <div id="login-error" class="alert alert-danger text-center" style="display: none;"></div>
+                                    <form action="{% url 'login_with_password' %}" method="POST" id="form-email-login" class="py-3">
+                                        {% csrf_token %}
+                                        <div class="comment-item mb-4">
+                                            <input 
+                                                type="email" 
+                                                name="email" 
+                                                class="form-control" 
+                                                id="email" 
+                                                required>
+                                            <label for="email" class="form-label label-float">ایمیل خود را وارد کنید</label>
+                                        </div>
+                                        <div class="comment-item mb-4">
+                                            <input 
+                                                type="password" 
+                                                name="password" 
+                                                class="form-control" 
+                                                id="password" 
+                                                required>
+                                            <label for="password" class="form-label label-float">رمز عبور خود را وارد کنید</label>
+                                        </div>
+                                        <button type="submit" class="btn main-color-one-bg w-100 py-3">
+                                            ورود
+                                        </button>
+                                        <div id="login-error" class="alert alert-danger text-center mt-3" style="display: none;"></div>                                        
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+<script>
+    document.getElementById('form-email-login').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const form = event.target;
+        const button = form.querySelector('button[type="submit"]');
+        const errorDiv = document.getElementById('login-error');
+    
+        // نمایش اسپینر
+        button.disabled = true;
+        button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+    
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+    
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                window.location.href = result.redirect_url;
+            } else {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = result.error || 'مشکلی رخ داده است.';
+            }
+        } catch (error) {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'مشکلی در ارتباط با سرور رخ داده است.';
+        } finally {
+            button.disabled = false;
+            button.innerHTML = 'ورود';
+        }
+    });
+</script>
+
+<script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>
+<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle-5.3.2.min.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
+
+</body>
+</html>
