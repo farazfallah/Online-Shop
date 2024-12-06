@@ -1,10 +1,10 @@
 # customer/models.py
 from django.db import models
-from core.models import BaseModel
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from core.managers import CustomUserManager
 from django.core.validators import validate_email
 from django.conf import settings
+from core.models import BaseModel
+from core.managers import CustomUserManager
 
 
 class Customer(AbstractBaseUser, PermissionsMixin):
