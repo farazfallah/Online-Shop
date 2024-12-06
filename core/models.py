@@ -15,8 +15,8 @@ class SiteInfo(models.Model):
     telegram_link = models.URLField(blank=True, null=True)
     linkedin_link = models.URLField(blank=True, null=True)
 
-    logo = models.ImageField(upload_to='logos/', blank=True, null=True)
-    favicon = models.ImageField(upload_to='favicons/', blank=True, null=True)
+    logo = models.ImageField(upload_to='logos/', blank=True, null=True, default='logos/default.png')
+    favicon = models.ImageField(upload_to='favicons/', blank=True, null=True,  default='logos/favicon.png')
 
     def __str__(self):
         return self.site_name

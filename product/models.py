@@ -5,8 +5,9 @@ from core.models import BaseModel
 class Category(BaseModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    icon = models.CharField(max_length=50)
     parent_category = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subcategories')
-
+    image = models.ImageField(upload_to='categories/', blank=True, null=True)
     def __str__(self):
         return self.name
 

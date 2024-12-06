@@ -19,7 +19,6 @@
 <body>
 
 <!--============ start header ==============-->
-
 <header class="header">
     <div class="container-fluid">
         <div class="top-header">
@@ -41,7 +40,7 @@
                                     </div>
                                     <div class="offcanvas-body">
                                         <a class="text-center top-header-logo d-block mb-3" href="">
-                                            <img alt="" class="img-fluid" src="assets/image/logo.png">
+                                            <img alt="{{ site_info.site_name }}" class="img-fluid" src="{{ site_info.logo.url }}">
                                         </a>
                                         <div class="header-bottom-form mb-4 w-100">
                                             <div class="search-form">
@@ -58,189 +57,41 @@
                                             </div>
                                         </div>
                                         <ul class="rm-item-menu navbar-nav">
-                                            <li class="nav-item bg-ul-f7"><a class="nav-link" href="index.html">صفحه
+                                            <li class="nav-item bg-ul-f7"><a class="nav-link" href="{% url 'home' %}">صفحه
                                                 اصلی</a>
                                             </li>
-                                            <li class="nav-item bg-ul-f7">
-                                                <a class="nav-link" href="">گوشی موبایل</a>
-                                                <span class="showSubMenu"><i class="bi bi-chevron-left"></i></span>
-                                                <ul class="navbar-nav h-0">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="">برند</a>
-                                                        <span class="showSubMenu"><i
-                                                                class="bi bi-chevron-left"></i></span>
-                                                        <ul class="navbar-nav h-0 bg-ul-f7">
-                                                            <li class="nav-item"><a class="nav-link" href="">سامسونگ</a>
+                                                <ul class="navbar-nav">
+                                                    {% for category in category_list %}
+                                                        {% if not category.parent_category %}
+                                                            <li class="nav-item bg-ul-f7">
+                                                                <a class="nav-link" href="">{% autoescape off %}{{ category.name }}{% endautoescape %}</a>
+                                                                {% if category.subcategories.exists %}
+                                                                    <span class="showSubMenu">
+                                                                        <i class="bi bi-chevron-left"></i>
+                                                                    </span>
+                                                                    <ul class="navbar-nav h-0">
+                                                                        {% for subcategory in category.subcategories.all %}
+                                                                            <li class="nav-item">
+                                                                                <a class="nav-link" href="">{% autoescape off %}{{ subcategory.name }}{% endautoescape %}</a>
+                                                                                {% if subcategory.subcategories.exists %}
+                                                                                    <span class="showSubMenu">
+                                                                                        <i class="bi bi-chevron-left"></i>
+                                                                                    </span>
+                                                                                    <ul class="navbar-nav h-0 bg-ul-f7">
+                                                                                        {% for subsubcategory in subcategory.subcategories.all %}
+                                                                                            <li class="nav-item">
+                                                                                                <a class="nav-link" href="">{% autoescape off %}{{ subsubcategory.name }}{% endautoescape %}</a>
+                                                                                            </li>
+                                                                                        {% endfor %}
+                                                                                    </ul>
+                                                                                {% endif %}
+                                                                            </li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                {% endif %}
                                                             </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">هوآوی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">شیائومی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">الجی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">سونی</a>
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="">بر اساس رده بندی</a>
-                                                        <span class="showSubMenu"><i
-                                                                class="bi bi-chevron-left"></i></span>
-                                                        <ul class="navbar-nav h-0 bg-ul-f7">
-                                                            <li class="nav-item"><a class="nav-link" href="">لمسی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">دکمه ای</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">نظامی</a>
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="nav-item bg-ul-f7">
-                                                <a class="nav-link" href="">تبلت</a>
-                                                <span class="showSubMenu"><i class="bi bi-chevron-left"></i></span>
-                                                <ul class="navbar-nav h-0">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="">کشور</a>
-                                                        <span class="showSubMenu"><i
-                                                                class="bi bi-chevron-left"></i></span>
-                                                        <ul class="navbar-nav h-0 bg-ul-f7">
-                                                            <li class="nav-item"><a class="nav-link" href="">ژاپن</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">کره
-                                                                جنوبی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link"
-                                                                                    href="">آمریکایی</a>
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="">بر اساس رده بندی</a>
-                                                        <span class="showSubMenu"><i
-                                                                class="bi bi-chevron-left"></i></span>
-                                                        <ul class="navbar-nav h-0 bg-ul-f7">
-                                                            <li class="nav-item"><a class="nav-link" href="">لمسی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">دانش
-                                                                آموزی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">مخصوص
-                                                                بازی</a>
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="nav-item bg-ul-f7">
-                                                <a class="nav-link" href="">لپتاپ</a>
-                                                <span class="showSubMenu"><i class="bi bi-chevron-left"></i></span>
-                                                <ul class="navbar-nav h-0">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="">برند</a>
-                                                        <span class="showSubMenu"><i
-                                                                class="bi bi-chevron-left"></i></span>
-                                                        <ul class="navbar-nav h-0 bg-ul-f7">
-                                                            <li class="nav-item"><a class="nav-link" href="">ایسر</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link"
-                                                                                    href="">مایکروسافت</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">ایسوس</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">اپل</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">سونی</a>
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" href="">بر اساس قیمت</a>
-                                                        <span class="showSubMenu"><i
-                                                                class="bi bi-chevron-left"></i></span>
-                                                        <ul class="navbar-nav h-0 bg-ul-f7">
-                                                            <li class="nav-item"><a class="nav-link" href="">ارزان</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">اقتصادی</a>
-                                                            </li>
-                                                            <li class="nav-item"><a class="nav-link" href="">گران</a>
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="nav-item bg-ul-f7">
-                                                <a class="nav-link" href="">صفحات</a>
-                                                <span class="showSubMenu"><i class="bi bi-chevron-left"></i></span>
-                                                <ul class="navbar-nav h-0">
-                                                    <li><a href="index.html">صفحه اصلی</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        محصول</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        دسته
-                                                        بندی</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه سبد
-                                                        خرید</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        جستجو</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">دسته بندی
-                                                        محصولات خطی</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        404</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        ورود</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        ثبت
-                                                        نام</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        فراموشی
-                                                        رمز
-                                                        عبور</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        وبلاگ</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        جزییات
-                                                        وبلاگ</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">صفحه
-                                                        مقایسه
-                                                        محصول</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">پرداخت
-                                                        مرحله
-                                                        ای</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">پرداخت
-                                                        موفق</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">پرداخت
-                                                        ناموفق</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">محصول
-                                                        ناموجود</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">سبد
-                                                        خرید
-                                                        خالی</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">
-                                                        داشبورد
-                                                        کاربری</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">سفارشات</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">محصولات
-                                                        مورد
-                                                        علاقه</a></li>
-                                                    <li class="nav-item"><a class="nav-link" href="">اطلاعیه</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">نظرات</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">آدرس
-                                                        ها</a>
-                                                    </li>
-                                                    <li class="nav-item"><a class="nav-link" href="">آخرین
-                                                        بازدید
-                                                        ها</a></li>
+                                                        {% endif %}
+                                                    {% endfor %}
                                                 </ul>
                                             </li>
                                         </ul>
@@ -249,8 +100,8 @@
                             </div>
                         </div>
                         <div class="top-header-logo">
-                            <a href="index.html">
-                                <img alt="" src="assets/image/logo.png">
+                            <a href="{% url 'home' %}">
+                                <img alt="{{ site_info.site_name }}" src="{{ site_info.logo.url }}">
                             </a>
                         </div>
                     </div>
@@ -282,12 +133,58 @@
                         </div>
                         <div class="d-flex align-items-center d-xl-none justify-content-end">
                             <div class="d-flex align-items-center justify-content-between top-header-call">
+                                {% if user.is_authenticated %}
+                                <div class="top-header-link d-lg-flex">
+                                    <div class="dropdown text-end">
+                                        <a href="" data-bs-toggle="dropdown" aria-expanded="false" role="button"
+                                           class="btn btn-white auth-dropdown header-register border-0">
+                                            <div class="d-flex align-items-center">
+                                                <figure class="avatar">
+                                                    <img src="{{ user.image.url }}" alt="{{ user.first_name }} {{ user.last_name }}">
+                                                </figure>
+                                                <span class="ms-3 d-md-block d-none font-18">{{ user.first_name }} {{ user.last_name }}<i
+                                                        class="bi bi-chevron-down arrow-auth font-12 ms-2"></i></span>
+                                            </div>
+                                        </a>
+                                        <ul class="dropdown-menu flex-column" style="min-width: 250px;">
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6"><i
+                                                    class="bi bi-house-door me-2"></i>پروفایل</a>
+                                            </li>
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                    class="bi bi-cart-check me-2"></i>سفارش های
+                                                من</a></li>
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                    class="bi bi-pin-map me-2"></i>آدرس های
+                                                من</a></li>
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                    class="bi bi-bell me-2"></i>پیام ها و
+                                                اطلاعیه ها</a></li>
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                    class="bi bi-chat-dots me-2"></i>نظرات
+                                                من</a></li>
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                    class="bi bi-question-circle me-2"></i>درخواست
+                                                پشتیبانی</a></li>
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                    class="bi bi-heart me-2"></i>محصولات مورد
+                                                علاقه</a></li>
+                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
+                                                    class="bi bi-gift me-2"></i>کد های تخفیف
+                                                من</a></li>
+                                            <li class="w-100"><a href="{% url 'logout' %}" class="dropdown-item fs-6 py-2 mct-hover"><i
+                                                    class="bi bi-arrow-right-square me-2"></i>خروج از حساب کاربری</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                {% else %}
                                 <div class="auth-link">
-                                    <a href="" class="auth-btn">
+                                    <a href="{% url 'login' %}">
                                         <i class="bi bi-person"></i>
-                                        <span class="fw-bold d-sm-inline-block d-none">ورود / عضویت</span>
+                                        <span class="fw-bold">ورود / عضویت</span>
                                     </a>
                                 </div>
+                                {% endif %}
                                 <div class="cart-button ms-3">
                                     <a class="d-flex align-items-center h-100" data-bs-toggle="offcanvas"
                                        href="#offcanvasCart" role="button" aria-controls="offcanvasCart">
@@ -315,170 +212,39 @@
                 <div class="col-lg-9 col-xl-8">
                     <div class="top-menu-menu">
                         <ul class="navbar-nav align-items-center">
+                            <li class="nav-item"><a class="nav-link border-animate fromCenter" href="{% url 'home' %}">
+                                <i class="bi bi-house"></i>
+                                صفحه اصلی
+                                </a>
+                            </li>
                             <li class="position-relative m-0"></li>
                             <li class="nav-item main-menu-head"><a
                                     class="nav-link border-animate fromCenter btn nav-active fw-bold" href="">
-                                <i class="bi bi-grid"></i>
-                                مگا تب منو
+                                <i class="bi bi-tags"></i>
+                                دسته‌بندی‌ها
                             </a>
                                 <ul class="main-menu mega-container">
-                                    <li class=""><a href=""><i class="bi bi-phone"></i>
-                                        موبایل</a>
-                                        <ul class="main-menu-sub back-menu"
-                                            style=" background: #fff url('assets/image/mobiles.png') no-repeat;">
-                                            <li><a class="title my-flex-baseline" href="">برند های مختلف گوشی</a>
+                                    {% for category in category_list %}
+                                        {% if not category.parent_category %}
+                                            <li class=""><a href=""><i class="{{ category.icon }}"></i>
+                                                {% autoescape off %}{{ category.name }}{% endautoescape %}</a>
+                                                <ul class="main-menu-sub back-menu"
+                                                {% if category.image %}
+                                                style="background: #fff url('{{ category.image.url }}') no-repeat;"
+                                                {% else %}
+                                                    style="background: none;"
+                                                {% endif %}>
+                                                {% for subcategory in category.subcategories.all %}
+                                                <li class="">
+                                                    <a class="title my-flex-baseline" href="">{% autoescape off %}{{ subcategory.name }}{% endautoescape %}</a>
+                                                </li>
+                                                {% empty %}
+                                                    <h6 class="my-4">هیچ زیر دسته ای وجود ندارد</h6>
+                                                {% endfor %}
+                                                </ul>
                                             </li>
-                                            <li><a href="">گوشی اپل</a></li>
-                                            <li><a href="">گوشی سامسونگ</a></li>
-                                            <li><a href="">گوشی شیائومی</a></li>
-                                            <li><a href="">گوشی بلک بری</a></li>
-                                            <li><a href="">گوشی ایرانی</a></li>
-                                            <li><a class="title my-flex-baseline" href="">گوشی بر اساس قیمت</a></li>
-                                            <li><a href="">گوشی تا 2 میلیون</a></li>
-                                            <li><a href="">گوشی تا 5 میلیون</a></li>
-                                            <li><a href="">گوشی تا 10 میلیون</a></li>
-                                            <li><a href="">گوشی تا 12 میلیون</a></li>
-                                            <li><a href="">گوشی تا 15 میلیون</a></li>
-                                            <li><a class="title my-flex-baseline" href="">گوشی براساس حافظه
-                                                داخلی</a></li>
-                                            <li><a href="">گوشی تا 16 گیگابایت</a></li>
-                                            <li><a href="">گوشی تا 32 گیگابایت</a></li>
-                                            <li><a href="">گوشی تا 64 گیگابایت</a></li>
-                                            <li><a href="">گوشی تا 128 گیگابایت</a></li>
-                                            <li><a href="">گوشی تا 256 گیگابایت</a></li>
-                                            <li><a href="">گوشی تا 512 گیگابایت</a></li>
-                                            <li><a href="">گوشی تا 1 ترابایت</a></li>
-                                            <li><a class="title my-flex-baseline" href="">گوشی براساس کاربری</a>
-                                            </li>
-                                            <li><a href="">گوشی اقتصادی</a></li>
-                                            <li><a href="">گوشی دانش آموزی</a></li>
-                                            <li><a href="">گوشی لاکچری</a></li>
-                                            <li><a href="">گوشی پرچمدار</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class=""><a href=""><i class="bi bi-tablet"></i> تبلت</a>
-                                        <ul class="main-menu-sub back-menu"
-                                            style=" background: #fff url('assets/image/tablet-menu.png') no-repeat;">
-                                            <li class=""><a class="title my-flex-baseline" href="">برند های مختلف
-                                                تبلت</a>
-                                            </li>
-                                            <li><a href="">تبلت اپل</a></li>
-                                            <li><a href="">تبلت سامسونگ</a></li>
-                                            <li><a href="">تبلت شیائومی</a></li>
-                                            <li class=""><a href="">تبلت بلک بری</a></li>
-                                            <li class=""><a href="">تبلت ایرانی</a></li>
-                                            <li class=""><a class="title my-flex-baseline" href="">تبلت بر اساس قیمت</a>
-                                            </li>
-                                            <li class=""><a href="">تبلت تا 2 میلیون</a></li>
-                                            <li class=""><a href="">تبلت تا 5 میلیون</a></li>
-                                            <li><a href="">تبلت تا 10 میلیون</a></li>
-                                            <li><a href="">تبلت تا 12 میلیون</a></li>
-                                            <li><a href="">تبلت تا 15 میلیون</a></li>
-                                            <li><a class="title my-flex-baseline" href="">تبلت براساس حافظه
-                                                داخلی</a></li>
-                                            <li><a href="">تبلت تا 16 گیگابایت</a></li>
-                                            <li><a href="">تبلت تا 32 گیگابایت</a></li>
-                                            <li><a href="">تبلت تا 64 گیگابایت</a></li>
-                                            <li><a href="">تبلت تا 128 گیگابایت</a></li>
-                                            <li><a href="">تبلت تا 256 گیگابایت</a></li>
-                                            <li><a href="">تبلت تا 512 گیگابایت</a></li>
-                                            <li><a href="">تبلت تا 1 ترابایت</a></li>
-                                            <li class=""><a class="title my-flex-baseline" href="">تبلت براساس
-                                                کاربری</a>
-                                            </li>
-                                            <li class=""><a href="">گتبلتوشی اقتصادی</a></li>
-                                            <li><a href="">تبلت دانش آموزی</a></li>
-                                            <li><a href="">تبلت لاکچری</a></li>
-                                            <li><a href="">تبلت پرچمدار</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="main-menu-sub-active-li"><a href=""><i class="bi bi-shield"></i>آنتی
-                                        ویروس</a>
-                                        <ul class="main-menu-sub back-menu main-menu-sub-active"
-                                            style=" background: #fff url('assets/image/EAV.png') no-repeat;">
-                                            <li><a class="title my-flex-baseline" href="">براساس برند</a></li>
-                                            <li><a href="">نود 32</a></li>
-                                            <li><a href="">کسپر اسکای</a></li>
-                                            <li><a href="">360 سکوریتی</a></li>
-                                            <li><a href="">بیت دیفیندر</a></li>
-                                            <li><a href="">ایمن</a></li>
-                                            <li><a class="title my-flex-baseline" href="">براساس ویندوز</a></li>
-                                            <li><a href="">ویندوز 7</a></li>
-                                            <li><a href="">ویندوز 8</a></li>
-                                            <li><a href="">ویندوز 8.1</a></li>
-                                            <li><a href="">ویندوز 10</a></li>
-                                            <li><a href="">ویندوز 11</a></li>
-                                            <li><a class="title my-flex-baseline" href="">براساس برند</a></li>
-                                            <li><a href="">نود 32</a></li>
-                                            <li><a href="">کسپر اسکای</a></li>
-                                            <li><a href="">360 سکوریتی</a></li>
-                                            <li><a href="">بیت دیفیندر</a></li>
-                                            <li><a href="">ایمن</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class=""><a href=""><i class="bi bi-laptop"></i>لبتاپ</a>
-                                        <ul class="main-menu-sub back-menu"
-                                            style=" background: #fff url('assets/image/labtop.png') no-repeat;">
-                                            <li><a class="title my-flex-baseline" href="">برند های مختلف لبتاپ</a>
-                                            </li>
-                                            <li><a href="">لبتاپ اپل</a></li>
-                                            <li><a href="">لبتاپ سامسونگ</a></li>
-                                            <li><a href="">لبتاپ شیائومی</a></li>
-                                            <li><a href="">لبتاپ بلک بری</a></li>
-                                            <li><a href="">لبتاپ ایرانی</a></li>
-                                            <li><a class="title my-flex-baseline" href="">لبتاپ بر اساس قیمت</a>
-                                            </li>
-                                            <li><a href="">لبتاپ تا 2 میلیون</a></li>
-                                            <li><a href="">لبتاپ تا 5 میلیون</a></li>
-                                            <li><a href="">لبتاپ تا 10 میلیون</a></li>
-                                            <li><a href="">لبتاپ تا 12 میلیون</a></li>
-                                            <li><a href="">لبتاپ تا 15 میلیون</a></li>
-                                            <li><a class="title my-flex-baseline" href="">لبتاپ براساس حافظه
-                                                داخلی</a></li>
-                                            <li><a href="">لبتاپ تا 16 گیگابایت</a></li>
-                                            <li><a href="">لبتاپ تا 32 گیگابایت</a></li>
-                                            <li><a href="">لبتاپ تا 64 گیگابایت</a></li>
-                                            <li><a href="">لبتاپ تا 128 گیگابایت</a></li>
-                                            <li><a href="">لبتاپ تا 256 گیگابایت</a></li>
-                                            <li><a href="">لبتاپ تا 512 گیگابایت</a></li>
-                                            <li><a href="">لبتاپ تا 1 ترابایت</a></li>
-                                            <li><a class="title my-flex-baseline" href="">لبتاپ براساس کاربری</a>
-                                            </li>
-                                            <li><a href="">لبتاپ اقتصادی</a></li>
-                                            <li><a href="">لبتاپ دانش آموزی</a></li>
-                                            <li><a href="">لبتاپ لاکچری</a></li>
-                                            <li><a href="">لبتاپ پرچمدار</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class=""><a href=""><i class="bi bi-tag"></i>پر فروش ترین ها</a>
-                                        <ul class="main-menu-sub back-menu"
-                                            style=" background: #fff url('assets/image/top-sales.jpeg') no-repeat;">
-                                            <li><a class="title my-flex-baseline" href="">زیر منو شماره 1 </a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a class="title my-flex-baseline" href="">زیر منو شماره 1 </a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a class="title my-flex-baseline" href="">زیر منو شماره 1 </a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a class="title my-flex-baseline" href="">زیر منو شماره 1 </a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                            <li><a href="">زیر منو شماره 1</a></li>
-                                        </ul>
-                                    </li>
+                                        {% endif %}
+                                    {% endfor %}
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link border-animate fromCenter" href="">
@@ -643,7 +409,7 @@
                 <div class="col-4">
                     <div class="footer-contact-image">
                         <a href="">
-                            <img src="assets/image/logo.png" alt="">
+                            <img src="{{ site_info.logo.url }}" alt="{{ site_info.site_name }}">
                         </a>
                     </div>
                 </div>
@@ -773,10 +539,7 @@
             <div class="row align-items-center gy-3">
                 <div class="col-lg-8">
                     <h5 class="mb-3">فروشگاه اینترنتی {{ site_info.site_name }} ، بررسی انتخاب و خرید آنلاین</h5>
-                    <p class="text-muted font-14">یک خرید اینترنتی مطمئن، نیازمند فروشگاهی است که بتواند کالاهایی متنوع،
-                        باکیفیت و دارای قیمت مناسب را در مدت زمانی کوتاه به دست مشتریان خود برساند و ضمانت بازگشت کالا
-                        هم داشته باشد؛ ویژگی‌هایی که فروشگاه اینترنتی دیجی‌کالا سال‌هاست بر روی آن‌ها کار کرده و توانسته
-                        از این طریق مشتریان ثابت خود را داشته باشد</p>
+                    <p class="text-muted font-14">{{ site_info.site_description }}</p>
                 </div>
                 <div class="col-lg-4">
                     <nav class="navbar navbar-expand justify-content-lg-end justify-content-center">
@@ -793,11 +556,10 @@
         <div class="footer-copyright mt-3">
             <div class="row gy-3">
                 <div class="col-lg-9">
-                    <p class="text-muted font-14"> استفاده از مطالب فروشگاه اینترنتی مهیارفقط برای مقاصد غیرتجاری و با
-                        ذکر منبع بلامانع است. کلیه حقوق این سایت متعلق به مهیار می‌باشد. </p>
+                    <p class="text-muted font-14">{{ site_info.copyright_text }}</p>
                 </div>
                 <div class="col-lg-3">
-                    <p class="text-muted font-14 text-end">{{ site_info.copyright_text }}</p>
+                    <p class="text-muted font-14 text-end">&copy; {% now "Y" %}</p>
                 </div>
             </div>
         </div>
@@ -929,7 +691,7 @@
             </div>
             <span class="mt-1 font-12 fw-bold mf-link-title">علاقه مندی ها</span>
         </a></li>
-        <li class="d-table-cell"><a href="" class="mf-link nav-link text-center">
+        <li class="d-table-cell"><a href="{% url 'home' %}" class="mf-link nav-link text-center">
             <span class="d-block mf-link-icon"><i class="bi bi-house font-20"></i></span>
             <span class="mt-1 font-12 fw-bold mf-link-title">صفحه اصلی</span>
         </a></li>
@@ -965,6 +727,5 @@
 <script src="{% static 'js/swiperInit.js' %}"></script>
 <script src="{% static 'js/megaMenu.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
-
 </body>
 </html>

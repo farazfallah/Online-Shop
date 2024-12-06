@@ -139,14 +139,10 @@
                                     <div class="auth-form-title header-logo d-flex align-items-center justify-content-between title-panel mb-4 slider-title-desc-center">
                                         <h2 class="text-center h4 text-muted title-font">ورود</h2>
                                         <a href="">
-                                            <img src="assets/image/logo.png" class="auth-logo" alt="">
+                                            <img src="{{ site_info.logo.url }}" class="auth-logo" alt="{{ site_info.site_name }}">
                                         </a>
                                     </div>
-    
-                                    <!-- پیام خطا -->
                                     <div id="login-error" class="alert alert-danger text-center" style="display: none;"></div>
-    
-                                    <!-- فرم ورود با ایمیل و رمز عبور -->
                                     <form action="{% url 'login_with_password' %}" method="POST" id="form-email-login" class="py-3">
                                         {% csrf_token %}
                                         <div class="comment-item mb-4">

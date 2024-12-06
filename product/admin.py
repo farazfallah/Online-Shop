@@ -5,10 +5,25 @@ class ProductAttributeInline(admin.TabularInline):
     model = ProductAttribute
     extra = 1
 
+from django.contrib import admin
+from django.utils.html import format_html
+
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'parent_category')
+    list_display = ('name', 'description', 'icon', 'image', 'parent_category')
     search_fields = ('name',)
     list_filter = ('parent_category',)
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'description', 'icon', 'image', 'parent_category'),
+            'description': (
+                "For the 'icon' field, enter the class name of a Bootstrap Icon. "
+                "For example: <code>bi bi-tablet</code>. "
+                "You can browse the full list of icons at "
+                "<a href='https://icons.getbootstrap.com/' target='_blank'>Bootstrap Icons</a>."
+            ),
+        }),
+    )
+
 
 class AttributeAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
