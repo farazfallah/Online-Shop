@@ -6,3 +6,6 @@ This branch serves as the primary development branch for the project. All new fe
 - Contains ongoing development work.
 - Should be merged into the `main` branch after thorough testing and review.
 - Developers should create feature branches and merge their work into `develop`.
+
+## Last Update
+- `First phase`
