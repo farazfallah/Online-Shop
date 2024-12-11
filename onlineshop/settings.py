@@ -37,11 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'rest_framework'
+    'core',
     'orders',
     'customers',
     'product',
-    'core',
 ]
 
 MIDDLEWARE = [
@@ -68,7 +67,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.site_info',
-                'product.context_processors.category',
+                # 'product.context_processors.category',
             ],
         },
     },
@@ -125,7 +124,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'farazfallah0@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_email_password'
+EMAIL_HOST_PASSWORD = 'uvop ujka jmhm uchk'
 
 
 # Internationalization

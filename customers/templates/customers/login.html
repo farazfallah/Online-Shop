@@ -28,7 +28,7 @@
     </div>
     {% endif %}
 
-    {% comment %} <section class="content vh-100">
+<section class="content vh-100">
         <div class="container-fluid h-100">
             <div class="auth h-100 d-flex align-items-center">
                 <div class="container-fluid">
@@ -85,7 +85,7 @@
     
                                         <!-- OTP Login -->
                                         <div class="tab-pane fade" id="otp-login" role="tabpanel" aria-labelledby="otp-tab">
-                                            <form method="POST" id="form-otp-login" class="py-3">
+                                            <form method="POST" id="form-otp-login" action="{% url 'login_with_otp' %}">
                                                 {% csrf_token %}
                                                 <div class="comment-item mb-4">
                                                     <input 
@@ -96,78 +96,41 @@
                                                         required>
                                                     <label for="otp-email" class="form-label label-float">ایمیل خود را وارد کنید</label>
                                                 </div>
-                                                <div class="comment-item mb-4">
-                                                    <input 
-                                                        type="text" 
-                                                        name="otp" 
-                                                        class="form-control" 
-                                                        id="otp" 
-                                                        placeholder="کد ارسال شده به ایمیل" 
-                                                        required>
-                                                    <label for="otp" class="form-label label-float">کد تایید</label>
+                                                <!-- Error message box -->
+                                                <div id="otp-error-box" class="alert alert-danger text-center" style="display: none;"></div>
+
+                                                <!-- New button to send OTP -->
+                                                <div class="text-center mb-3">
+                                                    <button 
+                                                        type="button" 
+                                                        id="send-otp-button" 
+                                                        class="btn main-color-one-bg w-100 py-3 position-relative">
+                                                        ارسال کد تایید
+                                                        <span id="otp-spinner" class="spinner-border spinner-border-sm text-light position-absolute d-none" 
+                                                            style="right: 15px; top: 50%; transform: translateY(-50%);"></span>
+                                                    </button>
                                                 </div>
-                                                <div class="text-center">
-                                                    <button type="submit" class="btn main-color-one-bg w-100 py-3">ورود</button>
+
+                                                <!-- OTP Section -->
+                                                <div id="otp-section" style="display: none;">
+                                                    <div class="alert text-center alert-success">
+                                                        یک کد برای شما پیامک شد لطفا آن را وارد کنید
+                                                    </div>
+                                                    <div id="otp-input" class="d-flex justify-content-center">
+                                                        {% for _ in "123456" %}
+                                                        <label>
+                                                            <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*" maxlength="1"/>
+                                                        </label>
+                                                        {% endfor %}
+                                                    </div>
+                                                    <input id="otp-value" placeholder="_" type="hidden" name="otp"/>
+                                                    <div class="text-center mt-3">
+                                                        <button type="submit" class="btn main-color-one-bg w-100 py-3">ورود</button>
+                                                    </div>
                                                 </div>
                                             </form>
-                                            <div class="text-center mt-3">
-                                                <form method="POST">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="email" value="{{ email }}">
-                                                    <button type="submit" class="btn btn-link text-decoration-none">ارسال مجدد کد</button>
-                                                </form>
-                                            </div>
                                         </div>
-    
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> {% endcomment %}
-    <section class="content vh-100">
-        <div class="container-fluid h-100">
-            <div class="auth h-100 d-flex align-items-center">
-                <div class="container-fluid">
-                    <div class="auth-items">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-4">
-                                <div class="auth-form shadow-xl rounded-3 mt-5 bg-white">
-                                    <div class="auth-form-title header-logo d-flex align-items-center justify-content-between title-panel mb-4 slider-title-desc-center">
-                                        <h2 class="text-center h4 text-muted title-font">ورود</h2>
-                                        <a href="">
-                                            <img src="{{ site_info.logo.url }}" class="auth-logo" alt="{{ site_info.site_name }}">
-                                        </a>
-                                    </div>
-                                    <div id="login-error" class="alert alert-danger text-center" style="display: none;"></div>
-                                    <form action="{% url 'login_with_password' %}" method="POST" id="form-email-login" class="py-3">
-                                        {% csrf_token %}
-                                        <div class="comment-item mb-4">
-                                            <input 
-                                                type="email" 
-                                                name="email" 
-                                                class="form-control" 
-                                                id="email" 
-                                                required>
-                                            <label for="email" class="form-label label-float">ایمیل خود را وارد کنید</label>
-                                        </div>
-                                        <div class="comment-item mb-4">
-                                            <input 
-                                                type="password" 
-                                                name="password" 
-                                                class="form-control" 
-                                                id="password" 
-                                                required>
-                                            <label for="password" class="form-label label-float">رمز عبور خود را وارد کنید</label>
-                                        </div>
-                                        <button type="submit" class="btn main-color-one-bg w-100 py-3">
-                                            ورود
-                                        </button>
-                                        <div id="login-error" class="alert alert-danger text-center mt-3" style="display: none;"></div>                                        
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -216,6 +179,59 @@
             button.innerHTML = 'ورود';
         }
     });
+
+    document.getElementById('send-otp-button').addEventListener('click', async function () {
+        const email = document.getElementById('otp-email').value;
+        const errorBox = document.getElementById('otp-error-box');
+        const spinner = document.getElementById('otp-spinner');
+        const otpSection = document.getElementById('otp-section');
+    
+        // Reset error box
+        errorBox.style.display = 'none';
+        errorBox.innerText = '';
+    
+        // Show spinner
+        spinner.classList.remove('d-none');
+    
+        try {
+            const response = await fetch('{% url "login_with_otp" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ email }),
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                // Hide spinner
+                spinner.classList.add('d-none');
+    
+                // Show OTP section
+                otpSection.style.display = 'block';
+    
+                // Show success message
+                alert('کد تایید به ایمیل ارسال شد.');
+            } else {
+                // Hide spinner
+                spinner.classList.add('d-none');
+    
+                // Show error message
+                errorBox.style.display = 'block';
+                errorBox.innerText = result.error || 'مشکلی در ارسال کد تایید رخ داده است.';
+            }
+        } catch (error) {
+            // Hide spinner
+            spinner.classList.add('d-none');
+    
+            // Show error message
+            errorBox.style.display = 'block';
+            errorBox.innerText = 'مشکلی در ارتباط با سرور رخ داده است.';
+        }
+    });
+    
 </script>
 
 <script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>

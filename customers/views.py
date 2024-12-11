@@ -2,16 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.utils.timezone import now
 from django.urls import reverse_lazy
+from django.utils.crypto import get_random_string
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.core.mail import send_mail
+from django.conf import settings
+from datetime import datetime, timedelta
 from .models import Customer
-from .utils import send_otp_email
-import random
-from datetime import timedelta
-
 
 class LoginWithPasswordView(APIView):
     permission_classes = [AllowAny]
@@ -34,6 +33,62 @@ class LoginWithPasswordView(APIView):
                 return Response({"token": token, "redirect_url": "/"}, status=200)
         else:
             return Response({"error": "ایمیل یا رمز عبور اشتباه است."}, status=401)
+
+
+class LoginWithOTPView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get("email")
+        otp = request.data.get("otp")
+
+        try:
+            customer = Customer.objects.get(email=email)
+        except Customer.DoesNotExist:
+            return Response({"error": "کاربری با این ایمیل یافت نشد."}, status=404)
+
+        # اگر OTP ارسال نشده باشد (درخواست برای ارسال OTP)
+        if not otp:
+            if not customer.is_active:
+                return Response({"error": "حساب کاربری غیرفعال است."}, status=403)
+
+            if customer.otp_is_active:
+                return Response({"error": "قبلاً کد تایید ارسال شده است. چند دقیقه صبر کنید."}, status=400)
+
+            # تولید OTP
+            generated_otp = get_random_string(length=4, allowed_chars="0123456789")
+            customer.otp = generated_otp
+            customer.otp_expiry = datetime.now() + timedelta(minutes=5)
+            customer.otp_is_active = True
+            customer.save()
+
+            # ارسال ایمیل
+            send_mail(
+                "کد تایید ورود",
+                f"کد تایید شما: {generated_otp}",
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+            )
+
+            return Response({"message": "کد تایید به ایمیل ارسال شد."}, status=200)
+
+        # اعتبارسنجی OTP
+        if customer.otp != otp or datetime.now() > customer.otp_expiry:
+            return Response({"error": "کد تایید نامعتبر یا منقضی است."}, status=400)
+
+        # ورود موفقیت‌آمیز
+        customer.otp = None
+        customer.otp_expiry = None
+        customer.otp_is_active = False
+        customer.save()
+
+        # تولید JWT
+        refresh = RefreshToken.for_user(customer)
+        return Response(
+            {"token": str(refresh.access_token), "message": "ورود موفقیت‌آمیز."},
+            status=200,
+        )
+
 
 
 def logout_view(request):

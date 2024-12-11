@@ -1,6 +1,6 @@
 from django.db import models
 from core.models import BaseModel
-
+from customers.models import Customer 
 
 class Category(BaseModel):
     name = models.CharField(max_length=100)
@@ -40,7 +40,7 @@ class ProductComment(BaseModel):
     ]
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
-    customer = models.ForeignKey('customers.Customer', on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     comment = models.TextField()
     rating = models.PositiveIntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

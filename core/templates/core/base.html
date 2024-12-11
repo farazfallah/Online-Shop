@@ -108,16 +108,20 @@
                 </div>
                 <div class="col-lg-5 col-xl-5 order-lg-3 order-3 d-lg-block d-none">
                     <div class="search-form">
-                        <form action="">
+                        <form action="" method="get">
                             <div class="search-filed">
                                 <label class="d-block">
-                                    <input class="form-control search-input" placeholder="جستجوی محصولات ..."
-                                           type="text">
+                                    <input class="form-control search-input" 
+                                           name="q" 
+                                           placeholder="جستجوی محصولات ..." 
+                                           type="text" 
+                                           value="{{ request.GET.q|default:'' }}">
                                 </label>
-                                <button class="btn search-btn main-color-two-bg rounded-circle" type="submit"><i
-                                        class="bi bi-search"></i></button>
+                                <button class="btn search-btn main-color-two-bg rounded-circle" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
                             </div>
-                        </form>
+                        </form>                        
                     </div>
                 </div>
                 <div class="col-lg-5 col-xl-5 col-6 order-lg-4 order-2">
