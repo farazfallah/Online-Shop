@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="{% static 'plugin/rasta-contact/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
-
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css' %}">
+    <link href="{% static 'plugin/tagify/tagify.css' %}" rel="stylesheet">
 </head>
 <body>
 
@@ -64,7 +65,7 @@
                                                     {% for category in category_list %}
                                                         {% if not category.parent_category %}
                                                             <li class="nav-item bg-ul-f7">
-                                                                <a class="nav-link" href="">{% autoescape off %}{{ category.name }}{% endautoescape %}</a>
+                                                                <a class="nav-link" href="{% url 'category-detail' name=category.name %}">{% autoescape off %}{{ category.name }}{% endautoescape %}</a>
                                                                 {% if category.subcategories.exists %}
                                                                     <span class="showSubMenu">
                                                                         <i class="bi bi-chevron-left"></i>
@@ -230,7 +231,7 @@
                                 <ul class="main-menu mega-container">
                                     {% for category in category_list %}
                                         {% if not category.parent_category %}
-                                            <li class=""><a href=""><i class="{{ category.icon }}"></i>
+                                            <li class=""><a href="{% url 'category-detail' name=category.name %}"><i class="{{ category.icon }}"></i>
                                                 {% autoescape off %}{{ category.name }}{% endautoescape %}</a>
                                                 <ul class="main-menu-sub back-menu"
                                                 {% if category.image %}
@@ -731,5 +732,8 @@
 <script src="{% static 'js/swiperInit.js' %}"></script>
 <script src="{% static 'js/megaMenu.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'plugin/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js' %}"></script>
+<script src="{% static 'plugin/tagify/jQuery.tagify.min.js' %}"></script>
+<script src="{% static 'plugin/chartjs/chart.js' %}"></script>
 </body>
 </html>

@@ -18,15 +18,6 @@
 </head>
 
 <body class="bg-auth">
-    {% if messages %}
-    <div class="messages mt-4">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} text-center" role="alert">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
 <section class="content vh-100">
         <div class="container-fluid h-100">
@@ -57,6 +48,7 @@
     
                                         <!-- Email and Password Login -->
                                         <div class="tab-pane fade show active" id="email-login" role="tabpanel" aria-labelledby="email-tab">
+                                            <div id="login-error" class="alert alert-danger text-center" style="display: none;"></div>
                                             <form action="{% url 'login_with_password' %}" method="POST" id="form-email-login" class="py-3">
                                                 {% csrf_token %}
                                                 <div class="comment-item mb-4">
@@ -77,6 +69,7 @@
                                                         required>
                                                     <label for="password" class="form-label label-float">رمز عبور خود را وارد کنید</label>
                                                 </div>
+
                                                 <div class="text-center">
                                                     <button type="submit" class="btn main-color-one-bg w-100 py-3">ورود</button>
                                                 </div>
@@ -147,7 +140,6 @@
         const button = form.querySelector('button[type="submit"]');
         const errorDiv = document.getElementById('login-error');
     
-        // نمایش اسپینر
         button.disabled = true;
         button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
     
@@ -186,11 +178,9 @@
         const spinner = document.getElementById('otp-spinner');
         const otpSection = document.getElementById('otp-section');
     
-        // Reset error box
         errorBox.style.display = 'none';
         errorBox.innerText = '';
     
-        // Show spinner
         spinner.classList.remove('d-none');
     
         try {
@@ -206,32 +196,24 @@
             const result = await response.json();
     
             if (response.ok) {
-                // Hide spinner
                 spinner.classList.add('d-none');
     
-                // Show OTP section
                 otpSection.style.display = 'block';
     
-                // Show success message
                 alert('کد تایید به ایمیل ارسال شد.');
             } else {
-                // Hide spinner
                 spinner.classList.add('d-none');
     
-                // Show error message
                 errorBox.style.display = 'block';
                 errorBox.innerText = result.error || 'مشکلی در ارسال کد تایید رخ داده است.';
             }
         } catch (error) {
-            // Hide spinner
             spinner.classList.add('d-none');
     
-            // Show error message
             errorBox.style.display = 'block';
             errorBox.innerText = 'مشکلی در ارتباط با سرور رخ داده است.';
         }
     });
-    
 </script>
 
 <script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>

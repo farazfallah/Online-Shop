@@ -63,12 +63,15 @@ class LoginWithOTPView(APIView):
             customer.save()
 
             # ارسال ایمیل
-            send_mail(
-                "کد تایید ورود",
-                f"کد تایید شما: {generated_otp}",
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-            )
+            try:
+                send_mail(
+                    "کد تایید ورود",
+                    f"کد تایید شما: {generated_otp}",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                )
+            except Exception as e:
+                return Response({"error": f"مشکلی در ارسال ایمیل رخ داد: {str(e)}"}, status=500)
 
             return Response({"message": "کد تایید به ایمیل ارسال شد."}, status=200)
 

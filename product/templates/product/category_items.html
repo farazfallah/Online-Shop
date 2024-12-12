@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% block title %}محصولات دسته بندی{% endblock %}
+{% block title %}دسته بندی {{ category.name }}{% endblock %}
 {% load static %}
 {% block content %}
 <!--============ start category slider  ==============-->
@@ -8,143 +8,30 @@
     <div class="container-fluid position-relative">
         <div class="section-title mb-5">
             <div class="section-title-title">
-                <h2 class="fw-900 h4">زیر دسته بندی<span class="with-highlight ms-1">محصولات</span>
+                <h2 class="fw-900 h4">دسته بندی<span class="with-highlight ms-1">{{ category.name }}</span>
                 </h2>
                 <div class="Dottedsquare"></div>
             </div>
         </div>
+        {% if subcategories %}
         <div class="swiper cat-slider">
             <div class="swiper-wrapper">
+                {% for subcategory in subcategories %}
                 <div class="swiper-slide">
                     <a href="">
                         <div class="cat-item d-flex align-items-center">
                             <div class="cat-item-image">
-                                <img src="assets/image/category/varzeshi.png" alt="">
+                                <img src="{{ category.image.url }}" alt="{{ subcategory.name }}">
                             </div>
                             <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای ورزشی</h5>
-                                <p class="text-muted">Sport</p>
+                                <h5>{{ subcategory.name }}</h5>
+                                <p class="text-muted">{{ subcategory.description }}</p>
                             </div>
                         </div>
                     </a>
                 </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/kalaye-degital.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای دیجیتال</h5>
-                                <p class="text-muted">Digitally</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/poshak.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای ورزشی</h5>
-                                <p class="text-muted">Clothing</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/boomi.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای بومی و محلی</h5>
-                                <p class="text-muted">Native</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/autr.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع اکسسوری</h5>
-                                <p class="text-muted">Accessory</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/ashpazkhane.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای آشپر خانه</h5>
-                                <p class="text-muted">Kitchen</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/abzar-khodro.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای ابزار خودرو</h5>
-                                <p class="text-muted">Car Tools</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/milk.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای سوپر مارکتی</h5>
-                                <p class="text-muted">Supermarket</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/children.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع اسباب بازی</h5>
-                                <p class="text-muted">Children</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="swiper-slide">
-                    <a href="">
-                        <div class="cat-item d-flex align-items-center">
-                            <div class="cat-item-image">
-                                <img src="assets/image/category/mobile.png" alt="">
-                            </div>
-                            <div class="cat-item-desc ms-3">
-                                <h5>انواع کالای موبایل</h5>
-                                <p class="text-muted">Mobile</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+                {% endfor %}
+        {% endif %} 
             </div>
         </div>
     </div>
@@ -606,7 +493,9 @@
                                         <li class="list-inline-item"><a href="#">محبوب ترین</a></li>
                                     </ul>
                                 </div>
-                                <div class="box_filter_counter fs-6"><i class="bi bi-card-list me-2"></i> 123 کالا</div>
+                                {% if product_count != 0 %}
+                                <div class="box_filter_counter fs-6"><i class="bi bi-card-list me-2"></i> {{product_count}} کالا</div>
+                                {% endif %}
                             </div>
                             <div class="d-lg-none d-block">
                                 <form action="">
@@ -626,32 +515,18 @@
                 <div class="category-pro">
                     <div class="row g-3">
                         <div class="col-lg-4 col-md-6">
+                            {% if products %}
+                            {% for product in products %}
                             <div class="product-box border-ui">
-                                <div class="product-timer position-relative">
-                                    <div class="product-header-btn flex-column position-absolute top-0">
-                                        <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip"
-                                           data-bs-placement="right" data-bs-title="مقایسه"><i
-                                                class="bi bi-shuffle"></i></a>
-                                        <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip"
-                                           data-bs-placement="right" data-bs-title="افزودن به علاقه مندی ها"><i
-                                                class="bi bi-heart"></i></a>
-                                        <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip"
-                                           data-bs-placement="right" data-bs-title="افزودن به سبد خرید"><i
-                                                class="bi bi-bag-plus"></i></a>
-                                    </div>
-                                </div>
                                 <a href="">
                                     <div class="product-image">
-                                        <img src="assets/image/product/product-image3.jpg" loading="lazy" alt=""
-                                             class="img-fluid one-image">
-                                        <img src="assets/image/product/product-image1.jpg" loading="lazy" alt=""
-                                             class="img-fluid two-image">
+                                        <img src="{{ product.image.url }}" loading="lazy" alt="{{ product.name }}"
+                                        class="img-fluid">
                                     </div>
                                     <div class="product-title mb-3">
                                         <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                            <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
+                                            <span class="text-muted text-overflow-1">{{ product.description }}</span>
+                                            <p class="text-overflow-1 mt-2">{{ product.name }}</p>
                                         </div>
                                         <div class="rating">
                                             <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
@@ -659,19 +534,35 @@
                                         </div>
                                     </div>
                                     <div class="product-action">
+                                        {% if product.discount != 0 %}
                                         <div class="discount">
                                             <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                                <span class="text-white">25%</span>
+                                                <span class="text-white">{{ product.discount }}%</span>
                                             </div>
                                         </div>
                                         <div class="price">
-                                            <p class="new-price">3,175,000 تومان</p>
-                                            <p class="old-price">6,500,000 تومان</p>
+                                            <p class="new-price">{{ product.final_price }} تومان</p>
+
+                                            <p class="old-price">{{ product.price }} تومان</p>
                                         </div>
+                                        {% else %}
+                                        <div class="price">
+                                            <p class="new-price">3,175,000 تومان</p>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </a>
-
                             </div>
+                            {% endfor %}
+                            {% else %}
+                            <div class="col-lg-9">
+                                <div class="content-box">
+                                    <h3 class="title-font">نتیجه‌ای یافت نشد !</h3>
+                                    <p class="my-3">- از عبارت‌های متداول‌تر استفاده کنید.</p>
+                                    <p>- املای عبارت وارد شده را بررسی کنید.</p>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                         <div class="col-12">
                             <div class="my-paginate my-4">
@@ -698,60 +589,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12">
-                <div class="content-box">
-                    <div class="container-fluid">
-                        <div class="product-desc-content">
-                            <input class="read-more-state" id="readMore3" type="checkbox">
-                            <!-- والد بیشتر ، کمتر ، تمام متن توضیحات باید داخل این تگ قرار بگیرند -->
-                            <div class="read-more-wrap">
-                                <h6 class="font-22 mb-2 title-font title-line-bottom">دسته بندی پوشاک</h6>
-
-                                <p>
-                                    اگر به دنبال تهیه یک هدفون بی‌سیم گیمینگ هستید، هدفون
-                                    بلوتوثی مدل K55
-                                    به‌عنوان
-                                    یکی از جدیدترین گزینه‌های موجود در بازار ارزش بررسی را
-                                    دارد. این مدل با
-                                    ابعادی
-                                    کوچک تولید شده است. ابعاد و وزن کم آن، جابه‌جایی این
-                                    وسیله و استفاده
-                                    طولانی‌مدت
-                                    از آن را آسان می‌کند و باعث خستگی گوش‌ها نخواهد شد. این
-                                    مدل برای اتصال
-                                    به
-                                    دستگاه‌ به بلوتوث نسخه 5.0 مجهز شده است و در مدت زمان
-                                    اندکی، اتصال با
-                                    گوشی
-                                    موبایل اندروید یا ios شما برقرار خواهد شد. هدفون بی سیم
-                                    K55 دارای یک
-                                    میکروفون با
-                                    کیفیت است و ...
-                                </p>
-
-                                <!-- متن بیشتر -->
-                                <div class="read-more-target">
-                                    <p>
-                                        و این ویژگی، آن را برای مکالمه مناسب می‌سازد. از ویژگی‌های
-                                        اصلی این محصول محفظه نگهدارنده یا همان کیس آن است. این کیس
-                                        قابلیت شارژ هدفون را دارد. برای شارژ آن کافی است از درگاه
-                                        USB-C تعبیه شده بر روی کیس و کابل شارژ درون بسته‌بندی
-                                        استفاده کنید. گفتنی است باتری 400 میلی‌آمپر ساعتی این هدفون
-                                        در حدود 4-6 ساعت مکالمه و 4-6 ساعت پخش موسیقی را پاسخ‌گو
-                                        خواهد بود.
-                                    </p>
-                                </div>
-                                <!-- پایان متن بیشتر -->
-                            </div>
-                            <!-- پایان والد بیشتر کمتر -->
-                            <label class="read-more-trigger" for="readMore3"></label>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </section>
 
 <!--============ end main content ==============-->
+
 {% endblock %}

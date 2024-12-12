@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'core',
     'orders',
     'customers',
@@ -67,7 +68,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.site_info',
-                # 'product.context_processors.category',
+                'product.context_processors.category',
             ],
         },
     },
@@ -137,6 +138,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+USE_L10N = True
+
+USE_THOUSAND_SEPARATOR = True
 
 # OTP configuration
 
