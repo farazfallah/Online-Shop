@@ -1,25 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import TemplateView
-from django.urls import reverse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 from product.models import Product, Category, ProductAttribute
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework import status
-# from rest_framework.generics import ListAPIView
+from product.serializers import ProductSerializer
 from decimal import Decimal, ROUND_HALF_UP
 
 class HomeView(TemplateView):
     template_name = 'product/index.html'
    
-    
 def category_detail_view(request, name):
     category = get_object_or_404(Category, name=name)
     products = category.products.filter(is_active=True)
-    subcategories = category.subcategories.all()
+    subcategories = category.subcategories.filter(is_active=True)
     product_count = products.count()
     
     for product in products:
-        product.final_price = Decimal(product.price) * (1 - Decimal(product.discount)/100)
+        product.final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
 
     context = {
         'category': category,
@@ -31,8 +29,8 @@ def category_detail_view(request, name):
 
 
 def product_detail_view(request, name):
-    product = get_object_or_404(Product, name=name)
-    product.final_price = Decimal(product.price) * (1 - Decimal(product.discount)/100)
+    product = get_object_or_404(Product, name=name, is_active=True)
+    product.final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
     
     breadcrumb_items = ['خانه']
     current_category = product.category
@@ -43,12 +41,28 @@ def product_detail_view(request, name):
 
     breadcrumb_items.append(product.name)
 
-    product_attributes = ProductAttribute.objects.filter(product=product)
-    
+    product_attributes = ProductAttribute.objects.filter(product=product, is_active=True)  # فقط ویژگی‌های فعال
+    similar_products = Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id)[:10]  # فقط محصولات مشابه فعال
+    for similar_product in similar_products:
+        similar_product.final_price = Decimal(similar_product.price) * (1 - Decimal(similar_product.discount) / 100)
+        
     context = {
         'product': product,
         'breadcrumbs': breadcrumb_items,
         'product_attributes': product_attributes,
+        'similar_products': similar_products,
     }
     
     return render(request, 'product/product.html', context)
+
+
+# API ViewSets
+class ProductDetailAPIView(APIView):
+    def get(self, request, name):
+        try:
+            product = Product.objects.get(name=name)
+        except Product.DoesNotExist:
+            raise NotFound("Product not found")
+
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)

@@ -4,24 +4,25 @@ from .models import Customer, Address
 
 
 class CustomerAdmin(UserAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'phone', 'role', 'is_staff', 'is_active')
-    list_filter = ('role', 'is_staff', 'is_active')
+    list_display = ('first_name', 'last_name', 'email', 'phone', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active', 'groups')
     search_fields = ('email', 'first_name', 'last_name', 'phone')
     ordering = ('email',)
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('first_name', 'last_name', 'phone', 'image')}),
-        ('Role & Permissions', {'fields': ('role', 'is_staff', 'is_active')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'first_name', 'last_name', 'phone', 'password1', 'password2', 'role', 'is_staff', 'is_active'),
+            'fields': ('email', 'first_name', 'last_name', 'phone', 'password1', 'password2', 'is_staff', 'is_active', 'groups'),
         }),
     )
+
 
 
 class AddressAdmin(admin.ModelAdmin):

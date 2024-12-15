@@ -514,18 +514,17 @@
                 </div>
                 <div class="category-pro">
                     <div class="row g-3">
+                        {% if products %}
+                        {% for product in products %}
                         <div class="col-lg-4 col-md-6">
-                            {% if products %}
-                            {% for product in products %}
                             <div class="product-box border-ui">
-                                <a href="">
+                                <a href="{% url 'product-detail' name=product.name %}">
                                     <div class="product-image">
                                         <img src="{{ product.image.url }}" loading="lazy" alt="{{ product.name }}"
                                         class="img-fluid">
                                     </div>
                                     <div class="product-title mb-3">
                                         <div class="title">
-                                            <span class="text-muted text-overflow-1">{{ product.description }}</span>
                                             <p class="text-overflow-1 mt-2">{{ product.name }}</p>
                                         </div>
                                         <div class="rating">
@@ -553,17 +552,17 @@
                                     </div>
                                 </a>
                             </div>
-                            {% endfor %}
-                            {% else %}
-                            <div class="col-lg-9">
-                                <div class="content-box">
-                                    <h3 class="title-font">نتیجه‌ای یافت نشد !</h3>
-                                    <p class="my-3">- از عبارت‌های متداول‌تر استفاده کنید.</p>
-                                    <p>- املای عبارت وارد شده را بررسی کنید.</p>
-                                </div>
-                            </div>
-                            {% endif %}
                         </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-lg-9">
+                            <div class="content-box">
+                                <h3 class="title-font">نتیجه‌ای یافت نشد !</h3>
+                                <p class="my-3">- از عبارت‌های متداول‌تر استفاده کنید.</p>
+                                <p>- املای عبارت وارد شده را بررسی کنید.</p>
+                            </div>
+                        </div>
+                        {% endif %}
                         <div class="col-12">
                             <div class="my-paginate my-4">
                                 <nav aria-label="Page navigation example">

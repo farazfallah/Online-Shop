@@ -8,19 +8,11 @@ from core.managers import CustomUserManager
 
 
 class Customer(AbstractBaseUser, PermissionsMixin):
-    ROLE_CHOICES = [
-        ('operator', 'Operator'),
-        ('product_manager', 'Product Manager'),
-        ('supervisor', 'Supervisor'),
-    ]
-
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True, validators=[validate_email])
     phone = models.CharField(max_length=15, blank=True, null=True, unique=True)
     image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.png')
-
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -31,7 +23,8 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.get_role_display()})"
+        return f"{self.first_name} {self.last_name}"
+
 
 
 class Address(BaseModel):

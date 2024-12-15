@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% block title %}محصول{% endblock %}
+{% block title %}محصول {{ product.name }}{% endblock %}
 {% load static %}
 
 {% block content %}
@@ -30,11 +30,9 @@
             <div class="row gy-3">
                 <div class="col-lg-4">
                     <div class="pro_gallery">
-                        <!-- گالری اصلی -->
                         <div style="--swiper-navigation-color: #fff; --swiper-pagination-color: #fff"
                              class="swiper product-gallery">
                             <div class="swiper-wrapper" title="برای بزرگنمایی تصویر دابل کلیک کنید">
-                                <!-- تصویر اصلی محصول -->
                                 {% if product.image %}
                                 <div class="swiper-slide">
                                     <div class="swiper-zoom-container">
@@ -42,8 +40,7 @@
                                     </div>
                                 </div>
                                 {% endif %}
-                    
-                                <!-- تصاویر اضافی محصول -->
+
                                 {% for image in product.images.all %}
                                 <div class="swiper-slide">
                                     <div class="swiper-zoom-container">
@@ -56,18 +53,15 @@
                             <div class="swiper-button-prev d-none d-lg-flex"></div>
                             <div class="swiper-pagination d-none d-lg-block"></div>
                         </div>
-                    
-                        <!-- گالری کوچک (Thumbnail) -->
+
                         <div class="swiper product-gallery-thumb">
                             <div class="swiper-wrapper">
-                                <!-- تصویر اصلی محصول در گالری کوچک -->
                                 {% if product.image %}
                                 <div class="swiper-slide">
                                     <img class="img-fluid" src="{{ product.image.url }}" alt="{{ product.name }}" />
                                 </div>
                                 {% endif %}
-                    
-                                <!-- تصاویر اضافی محصول در گالری کوچک -->
+
                                 {% for image in product.images.all %}
                                 <div class="swiper-slide">
                                     <img class="img-fluid" src="{{ image.image.url }}" alt="{{ product.name }}" />
@@ -85,8 +79,6 @@
                         <div class="title mt-md-0 mt-3">
                             <h6 class="font-16 mb-2">{{ product.name }}
                             </h6>
-                            <p class="font-12 text-muted font-en">{{ product.description }}
-                            </p>
                             <div class="d-flex align-items-center pb-2">
                                 <div class="star">
                                     <i class="bi bi-star-fill"></i>
@@ -110,16 +102,29 @@
                             </div>
                         </div>
                         <div class="product-feature py-2">
+                            {% if product_attributes %}
                             <div class="product-meta-feature-items">
                                 <h5 class="title font-16 mb-2 icon-circle">ویژگی های کالا</h5>
                                 <ul class="navbar-nav">
-                                    <li class="nav item"><span>نوع اتصال:</span><strong>با سیم</strong></li>
-                                    <li class="nav item"><span>رابط ها:</span><strong>3.5 میلیمتری</strong></li>
-                                    <li class="nav item"><span>مقدار رم :</span><strong>8 گیگابایت</strong></li>
-                                    <li class="nav item"><span>نوع گوشی:</span><strong>دوگوشی</strong></li>
+                                {% for attr in product_attributes %}
+                                {% if forloop.counter <= 3 %}
+                                        <li class="nav item"><span> {{ attr.attribute }}:</span><strong>{{ attr.value }}</strong></li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if product_attributes|length > 3 %}
+                                    <li class="nav item"><a href="#product-details" class="view-more">مشاهده بیشتر...</a></li>
+                                {% endif %}                                   
                                 </ul>
                             </div>
+                            {% endif %}
+
                             <div class="product-meta-color mt-4">
+                                <h5 class="title font-16 mb-2 icon-circle">توضیحات کالا</h5>
+                                <p class="text-muted" id="product-description">{{ product.description }}</p>
+                                <a id="show-more-link" href="#product-details" style="display:none;">مشاهده بیشتر...</a>
+                            </div>
+                            {% comment %} <div class="product-meta-color mt-4">
                                 <h5 class="font-16 icon-circle">
                                     انتخاب رنگ کالا
                                 </h5>
@@ -183,8 +188,8 @@
                                     </label>
 
                                 </div>
-                            </div>
-                            <div class="product-alert">
+                            </div> {% endcomment %}
+                            {% comment %} <div class="product-alert">
                                 <i class="bi bi-info-circle-fill me-1"></i>
                                 <span class="text-justify">امکان برگشت کالا با دلیل "انصراف از خرید" تنها در صورتی مورد قبول است که پلمب کالا باز نشده باشد.</span>
                             </div>
@@ -193,37 +198,16 @@
                                 <span class="text-justify">
                                     از سه روش زیر می‌توان با سامانه همتا ارتباط برقرار نموده و فرآیند فعال سازی دستگاه موبایل را انجام داد: 1. کد دستوری #۷۷۷۷* 2. اپلیکشین همتا 3. سایت اینترنتی به آدرس www.hamta.ntsw.ir
                                 </span>
-                            </div>
+                            </div> {% endcomment %}
+                            
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
+                    {% if product.stock_quantity > 0 %}
                     <div class="se-cart border-ui">
                         <div class="se-cart-item pb-0">
-                            <h4 class="font-18 fw-800 mb-4 icon-circle">فروشنده</h4>
-                            <div class="d-flex">
-                                <div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-                                         fill="currentColor" class="bi bi-shop" viewBox="0 0 16 16">
-                                        <path
-                                                d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.371 2.371 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976l2.61-3.045zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0zM1.5 8.5A.5.5 0 0 1 2 9v6h1v-5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v5h6V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5zM4 15h3v-5H4v5zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3zm3 0h-2v3h2v-3z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <div class="text-start ms-3">
-                                    <h6 class="fw-bold text-muted-2 font-16">رستا گالری</h6>
-                                    <div class="d-flex align-items-center mt-2">
-                                        <p class="font-12">
-                                            <span class="text-success ms-1">89.6%</span>
-                                            <span class="text-muted">رضایت از کالا</span>
-                                        </p>
-                                        <p class="ps-1 ms-1 border-start font-12">
-                                            <span class="text-muted">عملکرد</span>
-                                            <span class="text-success">عالی</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            <h4 class="font-18 fw-800 mb-4 icon-circle">خرید</h4>
                         </div>
                         <div class="se-cart-item">
                             <i class="bi bi-shield-check me-1 font-20"></i>
@@ -235,7 +219,7 @@
                                     <i class="bi bi-house font-20"></i>
                                 </div>
                                 <div class="text-start ms-3">
-                                    <h6 class="fw-normal font-16">موجود در انبار فروشنده</h6>
+                                    <h6 class="d-inline font-16 fw-normal">موجودی در انبار فروشنده: {{ product.stock_quantity }} عدد</h6>
                                 </div>
                             </div>
                         </div>
@@ -248,11 +232,17 @@
                             </div>
                             <div class="price d-flex flex-column justify-content-end">
                                 <div class="d-flex align-items-center">
-                                    <span class="fw-bold fs-3 def-color">299,000</span>
-                                    <span class="badge main-color-one-bg rounded-pill ms-2">25%</span>
+                                    {% if product.discount != 0 %}
+                                    <span class="fw-bold fs-3 def-color">{{ product.final_price }}</span>
+                                    <span class="badge main-color-one-bg rounded-pill ms-2">{{ product.discount }}%</span>
+                                    {% else %}
+                                    <span class="fw-bold fs-3 def-color">{{ product.price }}</span>
+                                    {% endif%}
                                 </div>
                                 <div class="d-flex justify-content-center align-items-center">
-                                    <span class="text-muted font-14 text-decoration-line-through">150,000</span>
+                                    {% if product.discount != 0 %}
+                                    <span class="text-muted font-14 text-decoration-line-through">{{ product.price }}</span>
+                                    {% endif %}
                                     <span class="text-muted font-14 ms-2">تومان</span>
                                 </div>
                             </div>
@@ -271,24 +261,28 @@
                             </form>
                         </div>
                     </div>
+                    {% elif product.stock_quantity == 0 %}
+                    <div class="se-cart border-ui">
+                        <div class="se-cart-item">
+                            <button disabled
+                                    class="btn justify-content-center btn-dark  w-100 text-center btn-add-to-cart text-white  mt-3">
+                                محصول ناموجود
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
                     <a href="">
                         <div
                                 class="d-flex border rounded-3 align-items-center justify-content-between mt-3 px-3 py-2">
                             <div>
                                 <i class="bi bi-info-circle"></i>
-                                <span class="font-14">فرایند قیمت گذاری و نظارت بر قیمت</span>
+                                <span class="font-14">گزارش محصول به پشتیبانی</span>
                             </div>
                             <div>
                                 <i class="bi bi-chevron-left"></i>
                             </div>
                         </div>
                     </a>
-                    <div class="d-flex my-3">
-                        <a href="">
-                            <i class="bi bi-tag"></i>
-                            <span class="me-1 font-14">آیا قیمت مناسب تری سارغ دارید</span>
-                        </a>
-                    </div>
                 </div>
                 <div class="col-12">
                     <div class="shop-feature">
@@ -296,25 +290,25 @@
                             <nav class="navbar">
                                 <ul class="navbar-nav justify-content-md-between justify-content-center">
                                     <li class="nav-item d-flex align-items-center">
-                                        <img alt="" src="assets/image/feature/box.png">
+                                        <img alt="" src="{% static 'image/feature/box.png' %}">
                                         <span>امکان تحویل اکسپرس</span>
                                     </li>
                                     <li class="nav-item d-flex align-items-center">
-                                        <img alt="" src="assets/image/feature/headphone.png">
+                                        <img alt="" src="{% static 'image/feature/headphone.png' %}">
                                         <span>24 ساعته 7 روز هفته</span>
                                     </li>
                                     <li class="nav-item d-flex align-items-center">
-                                        <img alt="" src="assets/image/feature/safe.png">
+                                        <img alt="" src="{% static 'image/feature/safe.png' %}">
                                         <span>امکان پرداخت در محل
                                         </span>
                                     </li>
                                     <li class="nav-item d-flex align-items-center">
-                                        <img alt="" src="assets/image/feature/seven.png">
+                                        <img alt="" src="{% static 'image/feature/seven.png' %}">
                                         <span>7 روز ضمانت بازگشت کالا
                                         </span>
                                     </li>
                                     <li class="nav-item d-flex align-items-center">
-                                        <img alt="" src="assets/image/feature/money.png">
+                                        <img alt="" src="{% static 'image/feature/money.png' %}">
                                         <span>ضمانت اصالت کالا
                                         </span>
                                     </li>
@@ -332,7 +326,7 @@
 
 <!--============ start product description ==============-->
 
-<section class="product-desc">
+<section class="product-desc" id="product-details">
     <div class="container-fluid">
         <div class="product-desc-tab">
             <ul class="nav justify-content-evenly" id="productTab" role="tablist">
@@ -359,13 +353,6 @@
                         نظرات <span class="badge main-color-one-bg ms-2 lh-sm">17</span>
                     </button>
                 </li>
-                <li class="nav-item">
-                    <button aria-selected="false" class="d-flex waves-effect waves-light"
-                            data-bs-target="#productAnswer-pane" data-bs-toggle="tab" id="productAnswer"
-                            role="button" type="button">
-                        پرسش و پاسخ <span class="badge main-color-one-bg ms-2 lh-sm">8</span>
-                    </button>
-                </li>
             </ul>
             
         </div>
@@ -380,35 +367,7 @@
                                          id="productDescLess-pane">
                                         <div class="product-desc-content">
                                             <h6 class="font-22 mb-2 title-font title-line-bottom">معرفی محصول</h6>
-
-                                            <p>
-                                                اگر به دنبال تهیه یک هدفون بی‌سیم گیمینگ هستید، هدفون
-                                                بلوتوثی مدل K55
-                                                به‌عنوان
-                                                یکی از جدیدترین گزینه‌های موجود در بازار ارزش بررسی را
-                                                دارد. این مدل با
-                                                ابعادی
-                                                کوچک تولید شده است. ابعاد و وزن کم آن، جابه‌جایی این
-                                                وسیله و استفاده
-                                                طولانی‌مدت
-                                                از آن را آسان می‌کند و باعث خستگی گوش‌ها نخواهد شد. این
-                                                مدل برای اتصال
-                                                به
-                                                دستگاه‌ به بلوتوث نسخه 5.0 مجهز شده است و در مدت زمان
-                                                اندکی، اتصال با
-                                                گوشی
-                                                موبایل اندروید یا ios شما برقرار خواهد شد. هدفون بی سیم
-                                                K55 دارای یک
-                                                میکروفون با
-                                                کیفیت است و و این ویژگی، آن را برای مکالمه مناسب می‌سازد. از
-                                                ویژگی‌های
-                                                اصلی این محصول محفظه نگهدارنده یا همان کیس آن است. این کیس
-                                                قابلیت شارژ هدفون را دارد. برای شارژ آن کافی است از درگاه
-                                                USB-C تعبیه شده بر روی کیس و کابل شارژ درون بسته‌بندی
-                                                استفاده کنید. گفتنی است باتری 400 میلی‌آمپر ساعتی این هدفون
-                                                در حدود 4-6 ساعت مکالمه و 4-6 ساعت پخش موسیقی را پاسخ‌گو
-                                                خواهد بود.
-                                            </p>
+                                            <p>{{ product.description }}</p>
                                         </div>
                                     </div>
                                     {% if product_attributes %}
@@ -447,12 +406,8 @@
                                             <h6 class="font-26 mb-2 title-font title-line-bottom">نظرت در مورد این
                                                 محصول
                                                 چیه؟</h6>
-                                            <p class="font-14 text-muted mt-2">برای ثبت نظر، از طریق دکمه افزودن
-                                                دیدگاه جدید
-                                                نمایید. اگر این محصول را قبلا خریده باشید، نظر شما به عنوان خریدار
-                                                ثبت خواهد
-                                                شد.</p>
-                                            <form action="">
+                                            <form action="POST" action="">
+                                                {% csrf_token %}
                                                 <div class="row gy-4">
                                                     <div class="col-md-4">
                                                         <div class="product-rateing position-sticky top-0">
@@ -468,97 +423,41 @@
                                                                         <i class="bi bi-star"></i>
                                                                     </div>
                                                                 </div>
-                                                                <div class="prog-rating">
-                                                                    <div class="item w-100 mb-2">
-                                                                        <div class="d-flex align-items-center flex-wrap">
-                                                                            <span class="font-14">5 ستاره</span>
-                                                                            <div class="progress flex-grow-1 mx-2"
-                                                                                 style="height: 7px;">
-                                                                                <div aria-valuemax="100"
-                                                                                     aria-valuemin="0"
-                                                                                     aria-valuenow="25"
-                                                                                     class="progress-bar"
-                                                                                     role="progressbar"
-                                                                                     style="width: 25%"></div>
-                                                                            </div>
-                                                                            <span class="font-14">5</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="item w-100 mb-2">
-                                                                        <div class="d-flex align-items-center flex-wrap">
-                                                                            <span class="font-14">4 ستاره</span>
-                                                                            <div class="progress flex-grow-1 mx-2"
-                                                                                 style="height: 7px;">
-                                                                                <div aria-valuemax="100"
-                                                                                     aria-valuemin="0"
-                                                                                     aria-valuenow="60"
-                                                                                     class="progress-bar"
-                                                                                     role="progressbar"
-                                                                                     style="width: 60%"></div>
-                                                                            </div>
-                                                                            <span class="font-14">17</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="item w-100 mb-2">
-                                                                        <div class="d-flex align-items-center flex-wrap">
-                                                                            <span class="font-14">3 ستاره</span>
-                                                                            <div class="progress flex-grow-1 mx-2"
-                                                                                 style="height: 7px;">
-                                                                                <div aria-valuemax="100"
-                                                                                     aria-valuemin="0"
-                                                                                     aria-valuenow="78"
-                                                                                     class="progress-bar"
-                                                                                     role="progressbar"
-                                                                                     style="width: 78%"></div>
-                                                                            </div>
-                                                                            <span class="font-14">85</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="item w-100 mb-2">
-                                                                        <div class="d-flex align-items-center flex-wrap">
-                                                                            <span class="font-14">2 ستاره</span>
-                                                                            <div class="progress flex-grow-1 mx-2"
-                                                                                 style="height: 7px;">
-                                                                                <div aria-valuemax="100"
-                                                                                     aria-valuemin="0"
-                                                                                     aria-valuenow="4"
-                                                                                     class="progress-bar"
-                                                                                     role="progressbar"
-                                                                                     style="width: 4%"></div>
-                                                                            </div>
-                                                                            <span class="font-14">3</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="item w-100">
-                                                                        <div class="d-flex align-items-center flex-wrap">
-                                                                            <span class="font-14">1 ستاره</span>
-                                                                            <div class="progress flex-grow-1 mx-2"
-                                                                                 style="height: 7px;">
-                                                                                <div aria-valuemax="100"
-                                                                                     aria-valuemin="0"
-                                                                                     aria-valuenow="82"
-                                                                                     class="progress-bar"
-                                                                                     role="progressbar"
-                                                                                     style="width: 82%"></div>
-                                                                            </div>
-                                                                            <span class="font-14">652</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
                                                         <div class="row">
+                                                            {% if user.is_authenticated %}
+                                                            <div class="col-sm-6">
+                                                                <div class="form-floating mb-3 form-group">
+                                                                    <input class="form-control"
+                                                                           id="floatingInputEmail1"
+                                                                           placeholder="{{ user.email }}"
+                                                                           type="email" disabled>
+                                                                    <label for="floatingInputEmail1">{{ user.email }}
+                                                                        </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-floating mb-3 form-group">
+                                                                    <input class="form-control"
+                                                                           id="floatingInputName"
+                                                                           placeholder="{{ user.first_name }} {{ user.last_name}}"
+                                                                           type="text" disabled>
+                                                                    <label for="floatingInputName">{{ user.first_name }} {{ user.last_name}}
+                                                                        </label>
+                                                                </div>
+                                                            </div>
+                                                            {% else %}
                                                             <div class="col-sm-6">
                                                                 <div class="form-floating mb-3 form-group">
                                                                     <input class="form-control"
                                                                            id="floatingInputEmail1"
                                                                            placeholder="ایمیل خود را وارد کنید"
-                                                                           type="email">
-                                                                    <label for="floatingInputEmail1">ایمیل خود را
-                                                                        وارد
-                                                                        کنید</label>
+                                                                           type="email" disabled>
+                                                                    <label for="floatingInputEmail1">ایمیل خود را وارد کنید
+                                                                        </label>
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-6">
@@ -566,25 +465,12 @@
                                                                     <input class="form-control"
                                                                            id="floatingInputName"
                                                                            placeholder="نام خود را وارد کنید"
-                                                                           type="text">
-                                                                    <label for="floatingInputName">نام خود را وارد
-                                                                        کنید</label>
+                                                                           type="text" disabled>
+                                                                    <label for="floatingInputName">نام خود را وارد کنید
+                                                                        </label>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-12">
-                                                                <div class="form-group form-check">
-                                                                    <input class="form-check-input"
-                                                                           id="rememberComment"
-                                                                           type="checkbox">
-                                                                    <label class="form-check-label d-block"
-                                                                           for="rememberComment">
-                                                                        ذخیره
-                                                                        نام، ایمیل و وبسایت من در مرورگر برای زمانی
-                                                                        که دوباره
-                                                                        دیدگاهی می‌نویسم.
-                                                                    </label>
-                                                                </div>
-                                                            </div>
+                                                            {% endif %}
                                                             <div class="col-12">
                                                                 <div class="form-group">
                                                                     <label class="my-3" for="commentRating">امتیاز
@@ -620,28 +506,6 @@
                                                                       placeholder="Leave a comment here"
                                                                       style="height: 150px"></textarea>
                                                                     <label for="floatingTextarea2">متن نظر!</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group mt-3">
-                                                                    <label class="text-success mb-2 fw-bold font-16"
-                                                                           for="tags-pos">نقاط
-                                                                        قوت</label>
-                                                                    <input class="commentTags form-control"
-                                                                           id="tags-pos"
-                                                                           name="tags-pos"
-                                                                           placeholder="با کلید اینتر اضافه کنید">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group mt-3">
-                                                                    <label class="text-danger fw-bold mb-2 font-16"
-                                                                           for="tags-neg">نقاط
-                                                                        ضعف</label>
-                                                                    <input class="commentTags form-control"
-                                                                           id="tags-neg"
-                                                                           name="tags-neg"
-                                                                           placeholder="با کلید اینتر اضافه کنید">
                                                                 </div>
                                                             </div>
                                                             <div class="col-12">
@@ -1081,7 +945,7 @@
                                     <i class="bi bi-house font-20"></i>
                                 </div>
                                 <div class="text-start ms-3">
-                                    <h6 class="fw-normal font-16">موجود در انبار فروشنده</h6>
+                                    <h6 class="fw-normal font-16">موجودی در انبار فروشنده: {{ product.stock_quantity }} عدد</h6>
                                 </div>
                             </div>
                         </div>
@@ -1094,11 +958,17 @@
                             </div>
                             <div class="price d-flex flex-column justify-content-end">
                                 <div>
-                                    <span class="fw-bold font-18 def-color">299,000</span>
-                                    <span class="badge main-color-two-bg rounded-pill">25%</span>
+                                    {% if product.discount != 0 %}
+                                    <span class="fw-bold font-18 def-color">{{ product.final_price }}</span>
+                                    <span class="badge main-color-two-bg rounded-pill">{{ product.discount }}%</span>
+                                    {% else %}
+                                    <span class="fw-bold font-18 def-color">{{ product.price }}</span>
+                                    {% endif %}
                                 </div>
                                 <div class="d-flex justify-content-center align-items-center">
-                                    <span class="text-muted font-14 text-decoration-line-through">150,000</span>
+                                    {% if product.discount != 0 %}
+                                    <span class="text-muted font-14 text-decoration-line-through">{{ product.price }}</span>
+                                    {% endif %}
                                     <span class="text-muted font-14 ms-2">تومان</span>
                                 </div>
                             </div>
@@ -1127,6 +997,7 @@
 
 <!--============ start product slider ==============-->
 
+{% if similar_products %}
 <section class="product-slider  site-slider">
     <div class="container-fluid">
         <div class="section-title mb-3">
@@ -1138,30 +1009,17 @@
         </div>
         <div class="swiper pro-slider">
             <div class="swiper-wrapper">
+                {% for item in similar_products %}
                 <div class="swiper-slide">
                     <div class="product-box border-ui">
-                        <div class="product-timer position-relative">
-                            <div class="product-header-btn flex-column position-absolute top-0">
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="مقایسه"><i class="bi bi-shuffle"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به علاقه مندی ها"><i class="bi bi-heart"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به سبد خرید"><i class="bi bi-bag-plus"></i></a>
-                            </div>
-                        </div>
                         <a href="">
                             <div class="product-image">
-                                <img src="assets/image/product/product-image3.jpg" loading="lazy" alt=""
-                                     class="img-fluid one-image">
-                                <img src="assets/image/product/product-image1.jpg" loading="lazy" alt=""
-                                     class="img-fluid two-image">
+                                <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}"
+                                     class="img-fluid">
                             </div>
                             <div class="product-title mb-3">
                                 <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                    <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
+                                    <p class="text-overflow-1 mt-2">{{ item.name }}</p>
                                 </div>
                                 <div class="rating">
                                     <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
@@ -1169,296 +1027,34 @@
                                 </div>
                             </div>
                             <div class="product-action">
+                                {% if item.discount != 0 %}
                                 <div class="discount">
                                     <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                        <span class="text-white">25%</span>
+                                        <span class="text-white">{{ item.discount }}%</span>
                                     </div>
                                 </div>
+                                {% endif %}
                                 <div class="price">
-                                    <p class="new-price">3,175,000 تومان</p>
-                                    <p class="old-price">6,500,000 تومان</p>
+                                    {% if item.discount != 0 %}
+                                    <p class="new-price">{{ item.final_price }} تومان</p>
+                                    <p class="old-price">{{ item.price }} تومان</p>
+                                    {% else %}
+                                    <p class="new-price">{{ item.price }} تومان</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </a>
 
                     </div>
                 </div>
-                <div class="swiper-slide">
-                    <div class="product-box border-ui">
-                        <div class="product-timer position-relative">
-                            <div class="product-header-btn flex-column position-absolute top-0">
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="مقایسه"><i class="bi bi-shuffle"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به علاقه مندی ها"><i class="bi bi-heart"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به سبد خرید"><i class="bi bi-bag-plus"></i></a>
-                            </div>
-                        </div>
-                        <a href="">
-                            <div class="product-image">
-                                <img src="assets/image/product/product-image2.jpg" loading="lazy" alt=""
-                                     class="img-fluid one-image">
-                                <img src="assets/image/product/product-image4.jpg" loading="lazy" alt=""
-                                     class="img-fluid two-image">
-                            </div>
-                            <div class="product-title mb-3">
-                                <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                    <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
-                                </div>
-                                <div class="rating">
-                                    <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
-                                    <div class="icon"><i class="bi bi-star-fill"></i></div>
-                                </div>
-                            </div>
-                            <div class="product-action">
-                                <div class="discount">
-                                    <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                        <span class="text-white">25%</span>
-                                    </div>
-                                </div>
-                                <div class="price">
-                                    <p class="new-price">3,175,000 تومان</p>
-                                    <p class="old-price">6,500,000 تومان</p>
-                                </div>
-                            </div>
-                        </a>
-
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="product-box border-ui">
-                        <div class="product-timer position-relative">
-                            <div class="product-header-btn flex-column position-absolute top-0">
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="مقایسه"><i class="bi bi-shuffle"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به علاقه مندی ها"><i class="bi bi-heart"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به سبد خرید"><i class="bi bi-bag-plus"></i></a>
-                            </div>
-                        </div>
-                        <a href="">
-                            <div class="product-image">
-                                <img src="assets/image/product/product-image4.jpg" loading="lazy" alt=""
-                                     class="img-fluid one-image">
-                                <img src="assets/image/product/product-image5.jpg" loading="lazy" alt=""
-                                     class="img-fluid two-image">
-                            </div>
-                            <div class="product-title mb-3">
-                                <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                    <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
-                                </div>
-                                <div class="rating">
-                                    <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
-                                    <div class="icon"><i class="bi bi-star-fill"></i></div>
-                                </div>
-                            </div>
-                            <div class="product-action">
-                                <div class="discount">
-                                    <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                        <span class="text-white">25%</span>
-                                    </div>
-                                </div>
-                                <div class="price">
-                                    <p class="new-price">3,175,000 تومان</p>
-                                    <p class="old-price">6,500,000 تومان</p>
-                                </div>
-                            </div>
-                        </a>
-
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="product-box border-ui">
-                        <div class="product-timer position-relative">
-                            <div class="product-header-btn flex-column position-absolute top-0">
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="مقایسه"><i class="bi bi-shuffle"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به علاقه مندی ها"><i class="bi bi-heart"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به سبد خرید"><i class="bi bi-bag-plus"></i></a>
-                            </div>
-                        </div>
-                        <a href="">
-                            <div class="product-image">
-                                <img src="assets/image/product/product-image6.jpg" loading="lazy" alt=""
-                                     class="img-fluid one-image">
-                                <img src="assets/image/product/product-image2.jpg" loading="lazy" alt=""
-                                     class="img-fluid two-image">
-                            </div>
-                            <div class="product-title mb-3">
-                                <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                    <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
-                                </div>
-                                <div class="rating">
-                                    <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
-                                    <div class="icon"><i class="bi bi-star-fill"></i></div>
-                                </div>
-                            </div>
-                            <div class="product-action">
-                                <div class="discount">
-                                    <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                        <span class="text-white">25%</span>
-                                    </div>
-                                </div>
-                                <div class="price">
-                                    <p class="new-price">3,175,000 تومان</p>
-                                    <p class="old-price">6,500,000 تومان</p>
-                                </div>
-                            </div>
-                        </a>
-
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="product-box border-ui">
-                        <div class="product-timer position-relative">
-                            <div class="product-header-btn flex-column position-absolute top-0">
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="مقایسه"><i class="bi bi-shuffle"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به علاقه مندی ها"><i class="bi bi-heart"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به سبد خرید"><i class="bi bi-bag-plus"></i></a>
-                            </div>
-                        </div>
-                        <a href="">
-                            <div class="product-image">
-                                <img src="assets/image/product/wach1.jpg" loading="lazy" alt=""
-                                     class="img-fluid one-image">
-                                <img src="assets/image/product/wach2.jpg" loading="lazy" alt=""
-                                     class="img-fluid two-image">
-                            </div>
-                            <div class="product-title mb-3">
-                                <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                    <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
-                                </div>
-                                <div class="rating">
-                                    <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
-                                    <div class="icon"><i class="bi bi-star-fill"></i></div>
-                                </div>
-                            </div>
-                            <div class="product-action">
-                                <div class="discount">
-                                    <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                        <span class="text-white">25%</span>
-                                    </div>
-                                </div>
-                                <div class="price">
-                                    <p class="new-price">3,175,000 تومان</p>
-                                    <p class="old-price">6,500,000 تومان</p>
-                                </div>
-                            </div>
-                        </a>
-
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="product-box border-ui">
-                        <div class="product-timer position-relative">
-                            <div class="product-header-btn flex-column position-absolute top-0">
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="مقایسه"><i class="bi bi-shuffle"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به علاقه مندی ها"><i class="bi bi-heart"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به سبد خرید"><i class="bi bi-bag-plus"></i></a>
-                            </div>
-                        </div>
-                        <a href="">
-                            <div class="product-image">
-                                <img src="assets/image/product/wach3.jpg" loading="lazy" alt=""
-                                     class="img-fluid one-image">
-                                <img src="assets/image/product/wach4.jpg" loading="lazy" alt=""
-                                     class="img-fluid two-image">
-                            </div>
-                            <div class="product-title mb-3">
-                                <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                    <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
-                                </div>
-                                <div class="rating">
-                                    <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
-                                    <div class="icon"><i class="bi bi-star-fill"></i></div>
-                                </div>
-                            </div>
-                            <div class="product-action">
-                                <div class="discount">
-                                    <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                        <span class="text-white">25%</span>
-                                    </div>
-                                </div>
-                                <div class="price">
-                                    <p class="new-price">3,175,000 تومان</p>
-                                    <p class="old-price">6,500,000 تومان</p>
-                                </div>
-                            </div>
-                        </a>
-
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="product-box border-ui">
-                        <div class="product-timer position-relative">
-                            <div class="product-header-btn flex-column position-absolute top-0">
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="مقایسه"><i class="bi bi-shuffle"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به علاقه مندی ها"><i class="bi bi-heart"></i></a>
-                                <a href="" class="mb-1 border-ui" data-bs-toggle="tooltip" data-bs-placement="right"
-                                   data-bs-title="افزودن به سبد خرید"><i class="bi bi-bag-plus"></i></a>
-                            </div>
-                        </div>
-                        <a href="">
-                            <div class="product-image">
-                                <img src="assets/image/product/television1.jpg" loading="lazy" alt=""
-                                     class="img-fluid one-image">
-                                <img src="assets/image/product/television3.jpg" loading="lazy" alt=""
-                                     class="img-fluid two-image">
-                            </div>
-                            <div class="product-title mb-3">
-                                <div class="title">
-                        <span class="text-muted text-overflow-1">Mibro Lite XPAW004
-                                            Smartwatch</span>
-                                    <p class="text-overflow-1 mt-2">ساعت هوشمند شیائومی</p>
-                                </div>
-                                <div class="rating">
-                                    <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
-                                    <div class="icon"><i class="bi bi-star-fill"></i></div>
-                                </div>
-                            </div>
-                            <div class="product-action">
-                                <div class="discount">
-                                    <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
-                                        <span class="text-white">25%</span>
-                                    </div>
-                                </div>
-                                <div class="price">
-                                    <p class="new-price">3,175,000 تومان</p>
-                                    <p class="old-price">6,500,000 تومان</p>
-                                </div>
-                            </div>
-                        </a>
-
-                    </div>
-                </div>
+                {% endfor %}
             </div>
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
         </div>
     </div>
 </section>
+{% endif %}
 <script>
     const ctx = document.getElementById('myChart');
     Chart.defaults.font.family = "payda";
@@ -1511,6 +1107,19 @@
             buttonup_class: "btn-counter waves-effect waves-light"
         });
     });
+</script>
+<script>
+    const maxLength = 250;
+
+    const description = document.getElementById('product-description').innerText;
+
+    if (description.length > maxLength) {
+        const shortenedDescription = description.substring(0, maxLength) + '...';
+
+        document.getElementById('product-description').innerText = shortenedDescription;
+
+        document.getElementById('show-more-link').style.display = 'inline-block';
+    }
 </script>
 <!--============ end product slider ==============-->
 {% endblock %}
