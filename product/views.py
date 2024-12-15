@@ -10,8 +10,9 @@ from decimal import Decimal, ROUND_HALF_UP
 class HomeView(TemplateView):
     template_name = 'product/index.html'
    
-def category_detail_view(request, name):
-    category = get_object_or_404(Category, name=name)
+   
+def category_detail_view(request, id):
+    category = get_object_or_404(Category, id=id)
     products = category.products.filter(is_active=True)
     subcategories = category.subcategories.filter(is_active=True)
     product_count = products.count()
@@ -28,8 +29,8 @@ def category_detail_view(request, name):
     return render(request, 'product/category_items.html', context)
 
 
-def product_detail_view(request, name):
-    product = get_object_or_404(Product, name=name, is_active=True)
+def product_detail_view(request, id):
+    product = get_object_or_404(Product, id=id, is_active=True)
     product.final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
     
     breadcrumb_items = ['خانه']
@@ -54,7 +55,6 @@ def product_detail_view(request, name):
     }
     
     return render(request, 'product/product.html', context)
-
 
 # API ViewSets
 class ProductDetailAPIView(APIView):

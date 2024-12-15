@@ -518,7 +518,7 @@
                         {% for product in products %}
                         <div class="col-lg-4 col-md-6">
                             <div class="product-box border-ui">
-                                <a href="{% url 'product-detail' name=product.name %}">
+                                <a href="{% url 'product-detail' id=product.id %}">
                                     <div class="product-image">
                                         <img src="{{ product.image.url }}" loading="lazy" alt="{{ product.name }}"
                                         class="img-fluid">
