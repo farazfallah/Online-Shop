@@ -5,21 +5,23 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from product.models import Product, Category, ProductAttribute
 from product.serializers import ProductSerializer
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 
 class HomeView(TemplateView):
     template_name = 'product/index.html'
    
-   
+
 def category_detail_view(request, id):
     category = get_object_or_404(Category, id=id)
     products = category.products.filter(is_active=True)
     subcategories = category.subcategories.filter(is_active=True)
     product_count = products.count()
-    
-    for product in products:
-        product.final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
 
+    for product in products:
+        final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
+        product.final_price = f"{final_price.normalize():f}"
+        product.price = f"{final_price.normalize():f}"
+        
     context = {
         'category': category,
         'products': products,
@@ -31,7 +33,9 @@ def category_detail_view(request, id):
 
 def product_detail_view(request, id):
     product = get_object_or_404(Product, id=id, is_active=True)
-    product.final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
+    final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
+    product.final_price = f"{final_price.normalize():f}"
+    product.price = f"{product.price.normalize():f}"
     
     breadcrumb_items = ['خانه']
     current_category = product.category
@@ -42,19 +46,24 @@ def product_detail_view(request, id):
 
     breadcrumb_items.append(product.name)
 
-    product_attributes = ProductAttribute.objects.filter(product=product, is_active=True)  # فقط ویژگی‌های فعال
-    similar_products = Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id)[:10]  # فقط محصولات مشابه فعال
+    product_attributes = ProductAttribute.objects.filter(product=product, is_active=True)
+    
+    similar_products = Product.objects.filter(category=product.category, is_active=True).exclude(id=product.id)[:10]
+    
     for similar_product in similar_products:
-        similar_product.final_price = Decimal(similar_product.price) * (1 - Decimal(similar_product.discount) / 100)
-        
+        final_price = Decimal(similar_product.price) * (1 - Decimal(similar_product.discount) / 100)
+        similar_product.final_price = f"{final_price.normalize():f}"
+        similar_product.price = f"{similar_product.price.normalize():f}"
+
     context = {
         'product': product,
         'breadcrumbs': breadcrumb_items,
         'product_attributes': product_attributes,
         'similar_products': similar_products,
     }
-    
+
     return render(request, 'product/product.html', context)
+
 
 # API ViewSets
 class ProductDetailAPIView(APIView):
