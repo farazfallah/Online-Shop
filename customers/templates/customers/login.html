@@ -33,8 +33,7 @@
                                             <img src="assets/image/logo.png" class="auth-logo" alt="">
                                         </a>
                                     </div>
-    
-                                    <!-- Tabs for Login Method -->
+
                                     <ul class="nav nav-tabs mb-4" id="login-tabs" role="tablist">
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link active" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-login" type="button" role="tab" aria-controls="email-login" aria-selected="true">ورود با ایمیل و رمز</button>
@@ -45,8 +44,6 @@
                                     </ul>
     
                                     <div class="tab-content" id="login-tabContent">
-    
-                                        <!-- Email and Password Login -->
                                         <div class="tab-pane fade show active" id="email-login" role="tabpanel" aria-labelledby="email-tab">
                                             <div id="login-error" class="alert alert-danger text-center" style="display: none;"></div>
                                             <form action="{% url 'login_with_password' %}" method="POST" id="form-email-login" class="py-3">
@@ -75,8 +72,6 @@
                                                 </div>
                                             </form>
                                         </div>
-    
-                                        <!-- OTP Login -->
                                         <div class="tab-pane fade" id="otp-login" role="tabpanel" aria-labelledby="otp-tab">
                                             <form method="POST" id="form-otp-login" action="{% url 'login_otp' %}">
                                                 {% csrf_token %}
@@ -89,10 +84,7 @@
                                                         required>
                                                     <label for="otp-email" class="form-label label-float">ایمیل خود را وارد کنید</label>
                                                 </div>
-                                                <!-- Error message box -->
                                                 <div id="otp-error-box" class="alert alert-danger text-center" style="display: none;"></div>
-
-                                                <!-- New button to send OTP -->
                                                 <div class="text-center mb-3">
                                                     <button 
                                                         type="button" 
@@ -103,24 +95,32 @@
                                                             style="right: 15px; top: 50%; transform: translateY(-50%);"></span>
                                                     </button>
                                                 </div>
-
-                                                <!-- OTP Section -->
                                                 <div id="otp-section" style="display: none;">
                                                     <div class="alert text-center alert-success">
-                                                        یک کد برای شما پیامک شد لطفا آن را وارد کنید
+                                                        یک کد برای شما ایمیل شد لطفا آن را وارد کنید
                                                     </div>
                                                     <div id="otp-input" class="d-flex justify-content-center">
                                                         {% for _ in "123456" %}
                                                         <label>
-                                                            <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*" maxlength="1"/>
+                                                            <input
+                                                                class="otp-input"
+                                                                type="number"
+                                                                step="1"
+                                                                min="0"
+                                                                max="9"
+                                                                autocomplete="off"
+                                                                pattern="\d*"
+                                                                maxlength="1"
+                                                                required
+                                                            />
                                                         </label>
                                                         {% endfor %}
                                                     </div>
-                                                    <input id="otp-value" placeholder="_" type="hidden" name="otp"/>
+                                                    <input id="otp-value" type="hidden" name="otp" />
                                                     <div class="text-center mt-3">
                                                         <button type="submit" class="btn main-color-one-bg w-100 py-3">ورود</button>
                                                     </div>
-                                                </div>
+                                                </div>                                                
                                             </form>
                                         </div>
                                     </div>
@@ -171,41 +171,114 @@
             button.innerHTML = 'ورود';
         }
     });
-    document.getElementById("send-otp-button").addEventListener("click", async function () {
-        const email = document.getElementById("otp-email").value;
-        const errorBox = document.getElementById("otp-error-box");
-        const spinner = document.getElementById("otp-spinner");
-
-        // Reset error box
-        errorBox.style.display = "none";
-        spinner.classList.remove("d-none");
-
+    document.getElementById("form-otp-login").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const form = event.target;
+        const button = form.querySelector('button[type="submit"]');
+        const errorDiv = document.getElementById('otp-error-box');
+    
+        button.disabled = true;
+        button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+    
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+    
         try {
-            // ارسال درخواست به سرور
-            const response = await fetch("{% url 'request_otp' %}", {
-                method: "POST",
+            const response = await fetch(form.action, {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}",
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
                 },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify(data),
             });
-
+    
+            const result = await response.json();
+    
             if (response.ok) {
-                // نمایش بخش وارد کردن OTP
-                document.getElementById("otp-section").style.display = "block";
+                console.log('OTP successfully submitted.');
             } else {
-                const errorData = await response.json();
-                errorBox.innerText = errorData.error || "مشکلی رخ داد. لطفاً دوباره امتحان کنید.";
-                errorBox.style.display = "block";
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = result.error || 'مشکلی رخ داده است.';
             }
-        } catch (err) {
-            errorBox.innerText = "ارتباط با سرور ممکن نیست. لطفاً دوباره تلاش کنید.";
-            errorBox.style.display = "block";
+        } catch (error) {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'مشکلی در ارتباط با سرور رخ داده است.';
         } finally {
-            spinner.classList.add("d-none");
+            button.disabled = false;
+            button.innerHTML = 'ورود';
         }
     });
+    
+
+document.getElementById("send-otp-button").addEventListener("click", async function () {
+    const email = document.getElementById("otp-email").value;
+    const errorBox = document.getElementById("otp-error-box");
+    const spinner = document.getElementById("otp-spinner");
+    const sendOtpButton = document.getElementById("send-otp-button");
+
+    // Reset error box
+    errorBox.style.display = "none";
+    spinner.classList.remove("d-none");
+
+    try {
+        // ارسال درخواست به سرور
+        const response = await fetch("{% url 'request_otp' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ email }),
+        });
+
+        if (response.ok) {
+            // نمایش بخش وارد کردن OTP
+            document.getElementById("otp-section").style.display = "block";
+            sendOtpButton.disabled = true;
+            sendOtpButton.textContent = "لطفا منتظر بمانید...";
+
+            // غیر فعال کردن ارسال مجدد برای 2 دقیقه
+            setTimeout(() => {
+                sendOtpButton.disabled = false;
+                sendOtpButton.textContent = "ارسال کد تایید";
+            }, 120000);
+        } else {
+            const errorData = await response.json();
+            errorBox.innerText = errorData.error || "مشکلی رخ داد. لطفاً دوباره امتحان کنید.";
+            errorBox.style.display = "block";
+        }
+    } catch (err) {
+        errorBox.innerText = "ارتباط با سرور ممکن نیست. لطفاً دوباره تلاش کنید.";
+        errorBox.style.display = "block";
+    } finally {
+        spinner.classList.add("d-none");
+    }
+});
+
+// حرکت خودکار بین فیلدهای OTP و جمع‌آوری مقدار
+document.querySelectorAll(".otp-input").forEach((input, index, inputs) => {
+    input.addEventListener("input", (e) => {
+        const value = e.target.value;
+
+        // اگر کاراکتر وارد شد به فیلد بعدی برود
+        if (value.length === 1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+
+        // مقدار نهایی OTP را جمع‌آوری کند
+        const otpValue = Array.from(inputs).map((input) => input.value).join("");
+        document.getElementById("otp-value").value = otpValue;
+    });
+
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !e.target.value && index > 0) {
+            // اگر کاراکتر پاک شد به فیلد قبلی برگردد
+            inputs[index - 1].focus();
+        }
+    });
+});
+
 </script>
 
 

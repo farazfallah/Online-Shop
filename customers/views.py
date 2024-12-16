@@ -32,9 +32,9 @@ class LoginWithPasswordView(APIView):
             login(request, user)
 
             if user.is_staff:
-                return Response({"token": token, "redirect_url": "/admin/"}, status=200)
+                return Response({"token": token, "redirect_url": reverse_lazy('admin:index')}, status=200)
             else:
-                return Response({"token": token, "redirect_url": "/"}, status=200)
+                return Response({"token": token, "redirect_url": reverse_lazy('home')}, status=200)
         else:
             return Response({"error": "ایمیل یا رمز عبور اشتباه است."}, status=401)
 
@@ -52,9 +52,9 @@ class RequestOtpView(APIView):
             otp_code = generate_otp()
             store_otp_in_redis(email, otp_code)
             send_otp_email(customer.email, otp_code)
-            return Response({'message': 'OTP sent to your email'})
+            return Response({'message': 'OTP به ایمیل شما ارسال شد'})
         except Customer.DoesNotExist:
-            return Response({'error': 'Email not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'کاربری با این ایمیل یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class LoginWithOtpView(APIView):
@@ -69,13 +69,16 @@ class LoginWithOtpView(APIView):
             if stored_otp and stored_otp == otp:
                 delete_otp_from_redis(email)  # حذف OTP از Redis پس از استفاده
                 refresh = RefreshToken.for_user(customer)
+
                 return Response({
                     'access': str(refresh.access_token),
                     'refresh': str(refresh)
                 })
-            return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            return Response({'error': 'کد تایید اشتباه است یا منقضی شده است'}, status=status.HTTP_401_UNAUTHORIZED)
         except Customer.DoesNotExist:
-            return Response({'error': 'Email not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'کاربری با این ایمیل یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 def logout_view(request):
@@ -84,4 +87,6 @@ def logout_view(request):
 
 
 def login_page(request):
+    if request.user.is_authenticated:
+        return redirect(reverse_lazy('home'))
     return render(request, 'customers/login.html')
