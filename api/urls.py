@@ -1,4 +1,6 @@
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from customers.views import LoginWithOtpView, LoginWithPasswordView, RequestOtpView
 from .views import (
     CategoryViewSet,
     AttributeViewSet,
@@ -9,8 +11,8 @@ from .views import (
     SiteInfoViewSet,
 )
 
-
 router = DefaultRouter()
+
 # Product
 router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'attributes', AttributeViewSet, basename='attribute')
@@ -22,4 +24,13 @@ router.register(r'product-attributes', ProductAttributeViewSet, basename='produc
 # Core
 router.register(r'site-info', SiteInfoViewSet, basename='siteinfo')
 
-urlpatterns = router.urls
+# paths for authentication
+auth_urls = [
+    path('login/password/', LoginWithPasswordView.as_view(), name='login_password'),
+    path('login/otp/request/', RequestOtpView.as_view(), name='request_otp'),
+    path('login/otp/', LoginWithOtpView.as_view(), name='login_otp'),
+]
+
+urlpatterns = [
+    path('', include(router.urls)),
+] + auth_urls

@@ -78,7 +78,7 @@
     
                                         <!-- OTP Login -->
                                         <div class="tab-pane fade" id="otp-login" role="tabpanel" aria-labelledby="otp-tab">
-                                            <form method="POST" id="form-otp-login" action="{% url 'login_with_otp' %}">
+                                            <form method="POST" id="form-otp-login" action="{% url 'login_otp' %}">
                                                 {% csrf_token %}
                                                 <div class="comment-item mb-4">
                                                     <input 
@@ -171,50 +171,43 @@
             button.innerHTML = 'ورود';
         }
     });
+    document.getElementById("send-otp-button").addEventListener("click", async function () {
+        const email = document.getElementById("otp-email").value;
+        const errorBox = document.getElementById("otp-error-box");
+        const spinner = document.getElementById("otp-spinner");
 
-    document.getElementById('send-otp-button').addEventListener('click', async function () {
-        const email = document.getElementById('otp-email').value;
-        const errorBox = document.getElementById('otp-error-box');
-        const spinner = document.getElementById('otp-spinner');
-        const otpSection = document.getElementById('otp-section');
-    
-        errorBox.style.display = 'none';
-        errorBox.innerText = '';
-    
-        spinner.classList.remove('d-none');
-    
+        // Reset error box
+        errorBox.style.display = "none";
+        spinner.classList.remove("d-none");
+
         try {
-            const response = await fetch('{% url "login_with_otp" %}', {
-                method: 'POST',
+            // ارسال درخواست به سرور
+            const response = await fetch("{% url 'request_otp' %}", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
                 },
                 body: JSON.stringify({ email }),
             });
-    
-            const result = await response.json();
-    
+
             if (response.ok) {
-                spinner.classList.add('d-none');
-    
-                otpSection.style.display = 'block';
-    
-                alert('کد تایید به ایمیل ارسال شد.');
+                // نمایش بخش وارد کردن OTP
+                document.getElementById("otp-section").style.display = "block";
             } else {
-                spinner.classList.add('d-none');
-    
-                errorBox.style.display = 'block';
-                errorBox.innerText = result.error || 'مشکلی در ارسال کد تایید رخ داده است.';
+                const errorData = await response.json();
+                errorBox.innerText = errorData.error || "مشکلی رخ داد. لطفاً دوباره امتحان کنید.";
+                errorBox.style.display = "block";
             }
-        } catch (error) {
-            spinner.classList.add('d-none');
-    
-            errorBox.style.display = 'block';
-            errorBox.innerText = 'مشکلی در ارتباط با سرور رخ داده است.';
+        } catch (err) {
+            errorBox.innerText = "ارتباط با سرور ممکن نیست. لطفاً دوباره تلاش کنید.";
+            errorBox.style.display = "block";
+        } finally {
+            spinner.classList.add("d-none");
         }
     });
 </script>
+
 
 <script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
