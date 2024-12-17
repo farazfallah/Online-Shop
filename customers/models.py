@@ -14,6 +14,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=15, blank=True, null=True, unique=True)
     image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.png')
 
+    is_otp_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 

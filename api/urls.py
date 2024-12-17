@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from customers.views import LoginWithOtpView, LoginWithPasswordView, RequestOtpView, RegisterView
+from product.views import ProductCommentAPIView
 from api.views import (
     CategoryViewSet,
     AttributeViewSet,
@@ -32,6 +33,10 @@ auth_urls = [
     path('register/', RegisterView.as_view(), name='register_api'),
 ]
 
+comment_urls = [
+    path('products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),
+]
+
 urlpatterns = [
     path('', include(router.urls)),
-] + auth_urls
+] + auth_urls + comment_urls

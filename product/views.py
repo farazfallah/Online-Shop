@@ -1,11 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import TemplateView
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
 from product.models import Product, Category, ProductAttribute
-from product.serializers import ProductSerializer
+from api.serializers import ProductCommentSerializer
+
 from decimal import Decimal
+
 
 class HomeView(TemplateView):
     template_name = 'product/index.html'
@@ -65,13 +68,32 @@ def product_detail_view(request, id):
     return render(request, 'product/product.html', context)
 
 
-# API ViewSets
-class ProductDetailAPIView(APIView):
-    def get(self, request, name):
-        try:
-            product = Product.objects.get(name=name)
-        except Product.DoesNotExist:
-            raise NotFound("Product not found")
+class ProductCommentAPIView(APIView):
+    """
+    API برای دریافت و ایجاد کامنت محصولات.
+    """
+    permission_classes = [IsAuthenticated]  # فقط کاربران لاگین شده مجاز هستند
 
-        serializer = ProductSerializer(product)
-        return Response(serializer.data)
+    def get(self, request, product_id):
+        """
+        دریافت لیست نظرات تأییدشده یک محصول.
+        """
+        product = get_object_or_404(Product, id=product_id)
+        comments = product.comments.filter(status='approved')
+        serializer = ProductCommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, product_id):
+        """
+        ایجاد یک کامنت جدید برای محصول.
+        """
+        product = get_object_or_404(Product, id=product_id)
+        data = request.data.copy()
+        data['product'] = product.id
+        data['customer'] = request.user.id  # اتصال کامنت به کاربر لاگین‌شده
+
+        serializer = ProductCommentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(status='pending')  # کامنت جدید در حالت انتظار تأیید
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

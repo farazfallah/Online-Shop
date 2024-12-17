@@ -32,11 +32,10 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductCommentSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.name', read_only=True)
-
     class Meta:
         model = ProductComment
-        fields = ['id', 'product', 'customer', 'customer_name', 'comment', 'rating', 'status']
+        fields = ['id', 'product', 'customer', 'comment', 'rating', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'status', 'created_at', 'updated_at', 'customer']
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):

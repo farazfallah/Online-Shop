@@ -406,138 +406,56 @@
                                             <h6 class="font-26 mb-2 title-font title-line-bottom">نظرت در مورد این
                                                 محصول
                                                 چیه؟</h6>
-                                            <form action="POST" action="">
-                                                {% csrf_token %}
-                                                <div class="row gy-4">
-                                                    <div class="col-md-4">
-                                                        <div class="product-rateing position-sticky top-0">
-                                                            <div class="row gy-2 align-items-center">
-                                                                <div class="number">
-                                                                    <h4 class="fw-light">متوسط امتیاز ها</h4>
-                                                                    <h2>3.00</h2>
-                                                                    <div class="star">
-                                                                        <i class="bi bi-star-fill"></i>
-                                                                        <i class="bi bi-star-fill"></i>
-                                                                        <i class="bi bi-star-fill"></i>
-                                                                        <i class="bi bi-star-fill"></i>
-                                                                        <i class="bi bi-star"></i>
-                                                                    </div>
-                                                                </div>
+                                                {% if user.is_authenticated %}
+                                                <form method="POST" action="{% url 'product-comments' product.id %}">
+                                                    {% csrf_token %}
+                                                    <div class="row gy-4">
+                                                        <div class="col-sm-6">
+                                                            <div class="form-floating mb-3">
+                                                                <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                                                                <label>ایمیل خود را وارد کنید</label>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        <div class="row">
-                                                            {% if user.is_authenticated %}
-                                                            <div class="col-sm-6">
-                                                                <div class="form-floating mb-3 form-group">
-                                                                    <input class="form-control"
-                                                                           id="floatingInputEmail1"
-                                                                           placeholder="{{ user.email }}"
-                                                                           type="email" disabled>
-                                                                    <label for="floatingInputEmail1">{{ user.email }}
-                                                                        </label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6">
-                                                                <div class="form-floating mb-3 form-group">
-                                                                    <input class="form-control"
-                                                                           id="floatingInputName"
-                                                                           placeholder="{{ user.first_name }} {{ user.last_name}}"
-                                                                           type="text" disabled>
-                                                                    <label for="floatingInputName">{{ user.first_name }} {{ user.last_name}}
-                                                                        </label>
-                                                                </div>
-                                                            </div>
-                                                            {% else %}
-                                                            <div class="col-sm-6">
-                                                                <div class="form-floating mb-3 form-group">
-                                                                    <input class="form-control"
-                                                                           id="floatingInputEmail1"
-                                                                           placeholder="ایمیل خود را وارد کنید"
-                                                                           type="email" disabled>
-                                                                    <label for="floatingInputEmail1">ایمیل خود را وارد کنید
-                                                                        </label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6">
-                                                                <div class="form-floating mb-3 form-group">
-                                                                    <input class="form-control"
-                                                                           id="floatingInputName"
-                                                                           placeholder="نام خود را وارد کنید"
-                                                                           type="text" disabled>
-                                                                    <label for="floatingInputName">نام خود را وارد کنید
-                                                                        </label>
-                                                                </div>
-                                                            </div>
-                                                            {% endif %}
-                                                            <div class="col-12">
-                                                                <div class="form-group">
-                                                                    <label class="my-3" for="commentRating">امتیاز
-                                                                        شما</label>
-                                                                    <fieldset class="rating" id="commentRating">
-                                                                        <input id="star5" name="rating" required
-                                                                               type="radio"
-                                                                               value="5"/>
-                                                                        <label for="star5">5 stars</label>
-                                                                        <input id="star4" name="rating" required
-                                                                               type="radio"
-                                                                               value="4"/>
-                                                                        <label for="star4">4 stars</label>
-                                                                        <input id="star3" name="rating" required
-                                                                               type="radio"
-                                                                               value="3"/>
-                                                                        <label for="star3">3 stars</label>
-                                                                        <input id="star2" name="rating" required
-                                                                               type="radio"
-                                                                               value="2"/>
-                                                                        <label for="star2">2 stars</label>
-                                                                        <input id="star1" name="rating" required
-                                                                               type="radio"
-                                                                               value="1"/>
-                                                                        <label for="star1">1 star</label>
-                                                                    </fieldset>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <div class="form-floating">
-                                                            <textarea class="form-control"
-                                                                      id="floatingTextarea2"
-                                                                      placeholder="Leave a comment here"
-                                                                      style="height: 150px"></textarea>
-                                                                    <label for="floatingTextarea2">متن نظر!</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <button type="submit"
-                                                                        class="btn main-color-two-bg px-5 btn-lg border-0">
-                                                                    ثبت نظر
-                                                                </button>
+                                                        <div class="col-sm-6">
+                                                            <div class="form-floating mb-3">
+                                                                <input type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}" disabled>
+                                                                <label>نام و نام خانوادگی خود را وارد کنید</label>
                                                             </div>
                                                         </div>
+                                                        <div class="col-12">
+                                                            <label class="my-3">امتیاز شما</label>
+                                                            <fieldset class="rating">
+                                                                <input id="star5" name="rating" type="radio" value="5" required>
+                                                                <label for="star5">5 stars</label>
+                                                                <input id="star4" name="rating" type="radio" value="4" required>
+                                                                <label for="star4">4 stars</label>
+                                                                <input id="star3" name="rating" type="radio" value="3" required>
+                                                                <label for="star3">3 stars</label>
+                                                                <input id="star2" name="rating" type="radio" value="2" required>
+                                                                <label for="star2">2 stars</label>
+                                                                <input id="star1" name="rating" type="radio" value="1" required>
+                                                                <label for="star1">1 star</label>
+                                                            </fieldset>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div class="form-floating">
+                                                                <textarea name="comment" class="form-control" placeholder="متن نظر شما" style="height: 150px" required></textarea>
+                                                                <label>متن نظر!</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <button type="submit" class="btn btn-lg main-color-two-bg px-5 border-0">ثبت نظر</button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </form>
+                                                </form>
+                                                {% else %}
+                                                <p class="loginTermsDesc lh-lg mt-3">برای ثبت نظر لطفاً <a href="{% url 'login' %}" class="underlined main-color-one-color fw-bold">وارد حساب کاربری</a> خود شوید.</p>
+                                                {% endif %}                                                
                                         </div>
                                         <div class="box_filter mt-5 pb-3">
                                             <div class="row align-items-end">
                                                 <div class="col-md-4 bf1">
                                                     <h4 class="title-font title-line-bottom">نظرات کاربران</h4>
-                                                </div>
-                                                <div class="col-md-8 bf2">
-                                                    <ul class="list-inline text-end mb-0">
-                                                        <li class="list-inline-item title-font">مرتب سازی بر اساس
-                                                            :
-                                                        </li>
-                                                        <li class="list-inline-item"><a href="#">نظر خریداران</a>
-                                                        </li>
-                                                        <li class="list-inline-item"><a class="active_custom"
-                                                                                        href="#">مفیدترین
-                                                            نظرات</a>
-                                                        </li>
-                                                        <li class="list-inline-item"><a href="#">جدیدترین نظرات</a>
-                                                        </li>
-                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>

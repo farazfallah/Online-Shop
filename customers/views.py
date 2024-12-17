@@ -66,20 +66,35 @@ class LoginWithOtpView(APIView):
         email = request.data.get('email')
         otp = request.data.get('otp')
 
+        print("Received OTP:", otp)
+
         try:
             customer = Customer.objects.get(email=email)
             stored_otp = get_otp_from_redis(email)
 
             if stored_otp and stored_otp == otp:
-                delete_otp_from_redis(email)
+                if not customer.is_otp_verified:
+                    customer.is_otp_verified = True
+                    customer.save()
+
                 refresh = RefreshToken.for_user(customer)
+                access_token = str(refresh.access_token)
+
+                if customer.is_staff:
+                    redirect_url = reverse_lazy('admin:index')
+                else:
+                    redirect_url = reverse_lazy('home')
+
+                delete_otp_from_redis(email)
 
                 return Response({
-                    'access': str(refresh.access_token),
-                    'refresh': str(refresh)
-                })
+                    'token': access_token,
+                    'refresh': str(refresh),
+                    'redirect_url': redirect_url
+                }, status=200)
+            else:
+                return Response({'error': 'کد تایید اشتباه است یا منقضی شده است'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            return Response({'error': 'کد تایید اشتباه است یا منقضی شده است'}, status=status.HTTP_401_UNAUTHORIZED)
         except Customer.DoesNotExist:
             return Response({'error': 'کاربری با این ایمیل یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
 

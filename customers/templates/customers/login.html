@@ -220,12 +220,10 @@ document.getElementById("send-otp-button").addEventListener("click", async funct
     const spinner = document.getElementById("otp-spinner");
     const sendOtpButton = document.getElementById("send-otp-button");
 
-    // Reset error box
     errorBox.style.display = "none";
     spinner.classList.remove("d-none");
 
     try {
-        // ارسال درخواست به سرور
         const response = await fetch("{% url 'request_otp' %}", {
             method: "POST",
             headers: {
@@ -236,12 +234,10 @@ document.getElementById("send-otp-button").addEventListener("click", async funct
         });
 
         if (response.ok) {
-            // نمایش بخش وارد کردن OTP
             document.getElementById("otp-section").style.display = "block";
             sendOtpButton.disabled = true;
             sendOtpButton.textContent = "لطفا منتظر بمانید...";
 
-            // غیر فعال کردن ارسال مجدد برای 2 دقیقه
             setTimeout(() => {
                 sendOtpButton.disabled = false;
                 sendOtpButton.textContent = "ارسال کد تایید";
@@ -259,27 +255,29 @@ document.getElementById("send-otp-button").addEventListener("click", async funct
     }
 });
 
-// حرکت خودکار بین فیلدهای OTP و جمع‌آوری مقدار
 document.querySelectorAll(".otp-input").forEach((input, index, inputs) => {
     input.addEventListener("input", (e) => {
         const value = e.target.value;
 
-        // اگر کاراکتر وارد شد به فیلد بعدی برود
         if (value.length === 1 && index < inputs.length - 1) {
             inputs[index + 1].focus();
         }
 
-        // مقدار نهایی OTP را جمع‌آوری کند
         const otpValue = Array.from(inputs).map((input) => input.value).join("");
         document.getElementById("otp-value").value = otpValue;
     });
 
     input.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && !e.target.value && index > 0) {
-            // اگر کاراکتر پاک شد به فیلد قبلی برگردد
             inputs[index - 1].focus();
         }
     });
+});
+document.getElementById("form-otp-login").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const otpValue = document.getElementById("otp-value").value;
+    console.log("OTP Value Sent:", otpValue);
 });
 
 </script>
