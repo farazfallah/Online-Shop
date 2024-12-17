@@ -4,8 +4,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter
 from product.models import Product, Category, ProductAttribute
-from api.serializers import ProductCommentSerializer
+from api.serializers import ProductCommentSerializer, ProductSerializer
 
 from decimal import Decimal
 
@@ -69,31 +71,29 @@ def product_detail_view(request, id):
 
 
 class ProductCommentAPIView(APIView):
-    """
-    API برای دریافت و ایجاد کامنت محصولات.
-    """
-    permission_classes = [IsAuthenticated]  # فقط کاربران لاگین شده مجاز هستند
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, product_id):
-        """
-        دریافت لیست نظرات تأییدشده یک محصول.
-        """
         product = get_object_or_404(Product, id=product_id)
         comments = product.comments.filter(status='approved')
         serializer = ProductCommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, product_id):
-        """
-        ایجاد یک کامنت جدید برای محصول.
-        """
         product = get_object_or_404(Product, id=product_id)
         data = request.data.copy()
         data['product'] = product.id
-        data['customer'] = request.user.id  # اتصال کامنت به کاربر لاگین‌شده
+        data['customer'] = request.user.id
 
         serializer = ProductCommentSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(status='pending')  # کامنت جدید در حالت انتظار تأیید
+            serializer.save(status='pending')
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ProductSearchView(ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['name', 'description', 'category__name']
