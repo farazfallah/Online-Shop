@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.password_validation import validate_password
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from rest_framework import status
 from rest_framework.views import APIView
@@ -45,6 +48,7 @@ class OtpRequestThrottle(AnonRateThrottle):
 
 class RequestOtpView(APIView):
     throttle_classes = [OtpRequestThrottle]
+    
     def post(self, request):
         email = request.data.get('email')
         try:
@@ -64,10 +68,10 @@ class LoginWithOtpView(APIView):
 
         try:
             customer = Customer.objects.get(email=email)
-            stored_otp = get_otp_from_redis(email)  # بازیابی OTP از Redis
+            stored_otp = get_otp_from_redis(email)
 
             if stored_otp and stored_otp == otp:
-                delete_otp_from_redis(email)  # حذف OTP از Redis پس از استفاده
+                delete_otp_from_redis(email)
                 refresh = RefreshToken.for_user(customer)
 
                 return Response({
@@ -80,13 +84,51 @@ class LoginWithOtpView(APIView):
             return Response({'error': 'کاربری با این ایمیل یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
 
 
+class RegisterView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        re_password = request.data.get('re_password')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
 
-def logout_view(request):
-    logout(request)
-    return redirect(reverse_lazy('home'))
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response({"error": "فرمت ایمیل نادرست است."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if password != re_password:
+            return Response({"error": "رمز عبور و تکرار آن مطابقت ندارند."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            return Response({"error": e.messages}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Customer.objects.filter(email=email).exists():
+            return Response({"error": "ایمیل وارد شده قبلاً ثبت شده است."}, status=status.HTTP_400_BAD_REQUEST)
+
+        customer = Customer.objects.create_user(
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name
+        )
+        return Response({"message": "ثبت‌نام با موفقیت انجام شد."}, status=status.HTTP_201_CREATED)
+
+
+def register_page(request):
+    if request.user.is_authenticated:
+        return redirect(reverse_lazy('home'))
+    return render(request, 'customers/register.html')
 
 
 def login_page(request):
     if request.user.is_authenticated:
         return redirect(reverse_lazy('home'))
     return render(request, 'customers/login.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(reverse_lazy('home'))

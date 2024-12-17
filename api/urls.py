@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from customers.views import LoginWithOtpView, LoginWithPasswordView, RequestOtpView
-from .views import (
+from customers.views import LoginWithOtpView, LoginWithPasswordView, RequestOtpView, RegisterView
+from api.views import (
     CategoryViewSet,
     AttributeViewSet,
     ProductViewSet,
@@ -29,6 +29,7 @@ auth_urls = [
     path('login/password/', LoginWithPasswordView.as_view(), name='login_password'),
     path('login/otp/request/', RequestOtpView.as_view(), name='request_otp'),
     path('login/otp/', LoginWithOtpView.as_view(), name='login_otp'),
+    path('register/', RegisterView.as_view(), name='register_api'),
 ]
 
 urlpatterns = [

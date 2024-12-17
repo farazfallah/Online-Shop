@@ -29,8 +29,8 @@
                                 <div class="auth-form shadow-xl rounded-3 mt-5 bg-white">
                                     <div class="auth-form-title header-logo d-flex align-items-center justify-content-between title-panel mb-4 slider-title-desc-center">
                                         <h2 class="text-center h4 text-muted title-font">ورود</h2>
-                                        <a href="">
-                                            <img src="assets/image/logo.png" class="auth-logo" alt="">
+                                        <a href="{% url 'home'%}">
+                                            <img src="{{ site_info.logo.url }}" class="auth-logo" alt="{{ site_info.name }}">
                                         </a>
                                     </div>
 
@@ -46,7 +46,7 @@
                                     <div class="tab-content" id="login-tabContent">
                                         <div class="tab-pane fade show active" id="email-login" role="tabpanel" aria-labelledby="email-tab">
                                             <div id="login-error" class="alert alert-danger text-center" style="display: none;"></div>
-                                            <form action="{% url 'login_with_password' %}" method="POST" id="form-email-login" class="py-3">
+                                            <form action="{% url 'login_password' %}" method="POST" id="form-email-login" class="py-3">
                                                 {% csrf_token %}
                                                 <div class="comment-item mb-4">
                                                     <input 
@@ -125,6 +125,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <p class="loginTermsDesc lh-lg mt-3">حساب کاربری ندارید؟ <a
+                                    class="underlined main-color-one-color fw-bold" href="{% url 'register' %}">ثبت نام در سایت
+                                </a></p>
                             </div>
                         </div>
                     </div>
