@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -79,7 +80,8 @@ class LoginWithOtpView(APIView):
 
                 refresh = RefreshToken.for_user(customer)
                 access_token = str(refresh.access_token)
-
+                login(request, customer)
+                
                 if customer.is_staff:
                     redirect_url = reverse_lazy('admin:index')
                 else:

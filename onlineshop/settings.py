@@ -83,6 +83,11 @@ TEMPLATES = [
 ]
 
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 WSGI_APPLICATION = 'onlineshop.wsgi.application'
 
 
