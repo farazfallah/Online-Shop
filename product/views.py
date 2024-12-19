@@ -25,7 +25,7 @@ def category_detail_view(request, id):
     for product in products:
         final_price = Decimal(product.price) * (1 - Decimal(product.discount) / 100)
         product.final_price = f"{final_price.normalize():f}"
-        product.price = f"{final_price.normalize():f}"
+        product.price = f"{product.price.normalize():f}"
         
     context = {
         'category': category,

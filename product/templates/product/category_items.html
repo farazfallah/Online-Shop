@@ -541,12 +541,11 @@
                                         </div>
                                         <div class="price">
                                             <p class="new-price">{{ product.final_price }} تومان</p>
-
                                             <p class="old-price">{{ product.price }} تومان</p>
                                         </div>
                                         {% else %}
                                         <div class="price">
-                                            <p class="new-price">3,175,000 تومان</p>
+                                            <p class="new-price">{{ product.price }} تومان</p>
                                         </div>
                                         {% endif %}
                                     </div>
