@@ -68,7 +68,6 @@ class ProductsByCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'icon', 'image', 'products']
 
 
-
 # Core
 class SiteInfoSerializer(serializers.ModelSerializer):
     class Meta:
