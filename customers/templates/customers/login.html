@@ -200,6 +200,12 @@
     
             if (response.ok) {
                 console.log('OTP successfully submitted.');
+                if (result.redirect_url) {
+                    window.location.href = result.redirect_url;
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'مسیر ریدایرکت مشخص نشده است.';
+                }
             } else {
                 errorDiv.style.display = 'block';
                 errorDiv.textContent = result.error || 'مشکلی رخ داده است.';
@@ -212,6 +218,7 @@
             button.innerHTML = 'ورود';
         }
     });
+    
     
 
 document.getElementById("send-otp-button").addEventListener("click", async function () {

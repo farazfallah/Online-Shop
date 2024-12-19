@@ -60,6 +60,14 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
 
 
+class ProductsByCategorySerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'description', 'icon', 'image', 'products']
+
+
 # Core
 class SiteInfoSerializer(serializers.ModelSerializer):
     class Meta:

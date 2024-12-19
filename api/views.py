@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import RetrieveAPIView
 from product.models import (
     Category,
     Attribute,
@@ -15,6 +16,7 @@ from .serializers import (
     ProductImageSerializer,
     ProductCommentSerializer,
     ProductAttributeSerializer,
+    ProductsByCategorySerializer,
     SiteInfoSerializer,
 )
 
@@ -49,6 +51,10 @@ class ProductAttributeViewSet(ModelViewSet):
     queryset = ProductAttribute.objects.all()
     serializer_class = ProductAttributeSerializer
 
+
+class ProductsByCategoryView(RetrieveAPIView):
+    queryset = Category.objects.prefetch_related('products').all()
+    serializer_class = ProductsByCategorySerializer
 
 # Core
 class SiteInfoViewSet(ModelViewSet):
