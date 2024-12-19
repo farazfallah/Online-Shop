@@ -9,7 +9,8 @@ from api.views import (
     ProductImageViewSet,
     ProductCommentViewSet,
     ProductAttributeViewSet,
-    SiteInfoViewSet,
+    ProductsByCategoryView,
+    SiteInfoViewSet
 )
 
 router = DefaultRouter()
@@ -33,14 +34,20 @@ auth_urls = [
     path('register/', RegisterView.as_view(), name='register_api'),
 ]
 
+# paths for comments. Not Working for now
 comment_urls = [
     path('products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),
 ]
 
+# paths for Search API. Not Working for now
 search_api = [
     path('products/search/', ProductSearchView.as_view(), name='product-search'),
 ]
 
+category_product_urls = [
+    path('category/<int:pk>/products/', ProductsByCategoryView.as_view(), name='products-by-category'),
+]
+
 urlpatterns = [
     path('', include(router.urls)),
-] + auth_urls + comment_urls + search_api
+] + auth_urls + comment_urls + search_api + category_product_urls
