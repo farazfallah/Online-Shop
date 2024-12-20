@@ -90,10 +90,3 @@ class ProductCommentAPIView(APIView):
             serializer.save(status='pending')
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-class ProductSearchView(ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ['name', 'description', 'category__name']

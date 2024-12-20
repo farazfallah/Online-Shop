@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from customers.views import LoginWithOtpView, LoginWithPasswordView, RequestOtpView, RegisterView
-from product.views import ProductCommentAPIView, ProductSearchView
+from product.views import ProductCommentAPIView
 from api.views import (
     CategoryViewSet,
     AttributeViewSet,
@@ -10,7 +10,8 @@ from api.views import (
     ProductCommentViewSet,
     ProductAttributeViewSet,
     ProductsByCategoryView,
-    SiteInfoViewSet
+    SiteInfoViewSet,
+    ProductSearchView
 )
 
 router = DefaultRouter()
@@ -41,7 +42,7 @@ comment_urls = [
 
 # paths for Search API. Not Working for now
 search_api = [
-    path('products/search/', ProductSearchView.as_view(), name='product-search'),
+    path('search/', ProductSearchView.as_view(), name='product-search'),
 ]
 
 category_product_urls = [

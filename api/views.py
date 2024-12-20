@@ -1,5 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from rest_framework.filters import SearchFilter, OrderingFilter
 from product.models import (
     Category,
     Attribute,
@@ -9,7 +11,7 @@ from product.models import (
     ProductAttribute,
 )
 from core.models import SiteInfo
-from .serializers import (
+from api.serializers import (
     CategorySerializer,
     AttributeSerializer,
     ProductSerializer,
@@ -60,3 +62,15 @@ class ProductsByCategoryView(RetrieveAPIView):
 class SiteInfoViewSet(ModelViewSet):
     queryset = SiteInfo.objects.all()
     serializer_class = SiteInfoSerializer
+
+
+# Search API
+class ProductSearchView(ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    search_fields = ['name', 'description', 'category__name', 'attributes__value']
+    ordering_fields = ['price', 'stock_quantity', 'discount']
+    filterset_fields = ['category', 'price', 'stock_quantity', 'discount']

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import HomeView, category_detail_view, product_detail_view, ProductSearchView
+from .views import HomeView, category_detail_view, product_detail_view
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
