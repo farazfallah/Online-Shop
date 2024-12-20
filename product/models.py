@@ -1,5 +1,6 @@
 from django.db import models
 from core.models import BaseModel
+from customers.models import Customer 
 
 
 class Category(BaseModel):
@@ -27,9 +28,18 @@ class Product(BaseModel):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock_quantity = models.PositiveIntegerField()
     image = models.ImageField(upload_to='products/', blank=True, null=True, default='products/default.jpg')
+    discount = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='product_images/')
+    
+    def __str__(self):
+        return f"Image for {self.product.name}"
 
 
 class ProductComment(BaseModel):
@@ -40,7 +50,7 @@ class ProductComment(BaseModel):
     ]
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
-    customer = models.ForeignKey('customers.Customer', on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     comment = models.TextField()
     rating = models.PositiveIntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

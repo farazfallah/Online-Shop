@@ -13,13 +13,8 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, validators=[validate_email])
     phone = models.CharField(max_length=15, blank=True, null=True, unique=True)
     image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.png')
-    
-    otp = models.CharField(max_length=4, blank=True, null=True)
-    otp_expiry = models.DateTimeField(blank=True, null=True)
-    max_otp_try = models.IntegerField(default=settings.MAX_OTP_TRY)
-    otp_max_out = models.DateTimeField(blank=True, null=True)
-    otp_is_active = models.BooleanField(default=False)
-    
+
+    is_otp_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -30,6 +25,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
 
 
 class Address(BaseModel):

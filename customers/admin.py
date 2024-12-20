@@ -2,25 +2,27 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import Customer, Address
 
+
 class CustomerAdmin(UserAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'phone', 'is_staff', 'is_active')
-    list_filter = ('is_staff', 'is_active')
+    list_display = ('first_name', 'last_name', 'email', 'phone', 'is_staff', 'is_active', 'is_otp_verified')
+    list_filter = ('is_staff', 'is_active', 'is_otp_verified', 'groups')
     search_fields = ('email', 'first_name', 'last_name', 'phone')
     ordering = ('email',)
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('first_name', 'last_name', 'phone', 'image')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups', 'user_permissions')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_otp_verified', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'first_name', 'last_name', 'phone', 'password1', 'password2', 'is_staff', 'is_active'),
+            'fields': ('email', 'first_name', 'last_name', 'phone', 'password1', 'password2', 'is_staff', 'is_active', 'groups'),
         }),
     )
+
 
 
 class AddressAdmin(admin.ModelAdmin):
