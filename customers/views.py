@@ -26,20 +26,27 @@ class LoginWithPasswordView(APIView):
     def post(self, request, *args, **kwargs):
         email = request.data.get("email")
         password = request.data.get("password")
-        user = authenticate(email=email, password=password)
+        try:
+            customer = Customer.objects.get(email=email)
+            if not customer.check_password(password):
+                return Response({"error": "ایمیل یا رمز عبور اشتباه است."}, status=401)
 
-        if user is not None:
-            if not user.is_active:
+            if not customer.is_active:
                 return Response({"error": "حساب کاربری شما غیرفعال شده است."}, status=403)
-            refresh = RefreshToken.for_user(user)
-            token = str(refresh.access_token)
-            login(request, user)
 
-            if user.is_staff:
-                return Response({"token": token, "redirect_url": reverse_lazy('admin:index')}, status=200)
-            else:
-                return Response({"token": token, "redirect_url": reverse_lazy('home')}, status=200)
-        else:
+            refresh = RefreshToken.for_user(customer)
+            access_token = str(refresh.access_token)
+            login(request, customer)
+            
+            redirect_url = reverse_lazy('admin:index') if customer.is_staff else reverse_lazy('home')
+
+            return Response({
+                "token": access_token,
+                "refresh": str(refresh),
+                "redirect_url": redirect_url
+            }, status=200)
+
+        except Customer.DoesNotExist:
             return Response({"error": "ایمیل یا رمز عبور اشتباه است."}, status=401)
 
 
@@ -66,8 +73,6 @@ class LoginWithOtpView(APIView):
     def post(self, request):
         email = request.data.get('email')
         otp = request.data.get('otp')
-
-        print("Received OTP:", otp)
 
         try:
             customer = Customer.objects.get(email=email)

@@ -18,7 +18,7 @@ def delete_otp_from_redis(email):
     
 def send_otp_email(customer_email, otp_code):
     subject = "Your OTP Code"
-    message = f"Dear user,\n\nYour OTP code is: {otp_code}\n\nThis code is valid for 5 minutes. Please do not share it with anyone.\n\nBest regards"
+    message = f"Dear user,\n\nYour OTP code is: {otp_code}\n\nThis code is valid for 5 minutes. Please do not share it with anyone."
     email_from = settings.DEFAULT_FROM_EMAIL
     recipient_list = [customer_email]
 

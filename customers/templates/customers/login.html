@@ -146,14 +146,19 @@
         button.disabled = true;
         button.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
     
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
+        const data = {
+            email: formData.get('email'),
+            password: formData.get('password'),
+        };
     
         try {
             const response = await fetch(form.action, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
                 },
                 body: JSON.stringify(data),
             });
@@ -161,6 +166,8 @@
             const result = await response.json();
     
             if (response.ok) {
+                localStorage.setItem('accessToken', result.token);
+                localStorage.setItem('refreshToken', result.refresh);
                 window.location.href = result.redirect_url;
             } else {
                 errorDiv.style.display = 'block';
@@ -174,6 +181,8 @@
             button.innerHTML = 'ورود';
         }
     });
+    
+    
     document.getElementById("form-otp-login").addEventListener("submit", async function (event) {
         event.preventDefault();
         const form = event.target;
@@ -218,8 +227,6 @@
             button.innerHTML = 'ورود';
         }
     });
-    
-    
 
 document.getElementById("send-otp-button").addEventListener("click", async function () {
     const email = document.getElementById("otp-email").value;

@@ -88,7 +88,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-
 WSGI_APPLICATION = 'onlineshop.wsgi.application'
 
 
@@ -142,10 +141,6 @@ CACHES = {
     }
 }
 
-MIDDLEWARE += [
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
