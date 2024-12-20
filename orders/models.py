@@ -1,9 +1,9 @@
 # orders/models.py
 from django.db import models
-from core.models import BaseModel
+from core.models import BaseModel, LogicalDeleteModel
 
 
-class Order(BaseModel):
+class Order(BaseModel, LogicalDeleteModel):
     STATUS_CHOICES = [
         ('registered', 'Registered'),
         ('confirmed', 'Awaiting Confirmation'),
@@ -21,7 +21,7 @@ class Order(BaseModel):
         return f"Order {self.id} by {self.customer} ({self.get_status_display()})"
 
 
-class OrderItem(BaseModel):
+class OrderItem(BaseModel, LogicalDeleteModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, related_name='order_items')
     quantity = models.PositiveIntegerField()
@@ -31,7 +31,7 @@ class OrderItem(BaseModel):
         return f"Item {self.product.name} in Order {self.order.id}"
 
 
-class DiscountCode(BaseModel):
+class DiscountCode(BaseModel, LogicalDeleteModel):
     code = models.CharField(max_length=50, unique=True)
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
     is_active = models.BooleanField(default=True)

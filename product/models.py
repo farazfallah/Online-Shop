@@ -1,9 +1,9 @@
 from django.db import models
-from core.models import BaseModel
+from core.models import BaseModel, LogicalDeleteModel
 from customers.models import Customer 
 
 
-class Category(BaseModel):
+class Category(BaseModel, LogicalDeleteModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     icon = models.CharField(max_length=50)
@@ -13,7 +13,7 @@ class Category(BaseModel):
         return self.name
 
 
-class Attribute(BaseModel):
+class Attribute(BaseModel, LogicalDeleteModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
 
@@ -21,7 +21,7 @@ class Attribute(BaseModel):
         return self.name
 
 
-class Product(BaseModel):
+class Product(BaseModel, LogicalDeleteModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
@@ -42,7 +42,7 @@ class ProductImage(models.Model):
         return f"Image for {self.product.name}"
 
 
-class ProductComment(BaseModel):
+class ProductComment(BaseModel, LogicalDeleteModel):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),

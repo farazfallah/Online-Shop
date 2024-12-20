@@ -2,8 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.validators import validate_email
-from django.conf import settings
-from core.models import BaseModel
+from core.models import BaseModel, LogicalDeleteModel
 from core.managers import CustomUserManager
 
 
@@ -28,7 +27,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
 
 
-class Address(BaseModel):
+class Address(BaseModel, LogicalDeleteModel):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='addresses')
     address_line = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
