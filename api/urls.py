@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from customers.views import LoginWithOtpView, LoginWithPasswordView, RequestOtpView, RegisterView
+from customers.views import LoginWithOtpView, LoginWithPasswordView, RequestOtpView, RegisterView, ValidateTokenView
 from product.views import ProductCommentAPIView
 from api.views import (
     CategoryViewSet,
@@ -33,6 +33,7 @@ auth_urls = [
     path('login/otp/request/', RequestOtpView.as_view(), name='request_otp'),
     path('login/otp/', LoginWithOtpView.as_view(), name='login_otp'),
     path('register/', RegisterView.as_view(), name='register_api'),
+    path('validate-token/', ValidateTokenView.as_view(), name='validate-token'),
 ]
 
 # paths for comments. Not Working for now

@@ -8,6 +8,8 @@ from django.urls import reverse_lazy
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.permissions import AllowAny
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -36,15 +38,28 @@ class LoginWithPasswordView(APIView):
 
             refresh = RefreshToken.for_user(customer)
             access_token = str(refresh.access_token)
-            login(request, customer)
-            
-            redirect_url = reverse_lazy('admin:index') if customer.is_staff else reverse_lazy('home')
 
-            return Response({
-                "token": access_token,
-                "refresh": str(refresh),
-                "redirect_url": redirect_url
+            login(request, customer)
+            response = Response({
+                "message": "ورود موفقیت‌آمیز بود.",
+                "redirect_url": reverse_lazy('admin:index') if customer.is_staff else reverse_lazy('home')
             }, status=200)
+
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,  # Ensures the token is not accessible via JavaScript
+                max_age=15 * 60,  # Expiry in seconds (same as your access token lifetime)
+                secure=True,  # Use only over HTTPS in production
+            )
+            response.set_cookie(
+                key='refresh_token',
+                value=str(refresh),
+                httponly=True,
+                max_age=24 * 60 * 60,
+                secure=True,
+            )
+            return response
 
         except Customer.DoesNotExist:
             return Response({"error": "ایمیل یا رمز عبور اشتباه است."}, status=401)
@@ -68,7 +83,6 @@ class RequestOtpView(APIView):
         except Customer.DoesNotExist:
             return Response({'error': 'کاربری با این ایمیل یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
 
-
 class LoginWithOtpView(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -85,20 +99,36 @@ class LoginWithOtpView(APIView):
 
                 refresh = RefreshToken.for_user(customer)
                 access_token = str(refresh.access_token)
-                login(request, customer)
-                
+
                 if customer.is_staff:
                     redirect_url = reverse_lazy('admin:index')
                 else:
                     redirect_url = reverse_lazy('home')
 
                 delete_otp_from_redis(email)
-
-                return Response({
-                    'token': access_token,
-                    'refresh': str(refresh),
-                    'redirect_url': redirect_url
+                
+                login(request, customer)
+                response = Response({
+                    "message": "ورود موفقیت‌آمیز بود.",
+                    "redirect_url": redirect_url
                 }, status=200)
+
+                response.set_cookie(
+                    key='access_token',
+                    value=access_token,
+                    httponly=True,
+                    max_age=15 * 60,
+                    secure=True,
+                )
+                response.set_cookie(
+                    key='refresh_token',
+                    value=str(refresh),
+                    httponly=True,
+                    max_age=24 * 60 * 60,
+                    secure=True,
+                )
+
+                return response
             else:
                 return Response({'error': 'کد تایید اشتباه است یا منقضی شده است'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -139,6 +169,82 @@ class RegisterView(APIView):
         return Response({"message": "ثبت‌نام با موفقیت انجام شد."}, status=status.HTTP_201_CREATED)
 
 
+class ValidateTokenView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        access_token = request.COOKIES.get('access_token')
+        refresh_token = request.COOKIES.get('refresh_token')
+
+        if not access_token:
+            return Response({
+                'error': 'توکن دسترسی یافت نشد',
+                'is_valid': False
+            }, status=401)
+
+        try:
+            access_token_obj = AccessToken(access_token)
+            user = access_token_obj.payload.get('user_id')
+            
+            customer = Customer.objects.get(id=user)
+            return Response({
+                'is_valid': True,
+                'user': {
+                    'email': customer.email,
+                    'first_name': customer.first_name,
+                    'last_name': customer.last_name,
+                    'is_staff': customer.is_staff,
+                }
+            })
+
+        except TokenError:
+            if not refresh_token:
+                return Response({
+                    'error': 'نیاز به لاگین مجدد دارید',
+                    'is_valid': False
+                }, status=401)
+
+            try:
+                refresh_token_obj = RefreshToken(refresh_token)
+                access_token = str(refresh_token_obj.access_token)
+
+                user = refresh_token_obj.payload.get('user_id')
+                customer = Customer.objects.get(id=user)
+
+                response = Response({
+                    'is_valid': True,
+                    'user': {
+                        'email': customer.email,
+                        'first_name': customer.first_name,
+                        'last_name': customer.last_name,
+                        'is_staff': customer.is_staff,
+                    }
+                })
+
+                response.set_cookie(
+                    key='access_token',
+                    value=access_token,
+                    httponly=True,
+                    max_age=15 * 60,
+                    secure=True,
+                    samesite='Lax',
+                )
+
+                return response
+
+            except TokenError:
+                return Response({
+                    'error': 'نیاز به لاگین مجدد دارید',
+                    'is_valid': False
+                }, status=401)
+
+        except Customer.DoesNotExist:
+            return Response({
+                'error': 'کاربر یافت نشد',
+                'is_valid': False
+            }, status=404)
+
+
 def register_page(request):
     if request.user.is_authenticated:
         return redirect(reverse_lazy('home'))
@@ -152,5 +258,9 @@ def login_page(request):
 
 
 def logout_view(request):
+    response = redirect(reverse_lazy('home'))
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    request.session.flush()
     logout(request)
-    return redirect(reverse_lazy('home'))
+    return response
