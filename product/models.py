@@ -59,7 +59,7 @@ class ProductComment(BaseModel, LogicalDeleteModel):
         return f"Comment by {self.customer} on {self.product}"
 
 
-class ProductAttribute(BaseModel):
+class ProductAttribute(BaseModel, LogicalDeleteModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='product_attributes')
     value = models.CharField(max_length=255)

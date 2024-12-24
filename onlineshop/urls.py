@@ -16,19 +16,64 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.routers import DefaultRouter
 from product.views import HomeView
+from core.api import SiteInfoViewSet
+from customers.api import (
+    LoginWithOtpView, 
+    LoginWithPasswordView, 
+    RequestOtpView, 
+    RegisterView, 
+    ValidateTokenView)
+from product.api import (
+    CategoryViewSet,
+    AttributeViewSet,
+    ProductViewSet,
+    ProductImageViewSet,
+    ProductCommentViewSet,
+    ProductAttributeViewSet,
+    ProductsByCategoryView,
+    ProductCommentAPIView,
+    ProductSearchView
+)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('product.urls')),
     path('account/', include('customers.urls')),
     path('order/', include('orders.urls')),
-    path('api/', include('api.urls')),
-    # path('search/', search, name='product_search'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+router = DefaultRouter()
+router.register(r'categories', CategoryViewSet, basename='category')
+router.register(r'attributes', AttributeViewSet, basename='attribute')
+router.register(r'products', ProductViewSet, basename='product')
+router.register(r'product-images', ProductImageViewSet, basename='productimage')
+router.register(r'product-comments', ProductCommentViewSet, basename='productcomment')
+router.register(r'product-attributes', ProductAttributeViewSet, basename='productattribute')
+
+apipath = [
+    # Site Info
+    path('api/site-info', SiteInfoViewSet.as_view({'get': 'list'}), name='siteinfo'),
+    # Auth API
+    path('api/login/password/', LoginWithPasswordView.as_view(), name='login_password'),
+    path('api/login/otp/request/', RequestOtpView.as_view(), name='request_otp'),
+    path('api/login/otp/', LoginWithOtpView.as_view(), name='login_otp'),
+    path('api/register/', RegisterView.as_view(), name='register_api'),
+    path('api/validate-token/', ValidateTokenView.as_view(), name='validate-token'), 
+    path('api/search/', ProductSearchView.as_view(), name='product-search'),
+    # Comment 
+    path('api/products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),
+    # Product router
+    path('api/', include(router.urls)),
+]
+
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += apipath

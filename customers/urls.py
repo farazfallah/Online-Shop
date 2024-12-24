@@ -1,5 +1,5 @@
 from django.urls import path, include
-from customers.views import login_page, register_page, logout_view
+from customers.api import login_page, register_page, logout_view
 
 
 urlpatterns = [

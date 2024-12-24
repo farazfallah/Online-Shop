@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from product.models import (
     Category,
     Attribute,
@@ -7,10 +8,8 @@ from product.models import (
     ProductComment,
     ProductAttribute,
 )
-from core.models import SiteInfo
 
 
-# Products
 class CategorySerializer(serializers.ModelSerializer):
     subcategories = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
@@ -66,10 +65,4 @@ class ProductsByCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'description', 'icon', 'image', 'products']
-
-
-# Core
-class SiteInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SiteInfo
-        fields = '__all__'
+        

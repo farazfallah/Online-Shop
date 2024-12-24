@@ -1,14 +1,6 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView
-from rest_framework.filters import SearchFilter
 from product.models import Product, Category, ProductAttribute
-from api.serializers import ProductCommentSerializer, ProductSerializer
-
 from decimal import Decimal
 
 
@@ -69,24 +61,3 @@ def product_detail_view(request, id):
 
     return render(request, 'product/product.html', context)
 
-
-class ProductCommentAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, product_id):
-        product = get_object_or_404(Product, id=product_id)
-        comments = product.comments.filter(status='approved')
-        serializer = ProductCommentSerializer(comments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, product_id):
-        product = get_object_or_404(Product, id=product_id)
-        data = request.data.copy()
-        data['product'] = product.id
-        data['customer'] = request.user.id
-
-        serializer = ProductCommentSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save(status='pending')
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
