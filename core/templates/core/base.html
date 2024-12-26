@@ -250,58 +250,9 @@
                         </div>
                         <div class="d-flex align-items-center d-xl-none justify-content-end">
                             <div class="d-flex align-items-center justify-content-between top-header-call">
-                                {% if user.is_authenticated %}
-                                <div class="top-header-link d-lg-flex">
-                                    <div class="dropdown text-end">
-                                        <a href="" data-bs-toggle="dropdown" aria-expanded="false" role="button"
-                                           class="btn btn-white auth-dropdown header-register border-0">
-                                            <div class="d-flex align-items-center">
-                                                <figure class="avatar">
-                                                    <img src="{{ user.image.url }}" alt="{{ user.first_name }} {{ user.last_name }}">
-                                                </figure>
-                                                <span class="ms-3 d-md-block d-none font-18">{{ user.first_name }} {{ user.last_name }}<i
-                                                        class="bi bi-chevron-down arrow-auth font-12 ms-2"></i></span>
-                                            </div>
-                                        </a>
-                                        <ul class="dropdown-menu flex-column" style="min-width: 250px;">
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6"><i
-                                                    class="bi bi-house-door me-2"></i>پروفایل</a>
-                                            </li>
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                    class="bi bi-cart-check me-2"></i>سفارش های
-                                                من</a></li>
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                    class="bi bi-pin-map me-2"></i>آدرس های
-                                                من</a></li>
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                    class="bi bi-bell me-2"></i>پیام ها و
-                                                اطلاعیه ها</a></li>
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                    class="bi bi-chat-dots me-2"></i>نظرات
-                                                من</a></li>
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                    class="bi bi-question-circle me-2"></i>درخواست
-                                                پشتیبانی</a></li>
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                    class="bi bi-heart me-2"></i>محصولات مورد
-                                                علاقه</a></li>
-                                            <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                    class="bi bi-gift me-2"></i>کد های تخفیف
-                                                من</a></li>
-                                            <li class="w-100"><a href="{% url 'logout' %}" class="dropdown-item fs-6 py-2 mct-hover"><i
-                                                    class="bi bi-arrow-right-square me-2"></i>خروج از حساب کاربری</a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <div class="user-auth-section">
+                                    <!-- محتوا توسط JavaScript به‌روزرسانی می‌شود -->
                                 </div>
-                                {% else %}
-                                <div class="auth-link">
-                                    <a href="{% url 'login' %}">
-                                        <i class="bi bi-person"></i>
-                                        <span class="fw-bold">ورود / عضویت</span>
-                                    </a>
-                                </div>
-                                {% endif %}
                                 <div class="cart-button ms-3">
                                     <a class="d-flex align-items-center h-100" data-bs-toggle="offcanvas"
                                        href="#offcanvasCart" role="button" aria-controls="offcanvasCart">
@@ -340,7 +291,7 @@
                                 <i class="bi bi-tags"></i>
                                 دسته‌بندی‌ها
                             </a>
-                                <ul class="main-menu mega-container">
+                                <ul class="main-menu mega-container" id="category-menu">
                                     {% for category in category_list %}
                                         {% if not category.parent_category %}
                                             <li class=""><a href="{% url 'category-detail' id=category.id %}"><i class="{{ category.icon }}"></i>
@@ -444,58 +395,9 @@
                 <div class="col-lg-3 col-xl-4">
                     <div class="d-flex align-items-center justify-content-end">
                         <div class="d-flex align-items-center justify-content-between top-header-call d-xl-flex d-none">
-                            {% if user.is_authenticated %}
-                            <div class="top-header-link d-lg-flex">
-                                <div class="dropdown text-end">
-                                    <a href="" data-bs-toggle="dropdown" aria-expanded="false" role="button"
-                                       class="btn btn-white auth-dropdown header-register border-0">
-                                        <div class="d-flex align-items-center">
-                                            <figure class="avatar">
-                                                <img src="{{ user.image.url }}" alt="{{ user.first_name }} {{ user.last_name }}">
-                                            </figure>
-                                            <span class="ms-3 d-md-block d-none font-18">{{ user.first_name }} {{ user.last_name }}<i
-                                                    class="bi bi-chevron-down arrow-auth font-12 ms-2"></i></span>
-                                        </div>
-                                    </a>
-                                    <ul class="dropdown-menu flex-column" style="min-width: 250px;">
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6"><i
-                                                class="bi bi-house-door me-2"></i>پروفایل</a>
-                                        </li>
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                class="bi bi-cart-check me-2"></i>سفارش های
-                                            من</a></li>
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                class="bi bi-pin-map me-2"></i>آدرس های
-                                            من</a></li>
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                class="bi bi-bell me-2"></i>پیام ها و
-                                            اطلاعیه ها</a></li>
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                class="bi bi-chat-dots me-2"></i>نظرات
-                                            من</a></li>
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                class="bi bi-question-circle me-2"></i>درخواست
-                                            پشتیبانی</a></li>
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                class="bi bi-heart me-2"></i>محصولات مورد
-                                            علاقه</a></li>
-                                        <li class="w-100"><a href="" class="dropdown-item fs-6 py-2"><i
-                                                class="bi bi-gift me-2"></i>کد های تخفیف
-                                            من</a></li>
-                                        <li class="w-100"><a href="{% url 'logout' %}" class="dropdown-item fs-6 py-2 mct-hover"><i
-                                                class="bi bi-arrow-right-square me-2"></i>خروج از حساب کاربری</a>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <div class="user-auth-section">
+                                <!-- محتوا توسط JavaScript به‌روزرسانی می‌شود -->
                             </div>
-                            {% else %}
-                            <div class="auth-link">
-                                <a href="{% url 'login' %}">
-                                    <i class="bi bi-person"></i>
-                                    <span class="fw-bold">ورود / عضویت</span>
-                                </a>
-                            </div>
-                            {% endif %}
                             <div class="cart-button ms-3">
                                 <a class="d-flex align-items-center h-100" data-bs-toggle="offcanvas"
                                    href="#offcanvasCart" role="button" aria-controls="offcanvasCart">
@@ -518,7 +420,6 @@
 
 
 <!--============ start footer   ==============-->
-
 <footer class="footer">
     <div class="container-fluid">
         <div class="footer-contact">
@@ -833,7 +734,6 @@
 </div>
 
 <!--============ end mobile menu ==============-->
-
 <script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>
 <script src="{% static 'js/auth-validator.js' %}"></script>
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>

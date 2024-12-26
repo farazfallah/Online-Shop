@@ -63,7 +63,7 @@ apipath = [
     path('api/login/otp/request/', RequestOtpView.as_view(), name='request_otp'),
     path('api/login/otp/', LoginWithOtpView.as_view(), name='login_otp'),
     path('api/register/', RegisterView.as_view(), name='register_api'),
-    path('api/validate-token/', ValidateTokenView.as_view(), name='validate-token'), 
+    path('api/validate-token/', ValidateTokenView.as_view(), name='validate_token'),
     path('api/search/', ProductSearchView.as_view(), name='product-search'),
     # Comment 
     path('api/products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),

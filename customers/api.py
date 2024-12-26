@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth import logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -39,7 +38,6 @@ class LoginWithPasswordView(APIView):
             refresh = RefreshToken.for_user(customer)
             access_token = str(refresh.access_token)
 
-            login(request, customer)
             response = Response({
                 "message": "ورود موفقیت‌آمیز بود.",
                 "redirect_url": reverse_lazy('admin:index') if customer.is_staff else reverse_lazy('home')
@@ -108,7 +106,6 @@ class LoginWithOtpView(APIView):
 
                 delete_otp_from_redis(email)
                 
-                login(request, customer)
                 response = Response({
                     "message": "ورود موفقیت‌آمیز بود.",
                     "redirect_url": redirect_url
@@ -172,73 +169,81 @@ class RegisterView(APIView):
 
 class ValidateTokenView(APIView):
     permission_classes = [AllowAny]
-
+    
     def post(self, request):
         access_token = request.COOKIES.get('access_token')
         refresh_token = request.COOKIES.get('refresh_token')
-
+        
         if not access_token:
             return Response({
                 'error': 'توکن دسترسی یافت نشد',
                 'is_valid': False
             }, status=401)
-
+            
         try:
             access_token_obj = AccessToken(access_token)
-            user = access_token_obj.payload.get('user_id')
+            user_id = access_token_obj.payload.get('user_id')
             
-            customer = Customer.objects.get(id=user)
+            customer = Customer.objects.get(id=user_id)
             return Response({
                 'is_valid': True,
                 'user': {
                     'email': customer.email,
                     'first_name': customer.first_name,
                     'last_name': customer.last_name,
+                    'phone': customer.phone,
+                    'image_url': request.build_absolute_uri(customer.image.url) if customer.image else None,
                     'is_staff': customer.is_staff,
+                    'is_active': customer.is_active,
+                    'is_otp_verified': customer.is_otp_verified,
                 }
             })
-
+            
         except TokenError:
             if not refresh_token:
                 return Response({
                     'error': 'نیاز به لاگین مجدد دارید',
                     'is_valid': False
                 }, status=401)
-
+                
             try:
                 refresh_token_obj = RefreshToken(refresh_token)
-                access_token = str(refresh_token_obj.access_token)
-
-                user = refresh_token_obj.payload.get('user_id')
-                customer = Customer.objects.get(id=user)
-
+                new_access_token = str(refresh_token_obj.access_token)
+                
+                user_id = refresh_token_obj.payload.get('user_id')
+                customer = Customer.objects.get(id=user_id)
+                
                 response = Response({
                     'is_valid': True,
                     'user': {
                         'email': customer.email,
                         'first_name': customer.first_name,
                         'last_name': customer.last_name,
+                        'phone': customer.phone,
+                        'image_url': request.build_absolute_uri(customer.image.url) if customer.image else None,
                         'is_staff': customer.is_staff,
+                        'is_active': customer.is_active,
+                        'is_otp_verified': customer.is_otp_verified,
                     }
                 })
-
+                
                 response.set_cookie(
                     key='access_token',
-                    value=access_token,
+                    value=new_access_token,
                     httponly=True,
                     max_age=15 * 60,
                     secure=True,
-                    samesite='Lax',
+                    samesite='Lax'
                 )
-
+                
                 return response
-
+                
             except TokenError:
                 return Response({
                     'error': 'نیاز به لاگین مجدد دارید',
                     'is_valid': False
                 }, status=401)
-
+                
         except Customer.DoesNotExist:
             return Response({
                 'error': 'کاربر یافت نشد',
