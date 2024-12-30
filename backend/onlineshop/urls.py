@@ -26,7 +26,8 @@ from customers.api import (
     LoginWithPasswordView, 
     RequestOtpView, 
     RegisterView, 
-    ValidateTokenView)
+    ValidateTokenView,
+    LogoutView)
 from product.api import (
     CategoryViewSet,
     AttributeViewSet,
@@ -64,6 +65,8 @@ apipath = [
     path('api/login/otp/', LoginWithOtpView.as_view(), name='login_otp'),
     path('api/register/', RegisterView.as_view(), name='register_api'),
     path('api/validate-token/', ValidateTokenView.as_view(), name='validate_token'),
+    path('api/logout/', LogoutView.as_view(), name='logout_api'),
+    
     path('api/search/', ProductSearchView.as_view(), name='product-search'),
     # Comment 
     path('api/products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),

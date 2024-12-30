@@ -40,7 +40,7 @@ class LoginWithPasswordView(APIView):
 
             response = Response({
                 "message": "ورود موفقیت‌آمیز بود.",
-                "redirect_url": reverse_lazy('admin:index') if customer.is_staff else reverse_lazy('home')
+                "redirect_url": reverse_lazy('home')
             }, status=200)
 
             response.set_cookie(
@@ -263,10 +263,10 @@ def login_page(request):
     return render(request, 'customers/login.html')
 
 
-def logout_view(request):
-    response = redirect(reverse_lazy('home'))
-    response.delete_cookie('access_token')
-    response.delete_cookie('refresh_token')
-    request.session.flush()
-    logout(request)
-    return response
+class LogoutView(APIView):
+   def post(self, request):
+       response = Response({'message': 'با موفقیت خارج شدید.'})
+       response.delete_cookie('access_token')
+       response.delete_cookie('refresh_token')
+       logout(request)
+       return response

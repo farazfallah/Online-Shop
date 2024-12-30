@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkAuthStatus() {
         console.log('Checking auth status...');
         
-        fetch('/api/validate-token/', {
+        fetch('http://127.0.0.1:8000/api/validate-token/', {
             method: 'POST',
             credentials: 'include',
             headers: {
