@@ -1,0 +1,607 @@
+{% extends 'base.html' %}
+{% block title %}دسته بندی {{ category.name }}{% endblock %}
+{% load static %}
+{% block content %}
+<!--============ start category slider  ==============-->
+
+<section class="categories free-swiper py-30">
+    <div class="container-fluid position-relative">
+        <div class="section-title mb-5">
+            <div class="section-title-title">
+                <h2 class="fw-900 h4">دسته بندی<span class="with-highlight ms-1">{{ category_name }}</span>
+                </h2>
+                <div class="Dottedsquare"></div>
+            </div>
+        </div>
+        {% if subcategories %}
+        <div class="swiper cat-slider">
+            <div class="swiper-wrapper">
+                {% for subcategory in subcategories %}
+                <div class="swiper-slide">
+                    <a href="">
+                        <div class="cat-item d-flex align-items-center">
+                            <div class="cat-item-image">
+                                <img src="{{ category.image.url }}" alt="{{ subcategory.name }}">
+                            </div>
+                            <div class="cat-item-desc ms-3">
+                                <h5>{{ subcategory.name }}</h5>
+                                <p class="text-muted">{{ subcategory.description }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+        {% endif %} 
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--============ end category slider  ==============-->
+
+<!--============ start main content ==============-->
+
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- start filter in mobile -->
+        <div class="custom-filter d-lg-none d-block">
+            <button class="btn btn-filter-float border-0 bs-bg-gray-800 shadow-box px-3 rounded-3 position-fixed"
+                    style="z-index: 999;bottom:76px;" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                <i class="bi bi-funnel font-20 fw-bold text-white"></i>
+                <span class="d-block font-14 text-white">فیلتر</span>
+            </button>
+
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasRight"
+                 aria-labelledby="offcanvasRightLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasRightLabel1">فیلتر ها</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div class="item-boxs position-sticky top-0">
+                        <div class="item-box">
+                            <div class="title">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h6 class="font-14">جستجوی محصول</h6>
+                                    <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBoxSearchSide"
+                                       role="button" aria-expanded="false">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="desc collapse show" id="collapseItemBoxSearchSide">
+                                <div class="search-form">
+                                    <form action="">
+                                        <div class="search-filed">
+                                            <label class="d-block">
+                                                <input class="form-control search-input"
+                                                       placeholder="جستجوی محصولات ..." type="text">
+                                            </label>
+                                            <button class="btn search-btn main-color-two-bg rounded-circle"
+                                                    type="submit"><i class="bi bi-search"></i></button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-box">
+                            <div class="title">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h6 class="font-14">فیلتر های اعمال شده</h6>
+                                    <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBox1"
+                                       role="button" aria-expanded="false">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="desc collapse show" id="collapseItemBox1">
+                                <a href=""
+                                   class="btn btn-sm rounded-pill border-1 border-muted me-1 font-14 mb-2">
+                                    <span>گوشی الجی</span>
+                                    <span class="ms-3"><i class="bi bi-x text-danger"></i></span></a>
+                                <a href=""
+                                   class="btn btn-sm rounded-pill border-1 border-muted me-1 font-14 mb-2">
+                                    <span>دوربین 108</span>
+                                    <span class="ms-3"><i class="bi bi-x text-danger"></i></span></a>
+                            </div>
+                        </div>
+                        <div class="item-box">
+                            <div class="title">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h6 class="font-14">محدوده قیمت</h6>
+                                    <a class="btn border-0" data-bs-toggle="collapse" href="#collapsePrice1"
+                                       role="button" aria-expanded="false">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="desc collapse show" id="collapsePrice1">
+                                <div class="filter-item-content">
+                                    <form action="" method="get">
+                                        <div class="form-group">
+                                            <label for="catRange"></label>
+                                            <input id="catRange" type="range" class="catRange" name="range[]">
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label for="maxPriceTwo"></label>
+                                                <input id="maxPriceTwo" type="number" name="" min="1500000"
+                                                       class="form-control input-range-filter"
+                                                       placeholder="از 1500000">
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="minPriceTwo"></label>
+                                                <input type="number" name="" id="minPriceTwo" min="1500000"
+                                                       max="3000000"
+                                                       class="form-control input-range-filter"
+                                                       placeholder="از 3000000">
+                                            </div>
+                                            <div class="col-12">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-box">
+                            <div class="title">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h6 class="font-14">فیلتر بر اساس رنگ</h6>
+                                    <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBoxExist1"
+                                       role="button" aria-expanded="false">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="desc collapse show" id="collapseItemBoxExist1">
+                                <div class="filter-item-content">
+                                    <form action="">
+                                        <div class="product-meta-color-items mt-4">
+                                            <input type="radio" class="btn-check" name="options" id="option11"
+                                                   autocomplete="off" checked>
+                                            <label class="btn btt-light" for="option11">
+                                                <span style="background-color: #c00;"></span>
+                                                قرمز
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="options" id="option22"
+                                                   autocomplete="off">
+                                            <label class="btn btt-light" for="option22">
+                                                <span style="background-color: #111;"></span>
+                                                مشکی
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="options" id="option33"
+                                                   autocomplete="off">
+                                            <label class="btn btt-light" for="option33">
+                                                <span style="background-color: #00cc5f;"></span>
+                                                سبز
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="options" id="option44"
+                                                   autocomplete="off">
+                                            <label class="btn btt-light" for="option44">
+                                                <span style="background-color: #1b69f0;"></span>
+                                                آبی
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="options" id="option55"
+                                                   autocomplete="off">
+                                            <label class="btn btt-light" for="option55">
+                                                <span style="background-color: #891bf0;"></span>
+                                                بنفش
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="options" id="option66"
+                                                   autocomplete="off">
+                                            <label class="btn btt-light" for="option66">
+                                                <span style="background-color: #f0501b;"></span>
+                                                نارنجی
+                                            </label>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-box">
+                            <div class="title">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h6 class="font-14">فیلتر براساس دسته</h6>
+                                    <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBoxColor1"
+                                       role="button" aria-expanded="false">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="desc collapse show" id="collapseItemBoxColor1">
+                                <div class="filter-item-content">
+                                    <form action="">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                            <div class="form-check">
+                                                <label for="colorCheck1" class="form-check-label">موبایل <i
+                                                        class="bi bi-phone ms-1"></i></label>
+                                                <input type="checkbox" name="" id="colorCheck1"
+                                                       class="form-check-input">
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold font-14">(27)</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                            <div class="form-check">
+                                                <label for="colorCheck5" class="form-check-label">ایرپاد <i
+                                                        class="bi bi-earbuds ms-1"></i></label>
+                                                <input type="checkbox" name="" id="colorCheck5"
+                                                       class="form-check-input">
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold font-14">(32)</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                            <div class="form-check">
+                                                <label for="colorCheck4" class="form-check-label">تبلت <i
+                                                        class="bi bi-tablet ms-1"></i></label>
+                                                <input type="checkbox" name="" id="colorCheck4"
+                                                       class="form-check-input">
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold font-14">(14)</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                            <div class="form-check">
+                                                <label for="colorCheck3" class="form-check-label">هدست <i
+                                                        class="bi bi-headset ms-1"></i></label>
+                                                <input type="checkbox" name="" id="colorCheck3"
+                                                       class="form-check-input">
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold font-14">(8)</span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end filter mobile -->
+        <div class="row gy-3">
+            <div class="col-lg-3 d-lg-block d-none">
+                <div class="item-boxs position-sticky top-0">
+                    <div class="item-box">
+                        <div class="title">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 class="font-14">جستجوی محصول</h6>
+                                <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBoxSearch"
+                                   role="button" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="desc collapse show" id="collapseItemBoxSearch">
+                            <div class="search-form">
+                                <form action="">
+                                    <div class="search-filed">
+                                        <label class="d-block">
+                                            <input class="form-control search-input" placeholder="جستجوی محصولات ..."
+                                                   type="text">
+                                        </label>
+                                        <button class="btn search-btn main-color-two-bg rounded-circle" type="submit"><i
+                                                class="bi bi-search"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-box">
+                        <div class="title">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 class="font-14">فیلتر های اعمال شده</h6>
+                                <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBox"
+                                   role="button" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="desc collapse show" id="collapseItemBox">
+                            <a href=""
+                               class="btn btn-sm rounded-pill border-1 border-muted me-1 font-14 mb-2">
+                                <span>گوشی الجی</span>
+                                <span class="ms-3"><i class="bi bi-x text-danger"></i></span></a>
+                            <a href=""
+                               class="btn btn-sm rounded-pill border-1 border-muted me-1 font-14 mb-2">
+                                <span>دوربین 108</span>
+                                <span class="ms-3"><i class="bi bi-x text-danger"></i></span></a>
+                        </div>
+                    </div>
+                    <div class="item-box">
+                        <div class="title">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 class="font-14">محدوده قیمت</h6>
+                                <a class="btn border-0" data-bs-toggle="collapse" href="#collapsePrice"
+                                   role="button" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="desc collapse show" id="collapsePrice">
+                            <div class="filter-item-content">
+                                <form action="" method="get">
+                                    <div class="form-group">
+                                        <label for="catRangeTwo"></label>
+                                        <input type="range" class="catRange" id="catRangeTwo" name="range[]">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label for="maxPrice"></label>
+                                            <input type="number" id="maxPrice" name="" min="1500000"
+                                                   class="form-control input-range-filter"
+                                                   placeholder="از 1500000">
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="minPrice"></label>
+                                            <input type="number" name="" id="minPrice" min="1500000" max="3000000"
+                                                   class="form-control input-range-filter"
+                                                   placeholder="از 3000000">
+                                        </div>
+                                        <div class="col-12">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-box">
+                        <div class="title">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 class="font-14">فیلتر بر اساس رنگ</h6>
+                                <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBoxExist"
+                                   role="button" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="desc collapse show" id="collapseItemBoxExist">
+                            <div class="filter-item-content">
+                                <form action="">
+                                    <div class="product-meta-color-items mt-4">
+                                        <input type="radio" class="btn-check" name="options" id="option1"
+                                               autocomplete="off" checked>
+                                        <label class="btn btt-light" for="option1">
+                                            <span style="background-color: #c00;"></span>
+                                            قرمز
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="options" id="option2"
+                                               autocomplete="off">
+                                        <label class="btn btt-light" for="option2">
+                                            <span style="background-color: #111;"></span>
+                                            مشکی
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="options" id="option3"
+                                               autocomplete="off">
+                                        <label class="btn btt-light" for="option3">
+                                            <span style="background-color: #00cc5f;"></span>
+                                            سبز
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="options" id="option4"
+                                               autocomplete="off">
+                                        <label class="btn btt-light" for="option4">
+                                            <span style="background-color: #1b69f0;"></span>
+                                            آبی
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="options" id="option5"
+                                               autocomplete="off">
+                                        <label class="btn btt-light" for="option5">
+                                            <span style="background-color: #891bf0;"></span>
+                                            بنفش
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="options" id="option6"
+                                               autocomplete="off">
+                                        <label class="btn btt-light" for="option6">
+                                            <span style="background-color: #f0501b;"></span>
+                                            نارنجی
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-box">
+                        <div class="title">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 class="font-14">فیلتر براساس دسته</h6>
+                                <a class="btn border-0" data-bs-toggle="collapse" href="#collapseItemBoxColor"
+                                   role="button" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="desc collapse show" id="collapseItemBoxColor">
+                            <div class="filter-item-content">
+                                <form action="">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                        <div class="form-check">
+                                            <label for="colorCheck11" class="form-check-label">موبایل <i
+                                                    class="bi bi-phone ms-1"></i></label>
+                                            <input type="checkbox" name="" id="colorCheck11" class="form-check-input">
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold font-14">(27)</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                        <div class="form-check">
+                                            <label for="colorCheck55" class="form-check-label">ایرپاد <i
+                                                    class="bi bi-earbuds ms-1"></i></label>
+                                            <input type="checkbox" name="" id="colorCheck55" class="form-check-input">
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold font-14">(32)</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                        <div class="form-check">
+                                            <label for="colorCheck44" class="form-check-label">تبلت <i
+                                                    class="bi bi-tablet ms-1"></i></label>
+                                            <input type="checkbox" name="" id="colorCheck44" class="form-check-input">
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold font-14">(14)</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                        <div class="form-check">
+                                            <label for="colorCheck33" class="form-check-label">هدست <i
+                                                    class="bi bi-headset ms-1"></i></label>
+                                            <input type="checkbox" name="" id="colorCheck33" class="form-check-input">
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold font-14">(8)</span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="category-sort mb-3">
+                    <div class="content-box">
+                        <div class="container-fluid">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="box_filter d-lg-block d-none">
+                                    <ul class="list-inline text-start mb-0">
+                                        <li class="list-inline-item title-font ms-0">مرتب سازی بر اساس :</li>
+                                        <li class="list-inline-item"><a href="#">گران ترین</a></li>
+                                        <li class="list-inline-item"><a class="active_custom" href="#">ارزان ترین</a>
+                                        </li>
+                                        <li class="list-inline-item"><a href="#">پروفروش ترین</a></li>
+                                        <li class="list-inline-item"><a href="#">داغ ترین</a></li>
+                                        <li class="list-inline-item"><a href="#">محبوب ترین</a></li>
+                                    </ul>
+                                </div>
+                                {% if product_count != 0 %}
+                                <div class="box_filter_counter fs-6"><i class="bi bi-card-list me-2"></i> {{product_count}} کالا</div>
+                                {% endif %}
+                            </div>
+                            <div class="d-lg-none d-block">
+                                <form action="">
+                                    <label for="" class="form-label my-3 fw-bold">مرتب سازی بر اساس</label>
+                                    <select name="" id="" class="form-select">
+                                        <option value="">گران ترین</option>
+                                        <option value="">ارزان ترین</option>
+                                        <option value="">پرفروش ترین</option>
+                                        <option value="">داغ ترین</option>
+                                        <option value="">محبوب ترین</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-pro">
+                    <div class="row g-3">
+                        {% if products %}
+                        {% for product in products %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="product-box border-ui">
+                                <a href="">
+                                    <div class="product-image">
+                                        <img src="{{ product.image }}" loading="lazy" alt="{{ product.name }}"
+                                        class="img-fluid">
+                                    </div>
+                                    <div class="product-title mb-3">
+                                        <div class="title">
+                                            <p class="text-overflow-1 mt-2">{{ product.name }}</p>
+                                        </div>
+                                        <div class="rating">
+                                            <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
+                                            <div class="icon"><i class="bi bi-star-fill"></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="product-action">
+                                        {% if product.discount != 0 %}
+                                        <div class="discount">
+                                            <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
+                                                <span class="text-white">{{ product.discount }}%</span>
+                                            </div>
+                                        </div>
+                                        <div class="price">
+                                            <p class="new-price">{{ product.final_price }} تومان</p>
+                                            <p class="old-price">{{ product.price }} تومان</p>
+                                        </div>
+                                        {% else %}
+                                        <div class="price">
+                                            <p class="new-price">{{ product.price }} تومان</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-lg-9">
+                            <div class="content-box">
+                                <h3 class="title-font">نتیجه‌ای یافت نشد !</h3>
+                                <p class="my-3">- از عبارت‌های متداول‌تر استفاده کنید.</p>
+                                <p>- املای عبارت وارد شده را بررسی کنید.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="col-12">
+                            <div class="my-paginate my-4">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination flex-wrap justify-content-center">
+                                        <!-- قبلی -->
+                                        {% if pagination.current_page > 1 %}
+                                            <li class="page-item">
+                                                <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:-1 }}">قبلی</a>
+                                            </li>
+                                        {% endif %}
+                            
+                                        <!-- شماره صفحات -->
+                                        {% for page in pagination.page_range %}
+                                            <li class="page-item {% if page == pagination.current_page %}active{% endif %}">
+                                                <a class="page-link rounded-3" href="?page={{ page }}">{{ page }}</a>
+                                            </li>
+                                        {% endfor %}
+                            
+                                        <!-- بعدی -->
+                                        {% if pagination.current_page < pagination.page_range|length %}
+                                            <li class="page-item">
+                                                <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:1 }}">بعدی</a>
+                                            </li>
+                                        {% endif %}
+                                        {% if pagination.next %}
+                                            <li class="page-item">
+                                                <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:1 }}">بعدی</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--============ end main content ==============-->
+
+{% endblock %}

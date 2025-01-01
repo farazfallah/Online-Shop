@@ -178,7 +178,7 @@
                                                     {% for category in category_list %}
                                                         {% if not category.parent_category %}
                                                             <li class="nav-item bg-ul-f7">
-                                                                <a class="nav-link" href="">{% autoescape off %}{{ category.name }}{% endautoescape %}</a>
+                                                                <a class="nav-link" href="{% url 'category-detail' category_id=category.id %}">{% autoescape off %}{{ category.name }}{% endautoescape %}</a>
                                                                 {% if category.subcategories.exists %}
                                                                     <span class="showSubMenu">
                                                                         <i class="bi bi-chevron-left"></i>
@@ -294,7 +294,7 @@
                                 <ul class="main-menu mega-container" id="category-menu">
                                     {% for category in category_list %}
                                         {% if not category.parent_category %}
-                                            <li class=""><a href=""><i class="{{ category.icon }}"></i>
+                                            <li class=""><a href="{% url 'category-detail' category_id=category.id %}"><i class="{{ category.icon }}"></i>
                                                 {% autoescape off %}{{ category.name }}{% endautoescape %}</a>
                                                 <ul class="main-menu-sub back-menu"
                                                 {% if category.image %}
