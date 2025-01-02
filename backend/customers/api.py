@@ -12,6 +12,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.permissions import AllowAny
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from customers.serializers import CustomerSerializer
 from customers.models import Customer
 from customers.utils import (
     store_otp_in_redis, 
@@ -249,6 +251,16 @@ class ValidateTokenView(APIView):
                 'error': 'کاربر یافت نشد',
                 'is_valid': False
             }, status=404)
+
+
+class CustomerProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        customer = request.user 
+        serializer = CustomerSerializer(customer)
+        return Response(serializer.data)
+
 
 
 def register_page(request):

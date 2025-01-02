@@ -65,6 +65,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'fetch_api.context_processors.site_info',
                 'fetch_api.context_processors.categories',
+                'fetch_api.context_processors.user_profile_context',
             ],
         },
     },

@@ -1,5 +1,6 @@
 import requests
 from django.conf import settings
+from fetch_api.request_view.utils import fetch_customer_profile
 
 
 def site_info(request):
@@ -34,3 +35,21 @@ def categories(request):
 
     except requests.exceptions.RequestException as e:
         return {"category_list": [], "error": f"An error occurred: {str(e)}"}
+    
+
+def user_profile_context(request):
+    profile_data = fetch_customer_profile(request)
+    if profile_data:
+        first_name = profile_data.get('first_name', 'کاربر')
+        last_name = profile_data.get('last_name', '')
+        email = profile_data.get('email', '')
+    else:
+        first_name = 'کاربر'
+        last_name = ''
+        email = ''
+
+    return {
+        'first_name': first_name,
+        'last_name': last_name,
+        'email': email,
+    }

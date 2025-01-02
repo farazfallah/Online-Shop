@@ -1,7 +1,7 @@
 import requests
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 from django.conf import settings
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 
 def logout_view(request):
@@ -24,3 +24,5 @@ def logout_view(request):
 
     except requests.RequestException as e:
         return JsonResponse({'error': 'Error communicating with API', 'details': str(e)}, status=500)
+    
+    

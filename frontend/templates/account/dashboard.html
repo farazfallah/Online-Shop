@@ -1,0 +1,521 @@
+{% extends "../base_panel.html" %}
+{% block title %}خانه{% endblock %}
+{% load static %}
+{% block dashboard_content %}
+<!--============ start main content ==============-->
+                <div class="col-xl-9">
+                    {% if not is_otp_verified %}
+                    <div class="alert alert-warning shadow-box" role="alert">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap">
+                            <div class="right text-right d-flex align-items-center">
+                                <i class="bi bi-exclamation-triangle-fill font-20"></i>
+                                <div class="d-grid gap-2 ms-3">
+                                    <h4 class="font-16">تایید ایمیل</h4>
+                                    <h4 class="font-14 text-muted fw-normal">برای کار با پنل کاربری نیاز به تایید
+                                        ایمیل
+                                        دارید</h4>
+                                </div>
+                            </div>
+                            <div class="left text-left mt-sm-0 mt-3">
+                                <a href="" class="btn border-0 main-color-one-bg font-14 waves-effect waves-light">بریم
+                                    واسه تایید !</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="content-box">
+                        <div class="container-fluid">
+                            <div class="row gy-3">
+                                <div class="col-lg-8">
+                                    <h6 class="font-14 main-color-one-color">سلام {{ first_name }} عزیز</h6>
+                                    <p class="text-muted">از پیش خوان حساب کاربری خود میتوانید <a href=""
+                                                                                                  class="def-color fw-bold">آخرین
+                                        سفارش ها</a>
+                                        را ببینید به راحتی آدرس <a href="" class="def-color fw-bold">آدرس حمل و نقل و
+                                            صورت حساب</a> را مدیریت کنید
+                                        و <a href="" class="def-color fw-bold">اطلاعات حساب کاربری و رمز عبور</a> خود را
+                                        تغییر دهید
+                                    </p>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="panel-image">
+                                        <img src="assets/image/panel/panel.svg" alt="" class="img-fluid">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-box px-2 slider-parent">
+                        <div class="container-fluid">
+                            <div class="panel-mini-card">
+                                <div class="row gy-4">
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="panel-two-full-info-item w-100">
+                                            <div class="content d-flex align-items-center flex-column flex-md-row">
+                                                <div class="icon-card me-3">
+                                                    <i class="bi bi-credit-card"></i>
+                                                </div>
+                                                <div class="detail text-center text-md-start">
+                                                    <div class="title mb-2 text-muted"> در حال انجام</div>
+                                                    <div class="value fw-bold h5"> 0 سفارش</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="panel-two-full-info-item w-100">
+                                            <div class="content d-flex align-items-center flex-column flex-md-row">
+                                                <div class="icon-card me-3">
+                                                    <i class="bi bi-truck"></i>
+                                                </div>
+                                                <div class="detail text-center text-md-start">
+                                                    <div class="title mb-2 text-muted"> تکمیل شده</div>
+                                                    <div class="value fw-bold h5"> 17 سفارش</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="panel-two-full-info-item w-100">
+                                            <div class="content d-flex align-items-center flex-column flex-md-row">
+                                                <div class="icon-card me-3">
+                                                    <i class="bi bi-box-seam"></i>
+                                                </div>
+                                                <div class="detail text-center text-md-start">
+                                                    <div class="title mb-2 text-muted"> مرجوع شده</div>
+                                                    <div class="value fw-bold h5"> 0 سفارش</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-6">
+                                        <div class="panel-two-full-info-item w-100">
+                                            <div class="content d-flex align-items-center flex-column flex-md-row">
+                                                <div class="icon-card me-3">
+                                                    <i class="bi bi-cart-x"></i>
+                                                </div>
+                                                <div class="detail text-center text-md-start">
+                                                    <div class="title mb-2 text-muted"> لغو شده</div>
+                                                    <div class="value fw-bold h5"> 0 سفارش</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert slider-parent bg-white mt-5 shadow-box rounded-4">
+                        <div class="tab-product-nav tab-panel-tbl  p-3 rounded-3">
+                            <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link btn border-bottom-0 active" id="latest-order"
+                                            data-bs-toggle="tab" data-bs-target="#latest-order-pane" type="button"
+                                            role="tab" aria-controls="latest-order-pane" aria-selected="true">آخرین
+                                        سفارشات <span class="badge main-color-green ms-1">1</span></button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link btn border-bottom-0" id="favorite-product"
+                                            data-bs-toggle="tab" data-bs-target="#favorite-product-pane" type="button"
+                                            role="tab" aria-controls="favorite-product-pane" aria-selected="false"
+                                            tabindex="-1">علاقه مندی ها
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link btn border-bottom-0" id="cancel-order" data-bs-toggle="tab"
+                                            data-bs-target="#cancel-order-pane" type="button" role="tab"
+                                            aria-controls="cancel-order-pane" aria-selected="false" tabindex="-1">لغو
+                                        شده ها
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-content tab-product-content" id="myTabContent">
+                            <div class="tab-pane fade active show" id="latest-order-pane" role="tabpanel"
+                                 aria-labelledby="latest-order" tabindex="0">
+                                <div class="panel-latest-order">
+                                    <div class="table-responsive roundedTable p-0">
+                                        <table class="table table-bordered main-table rounded-0">
+                                            <tbody>
+                                            <tr>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="avatar-group d-flex align-items-center justify-content-center assigned-avatar">
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image1.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image2.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image3.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <h5 class="text-overflow-1 mt-2 font-15">
+                                                        سفارش شماره 427 خرم آباد
+                                                    </h5>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">کد سفارش</p>
+                                                        <p class="mb-0 ms-2 font-12 fw-bold">1456321</p>
+                                                    </div>
+                                                    <p class="mb-0 text-muted mt-2 font-14">4 تیرماه 1403</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">مبلغ</p>
+                                                        <p class="mb-0 ms-2 fw-bold font-14">1,700,000 تومان</p>
+                                                    </div>
+                                                    <p class="mb-0 fw-bold mt-2 font-14"><i
+                                                            class="bi bi-check-circle-fill me-1 main-color-three-color"></i>
+                                                        تحویل داده شده</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="text-center">
+                                                        <a href="" class="btn main-color-one-bg">مشاهده</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="avatar-group d-flex align-items-center justify-content-center assigned-avatar">
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image1.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image2.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image3.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <h5 class="text-overflow-1 mt-2 font-15">
+                                                        سفارش شماره 427 خرم آباد
+                                                    </h5>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">کد سفارش</p>
+                                                        <p class="mb-0 ms-2 font-12 fw-bold">1456321</p>
+                                                    </div>
+                                                    <p class="mb-0 text-muted mt-2 font-14">4 تیرماه 1403</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">مبلغ</p>
+                                                        <p class="mb-0 ms-2 fw-bold font-14">1,700,000 تومان</p>
+                                                    </div>
+                                                    <p class="mb-0 fw-bold mt-2 font-14"><i
+                                                            class="bi bi-check-circle-fill me-1 main-color-three-color"></i>
+                                                        تحویل داده شده</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="text-center">
+                                                        <a href="" class="btn main-color-one-bg">مشاهده</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="avatar-group d-flex align-items-center justify-content-center assigned-avatar">
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image1.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image2.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image3.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <h5 class="text-overflow-1 mt-2 font-15">
+                                                        سفارش شماره 427 خرم آباد
+                                                    </h5>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">کد سفارش</p>
+                                                        <p class="mb-0 ms-2 font-12 fw-bold">1456321</p>
+                                                    </div>
+                                                    <p class="mb-0 text-muted mt-2 font-14">4 تیرماه 1403</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">مبلغ</p>
+                                                        <p class="mb-0 ms-2 fw-bold font-14">1,700,000 تومان</p>
+                                                    </div>
+                                                    <p class="mb-0 fw-bold mt-2 font-14"><i
+                                                            class="bi bi-check-circle-fill me-1 main-color-three-color"></i>
+                                                        تحویل داده شده</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="text-center">
+                                                        <a href="" class="btn main-color-one-bg">مشاهده</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="avatar-group d-flex align-items-center justify-content-center assigned-avatar">
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image1.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image2.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip"
+                                                             data-bs-placement="top"
+                                                             aria-label="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW"
+                                                             data-bs-original-title="تی شرت لانگ ورزشی مردانه نوزده نودیک مدل TS1967 WW">
+                                                            <a href="">
+                                                                <img src="assets/image/product/product-image3.jpg"
+                                                                     alt="Avatar" class="rounded-circle  pull-up">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <h5 class="text-overflow-1 mt-2 font-15">
+                                                        سفارش شماره 427 خرم آباد
+                                                    </h5>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">کد سفارش</p>
+                                                        <p class="mb-0 ms-2 font-12 fw-bold">1456321</p>
+                                                    </div>
+                                                    <p class="mb-0 text-muted mt-2 font-14">4 تیرماه 1403</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="mb-0 text-muted font-15">مبلغ</p>
+                                                        <p class="mb-0 ms-2 fw-bold font-14">1,700,000 تومان</p>
+                                                    </div>
+                                                    <p class="mb-0 fw-bold mt-2 font-14"><i
+                                                            class="bi bi-check-circle-fill me-1 main-color-three-color"></i>
+                                                        تحویل داده شده</p>
+                                                </td>
+                                                <td colspan="2" class="align-middle">
+                                                    <div class="text-center">
+                                                        <a href="" class="btn main-color-one-bg">مشاهده</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="pagination mt-5 pagination-2 justify-content-center">
+                                    <a href="#" class="pageitem">قبلی</a>
+                                    <a href="#">1</a>
+                                    <a href="#" class="active">2</a>
+                                    <a href="#">3</a>
+                                    <a href="#">4</a>
+                                    <a href="#">5</a>
+                                    <a href="#">6</a>
+                                    <a href="#">7</a>
+                                    <a href="#" class="pageitem">بعدی</a>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="favorite-product-pane" role="tabpanel"
+                                 aria-labelledby="latest-order" tabindex="0">
+                                <nav class="navbar navbar-expand">
+                                    <ul class="row navbar-nav gy-3 ps-0 mt-4">
+                                        <li class="col-sm-6">
+                                            <div class="cart-canvas border rounded-3 p-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-4 ps-0">
+                                                        <img src="assets/image/product/wach1.jpg" alt="">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <h3 class="text-overflow-2 font-16">ساعت مچی عقربه‌ای مردانه
+                                                            اینویکتا مدل
+                                                            Automatico Ghost Reserve
+                                                        </h3>
+                                                        <div class="product-box-suggest-price my-2  d-flex align-items-center justify-content-between">
+                                                            <ins class="font-25 ms-0">2,500,000 <span>تومان</span></ins>
+                                                        </div>
+                                                        <div class="cart-canvas-foot d-flex align-items-center justify-content-between">
+                                                            <div class="cart-canvas-delete">
+                                                                <a href="" class="btn"><i class="bi bi-x"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col-sm-6">
+                                            <div class="cart-canvas p-3 border rounded-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-4 ps-0">
+                                                        <img src="assets/image/product/wach4.jpg" alt="">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <h3 class="text-overflow-2 font-16">ساعت مچی عقربه‌ای مردانه
+                                                            اینویکتا مدل
+                                                            Automatico Ghost Reserve
+                                                        </h3>
+                                                        <div class="product-box-suggest-price my-2  d-flex align-items-center justify-content-between">
+                                                            <ins class="font-25 ms-0">2,500,000 <span>تومان</span></ins>
+                                                        </div>
+                                                        <div class="cart-canvas-foot d-flex align-items-center justify-content-between">
+                                                            <div class="cart-canvas-delete">
+                                                                <a href="" class="btn"><i class="bi bi-x"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col-sm-6">
+                                            <div class="cart-canvas p-3 border rounded-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-4 ps-0">
+                                                        <img src="assets/image/product/wach2.jpg" alt="">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <h3 class="text-overflow-2 font-16">ساعت مچی عقربه‌ای مردانه
+                                                            اینویکتا مدل
+                                                            Automatico Ghost Reserve
+                                                        </h3>
+                                                        <div class="product-box-suggest-price my-2  d-flex align-items-center justify-content-between">
+                                                            <ins class="font-25 ms-0">2,500,000 <span>تومان</span></ins>
+                                                        </div>
+                                                        <div class="cart-canvas-foot d-flex align-items-center justify-content-between">
+                                                            <div class="cart-canvas-delete">
+                                                                <a href="" class="btn"><i class="bi bi-x"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="col-sm-6">
+                                            <div class="cart-canvas p-3 border rounded-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-4 ps-0">
+                                                        <img src="assets/image/product/wach3.jpg" alt="">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <h3 class="text-overflow-2 font-16">ساعت مچی عقربه‌ای مردانه
+                                                            اینویکتا مدل
+                                                            Automatico Ghost Reserve
+                                                        </h3>
+                                                        <div class="product-box-suggest-price my-2  d-flex align-items-center justify-content-between">
+                                                            <ins class="font-25 ms-0">2,500,000 <span>تومان</span></ins>
+                                                        </div>
+                                                        <div class="cart-canvas-foot d-flex align-items-center justify-content-between">
+                                                            <div class="cart-canvas-delete">
+                                                                <a href="" class="btn"><i class="bi bi-x"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="tab-pane fade" id="cancel-order-pane" role="tabpanel"
+                                 aria-labelledby="cancel-order" tabindex="0">
+                                <div class="order-list__table-body" id="js-orders-table-body">
+                                    <div class="order-list--empty">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"
+                                             viewBox="0 0 150 150" fill="none">
+                                            <path d="M14.8323 44.1052L93.1651 29.6021L106.815 103.327L28.4823 117.83L14.8323 44.1052Z"
+                                                  fill="#B3B9BF"></path>
+                                            <path d="M29.8665 22.2656L14.843 44.1164L44.8008 38.5688L93.1969 29.6086L108.22 7.75781L29.8665 22.2656Z"
+                                                  fill="#C0C2C9"></path>
+                                            <path d="M108.22 7.75781L93.1965 29.6086L106.851 103.355L121.875 81.5039L108.22 7.75781Z"
+                                                  fill="#A6ABB3"></path>
+                                            <path d="M44.7856 38.5598L63.2169 35.1473L68.7622 65.0981L50.331 68.5106L44.7856 38.5598Z"
+                                                  fill="#9BA1A8"></path>
+                                            <path d="M63.2391 35.1539L44.8008 38.5687L59.8242 16.7179L78.2625 13.3054L63.2391 35.1539Z"
+                                                  fill="#9BA1A8"></path>
+                                            <path d="M21.0938 21.0938H16.4062C16.4062 12.0492 23.7656 4.6875 32.8125 4.6875H35.1562V9.375H32.8125C26.3508 9.375 21.0938 14.632 21.0938 21.0938Z"
+                                                  fill="#9BA1A8"></path>
+                                            <path d="M111.875 135.312H109.531V130.625H111.875C118.337 130.625 123.594 125.368 123.594 118.906H128.281C128.281 127.951 120.922 135.312 111.875 135.312Z"
+                                                  fill="#9BA1A8"></path>
+                                            <path d="M104.844 128.281H102.5V123.594H104.844C111.305 123.594 116.562 118.337 116.562 111.875H121.25C121.25 120.92 113.891 128.281 104.844 128.281Z"
+                                                  fill="#9BA1A8"></path>
+                                        </svg>
+                                        <p class="order-list__empty-text">سفارشی موجود نیست!</p></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+{% endblock %}

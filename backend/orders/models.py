@@ -1,4 +1,3 @@
-# orders/models.py
 from django.db import models
 from core.models import BaseModel, LogicalDeleteModel
 
@@ -24,11 +23,19 @@ class Order(BaseModel, LogicalDeleteModel):
 class OrderItem(BaseModel, LogicalDeleteModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, related_name='order_items')
+    product_name = models.CharField(max_length=255)
+    product_price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"Item {self.product.name} in Order {self.order.id}"
+        return f"Item {self.product_name} in Order {self.order.id}"
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.product_name = self.product.name
+            self.product_price = self.product.price
+        super().save(*args, **kwargs)
 
 
 class DiscountCode(BaseModel, LogicalDeleteModel):
