@@ -13,12 +13,21 @@
         </div>
         <div class="col-6">
             <div class="text-end">
-                <a data-bs-toggle="modal" data-bs-target="#editModal" href=""
+                <a data-bs-toggle="modal" data-bs-target="#addAddressModal" href=""
                    class="btn main-color-one-bg rounded-3 btn-action-panel"><i
                         class="bi bi-pencil-square me-2"></i>ثبت آدرس</a>
             </div>
         </div>
     </div>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
     <div class="content mt-4">
         <div class="slider-parent rounded-4 border-ui content-box">
             <div class="container-fluid">
@@ -26,28 +35,20 @@
                 <div class="ui-box-item-desc bg-white">
                     <div class="orders">
                         {% for address in addresses %}
-                        <div class="order-item">
+                        <div class="order-item{% if not forloop.last %} border-bottom{% endif %}">
                             <div class="order-item-status flex-nowrap">
                                 <div class="order-item-status-item">
-                                    <p>{{ address.address_line }}
-                                    </p>
+                                    <p>{{ address.address_line }}</p>
                                 </div>
                                 <div class="order-item-status-item dropd-status">
                                     <div class="dropdown">
-                                        <a class="" href="#" role="button" id="dropdownMenuLink"
-                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                        <a class="" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical text-dark fs-5"></i>
                                         </a>
-
-                                        <ul class="dropdown-menu flex-column"
-                                            aria-labelledby="dropdownMenuLink" style="">
-                                            <li><a class="dropdown-item" href="#"><i
-                                                    class="bi bi-pencil"></i>
-                                                ویرایش
-                                            </a></li>
-                                            <li><a class="dropdown-item" href="#"><i
-                                                    class="bi bi-trash text-danger"></i>
-                                                حذف </a></li>
+                        
+                                        <ul class="dropdown-menu flex-column" aria-labelledby="dropdownMenuLink" style="">
+                                            <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> ویرایش </a></li>
+                                            <li><a class="dropdown-item" href="#"><i class="bi bi-trash text-danger"></i> حذف </a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -71,18 +72,13 @@
                                             <i class="bi bi-phone me-2"></i>
                                             <p>{{ email }}</p>
                                         </div>
-                                        <div class="text-muted d-flex align-items-center mb-2">
-                                            <i class="bi bi-person me-2"></i>
-                                            <p>{{ first_name }} {{ last_name }}</p>
-                                        </div>
                                     </div>
-                                    <img src="{% static 'image/emptyAddress.webp' %}" alt=""
-                                         class="img-thumbnail w-150-px h-150-px object-fit-cover"
-                                         style="pointer-events: none;">
+                                    <img src="{% static 'image/emptyAddress.webp' %}" alt="" class="img-thumbnail w-150-px h-150-px object-fit-cover" style="pointer-events: none;">
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
+                        
                     </div>
                     {% else %}
                     <div class="order-list--empty">
@@ -113,4 +109,56 @@
         </div>
     </div>
 </div>
+
+<!--============ start edit profile modal ==============-->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addAddressModalLabel">افزودن آدرس جدید</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="address_line" name="address_line" placeholder="آدرس خیابان را وارد کنید..." required>
+                                <label for="address_line" class="form-label label-float fw-bold">آدرس خیابان <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="city" name="city" placeholder="شهر را وارد کنید..." required>
+                                <label for="city" class="form-label label-float fw-bold">شهر <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="state" name="state" placeholder="استان را وارد کنید..." required>
+                                <label for="state" class="form-label label-float fw-bold">استان <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="کد پستی را وارد کنید..." required>
+                                <label for="postal_code" class="form-label label-float fw-bold">کد پستی <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn main-color-one-bg border-0">
+                                    افزودن آدرس
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>                
+            </div>
+        </div>
+    </div>
+</div>  
+<!--============ end edit profile modal ==============-->
+
 {% endblock %}

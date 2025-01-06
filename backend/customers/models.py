@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.validators import validate_email
 from core.models import BaseModel, LogicalDeleteModel
 from core.managers import CustomUserManager
-
+import uuid
 
 class Customer(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100)
@@ -33,6 +33,7 @@ class Address(BaseModel, LogicalDeleteModel):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self):
         return f"{self.address_line}, {self.city}"

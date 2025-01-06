@@ -12,8 +12,9 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.permissions import AllowAny
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from customers.serializers import CustomerSerializer
+from customers.serializers import CustomerSerializer, AddressSerializer
 from customers.models import Customer
 from customers.utils import (
     store_otp_in_redis, 
@@ -101,10 +102,7 @@ class LoginWithOtpView(APIView):
                 refresh = RefreshToken.for_user(customer)
                 access_token = str(refresh.access_token)
 
-                if customer.is_staff:
-                    redirect_url = reverse_lazy('admin:index')
-                else:
-                    redirect_url = reverse_lazy('home')
+                redirect_url = reverse_lazy('home')
 
                 delete_otp_from_redis(email)
                 
@@ -260,6 +258,20 @@ class CustomerProfileView(APIView):
         customer = request.user 
         serializer = CustomerSerializer(customer)
         return Response(serializer.data)
+
+
+class AddAddressView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        customer = request.user
+        data = request.data
+        
+        serializer = AddressSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(customer=customer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

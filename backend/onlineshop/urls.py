@@ -28,7 +28,8 @@ from customers.api import (
     RegisterView, 
     ValidateTokenView,
     LogoutView,
-    CustomerProfileView
+    CustomerProfileView,
+    AddAddressView
     )
 from product.api import (
     CategoryViewSet,
@@ -69,6 +70,8 @@ apipath = [
     path('api/logout/', LogoutView.as_view(), name='logout_api'),
     path('api/profile/', CustomerProfileView.as_view(), name='customer-profile'),
     path('api/search/', ProductSearchView.as_view(), name='product-search'),
+    # Addresses
+    path('api/addresses/add/', AddAddressView.as_view(), name='add_address'),
     # Comment 
     path('api/products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),
     # Product router
