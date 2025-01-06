@@ -74,6 +74,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'frontend.wsgi.application'
 
 API_BASE_URL = "http://127.0.0.1:8000/api/"
+PRODUCTS_PER_PAGE = 1
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 

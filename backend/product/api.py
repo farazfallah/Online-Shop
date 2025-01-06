@@ -1,11 +1,12 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -64,12 +65,17 @@ class ProductsByCategoryView(RetrieveAPIView):
     serializer_class = ProductsByCategorySerializer
     
     
-class ProductSearchView(ListAPIView):
+class ProductPagination(PageNumberPagination):
+    page_size = 10  # تعداد محصولات در هر صفحه
+    page_size_query_param = 'page_size'  # امکان تغییر تعداد محصولات در هر صفحه از طریق URL
+    max_page_size = 100  # حداکثر تعداد محصولات در هر صفحه
+
+class ProductSearchView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    pagination_class = ProductPagination  # اضافه کردن کلاس صفحه‌بندی
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-
     search_fields = ['name', 'description', 'category__name', 'attributes__value']
     ordering_fields = ['price', 'stock_quantity', 'discount']
     filterset_fields = ['category', 'price', 'stock_quantity', 'discount']

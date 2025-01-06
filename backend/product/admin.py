@@ -35,6 +35,9 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('category',)
     list_editable = ('price', 'discount', 'stock_quantity')
     inlines = [ProductImageInline, ProductAttributeInline]
+    def get_queryset(self, request):
+        return Product.all_objects.all()
+
     
     
 class ProductCommentAdmin(admin.ModelAdmin):

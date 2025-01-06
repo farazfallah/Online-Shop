@@ -1,4 +1,5 @@
 # core/managers.py
+from django.db import models
 from django.contrib.auth.models import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
@@ -25,3 +26,12 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
+class ActiveQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return ActiveQuerySet(self.model, using=self._db).active()

@@ -1,4 +1,5 @@
 from django.db import models
+from core.managers import ActiveManager
 
 
 class BaseModel(models.Model):
@@ -11,6 +12,9 @@ class BaseModel(models.Model):
 class LogicalDeleteModel(models.Model):
     is_active = models.BooleanField(default=True)
 
+    objects = ActiveManager()
+    all_objects = models.Manager()
+    
     class Meta:
         abstract = True
 

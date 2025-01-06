@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}دسته بندی {{ category.name }}{% endblock %}
+{% block title %}دسته بندی {{ category_name }}{% endblock %}
 {% load static %}
 {% block content %}
 <!--============ start category slider  ==============-->
@@ -485,29 +485,31 @@
                                 <div class="box_filter d-lg-block d-none">
                                     <ul class="list-inline text-start mb-0">
                                         <li class="list-inline-item title-font ms-0">مرتب سازی بر اساس :</li>
-                                        <li class="list-inline-item"><a href="#">گران ترین</a></li>
-                                        <li class="list-inline-item"><a class="active_custom" href="#">ارزان ترین</a>
+                                        <li class="list-inline-item">
+                                            <a href="?ordering=-price" class="{% if current_ordering == '-price' %}active_custom{% endif %}">
+                                                گران ترین
+                                            </a>
                                         </li>
-                                        <li class="list-inline-item"><a href="#">پروفروش ترین</a></li>
-                                        <li class="list-inline-item"><a href="#">داغ ترین</a></li>
-                                        <li class="list-inline-item"><a href="#">محبوب ترین</a></li>
+                                        <li class="list-inline-item">
+                                            <a href="?ordering=price" class="{% if current_ordering == 'price' %}active_custom{% endif %}">
+                                                ارزان ترین
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
+                                
                                 {% if product_count != 0 %}
                                 <div class="box_filter_counter fs-6"><i class="bi bi-card-list me-2"></i> {{product_count}} کالا</div>
                                 {% endif %}
                             </div>
                             <div class="d-lg-none d-block">
-                                <form action="">
-                                    <label for="" class="form-label my-3 fw-bold">مرتب سازی بر اساس</label>
-                                    <select name="" id="" class="form-select">
-                                        <option value="">گران ترین</option>
-                                        <option value="">ارزان ترین</option>
-                                        <option value="">پرفروش ترین</option>
-                                        <option value="">داغ ترین</option>
-                                        <option value="">محبوب ترین</option>
+                                <form action="" method="get">
+                                    <label for="ordering" class="form-label my-3 fw-bold">مرتب سازی بر اساس</label>
+                                    <select name="ordering" id="ordering" class="form-select" onchange="this.form.submit()">
+                                        <option value="-price" {% if current_ordering == '-price' %}selected{% endif %}>گران ترین</option>
+                                        <option value="price" {% if current_ordering == 'price' %}selected{% endif %}>ارزان ترین</option>
                                     </select>
-                                </form>
+                                </form>                                
                             </div>
                         </div>
                     </div>
@@ -518,7 +520,7 @@
                         {% for product in products %}
                         <div class="col-lg-4 col-md-6">
                             <div class="product-box border-ui">
-                                <a href="">
+                                <a href="{% url 'product_detail' product_id=product.id %}">
                                     <div class="product-image">
                                         <img src="{{ product.image }}" loading="lazy" alt="{{ product.name }}"
                                         class="img-fluid">
@@ -568,29 +570,25 @@
                                     <ul class="pagination flex-wrap justify-content-center">
                                         <!-- قبلی -->
                                         {% if pagination.current_page > 1 %}
-                                            <li class="page-item">
-                                                <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:-1 }}">قبلی</a>
-                                            </li>
-                                        {% endif %}
-                            
-                                        <!-- شماره صفحات -->
-                                        {% for page in pagination.page_range %}
-                                            <li class="page-item {% if page == pagination.current_page %}active{% endif %}">
-                                                <a class="page-link rounded-3" href="?page={{ page }}">{{ page }}</a>
-                                            </li>
-                                        {% endfor %}
-                            
-                                        <!-- بعدی -->
-                                        {% if pagination.current_page < pagination.page_range|length %}
-                                            <li class="page-item">
-                                                <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:1 }}">بعدی</a>
-                                            </li>
-                                        {% endif %}
-                                        {% if pagination.next %}
-                                            <li class="page-item">
-                                                <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:1 }}">بعدی</a>
-                                            </li>
-                                        {% endif %}
+                                        <li class="page-item">
+                                            <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:-1 }}">قبلی</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <!-- شماره صفحات -->
+                                    {% for page in pagination.page_range %}
+                                        <li class="page-item {% if page == pagination.current_page %}active{% endif %}">
+                                            <a class="page-link rounded-3" href="?page={{ page }}">{{ page }}</a>
+                                        </li>
+                                    {% endfor %}
+                                    
+                                    <!-- بعدی -->
+                                    {% if pagination.current_page < pagination.page_range|length %}
+                                        <li class="page-item">
+                                            <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:1 }}">بعدی</a>
+                                        </li>
+                                    {% endif %}
+                                    
                                     </ul>
                                 </nav>
                             </div>                            
