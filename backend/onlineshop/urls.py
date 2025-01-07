@@ -29,7 +29,9 @@ from customers.api import (
     ValidateTokenView,
     LogoutView,
     CustomerProfileView,
-    AddAddressView
+    AddAddressView,
+    EditAddressView,
+    DeleteAddressView
     )
 from product.api import (
     CategoryViewSet,
@@ -72,6 +74,8 @@ apipath = [
     path('api/search/', ProductSearchView.as_view(), name='product-search'),
     # Addresses
     path('api/addresses/add/', AddAddressView.as_view(), name='add_address'),
+    path('api/addresses/edit/<int:address_id>/', EditAddressView.as_view(), name='edit_address'),
+    path('api/addresses/delete/<int:address_id>/', DeleteAddressView.as_view(), name='delete-address'),
     # Comment 
     path('api/products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),
     # Product router

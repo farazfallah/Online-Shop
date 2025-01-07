@@ -43,13 +43,16 @@ def user_profile_context(request):
         first_name = profile_data.get('first_name', 'کاربر')
         last_name = profile_data.get('last_name', '')
         email = profile_data.get('email', '')
+        image = profile_data.get('image', '')
     else:
         first_name = 'کاربر'
         last_name = ''
         email = ''
+        image = ''
 
     return {
         'first_name': first_name,
         'last_name': last_name,
         'email': email,
+        'image': f"{settings.BACK_END_URL}{image}",
     }

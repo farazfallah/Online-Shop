@@ -12,10 +12,9 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.permissions import AllowAny
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from customers.serializers import CustomerSerializer, AddressSerializer
-from customers.models import Customer
+from customers.models import Customer, Address
 from customers.utils import (
     store_otp_in_redis, 
     send_otp_email,
@@ -272,6 +271,40 @@ class AddAddressView(APIView):
             serializer.save(customer=customer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EditAddressView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, address_id):
+        customer = request.user
+        try:
+            # بررسی اینکه آدرس متعلق به کاربر فعلی است
+            address = Address.objects.get(id=address_id, customer=customer)
+        except Address.DoesNotExist:
+            return Response({'detail': 'آدرس موردنظر یافت نشد.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # بررسی داده‌های ورودی
+        data = request.data
+        serializer = AddressSerializer(address, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteAddressView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, address_id):
+        customer = request.user
+        try:
+            address = Address.objects.get(id=address_id, customer=customer)
+        except Address.DoesNotExist:
+            return Response({'detail': 'آدرس موردنظر یافت نشد.'}, status=status.HTTP_404_NOT_FOUND)
+
+        address.delete()
+        return Response({'detail': 'آدرس با موفقیت حذف شد.'}, status=status.HTTP_204_NO_CONTENT)
 
 
 

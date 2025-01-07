@@ -13,7 +13,7 @@
         </div>
         <div class="col-6">
             <div class="text-end">
-                <a data-bs-toggle="modal" data-bs-target="#addAddressModal" href=""
+                <a data-bs-toggle="modal" data-bs-target="#addressModal" href=""
                    class="btn main-color-one-bg rounded-3 btn-action-panel"><i
                         class="bi bi-pencil-square me-2"></i>ثبت آدرس</a>
             </div>
@@ -47,8 +47,26 @@
                                         </a>
                         
                                         <ul class="dropdown-menu flex-column" aria-labelledby="dropdownMenuLink" style="">
-                                            <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> ویرایش </a></li>
-                                            <li><a class="dropdown-item" href="#"><i class="bi bi-trash text-danger"></i> حذف </a></li>
+                                            <li>
+                                                <a class="dropdown-item edit-address-btn" 
+                                                   href="#" 
+                                                   data-bs-toggle="modal" 
+                                                   data-bs-target="#addressModal"
+                                                   data-id="{{ address.id }}"
+                                                   data-address_line="{{ address.address_line }}"
+                                                   data-city="{{ address.city }}"
+                                                   data-state="{{ address.state }}"
+                                                   data-postal_code="{{ address.postal_code }}">
+                                                   <i class="bi bi-pencil"></i> ویرایش
+                                                </a>
+                                            </li>                                            
+                                            <form method="POST" action="{% url 'dashboard-address' %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="address_id" value="{{ address.id }}">
+                                                <button type="submit" class="btn btn-link text-danger" style="text-decoration: none" name="delete_address">
+                                                    <i class="bi bi-trash text-danger"></i> حذف
+                                                </button>
+                                            </form>
                                         </ul>
                                     </div>
                                 </div>
@@ -110,8 +128,8 @@
     </div>
 </div>
 
-<!--============ start edit profile modal ==============-->
-<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+
+{% comment %} <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -158,7 +176,103 @@
             </div>
         </div>
     </div>
-</div>  
-<!--============ end edit profile modal ==============-->
-
+</div>   {% endcomment %}
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addressModalLabel">افزودن آدرس جدید</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm" method="POST">
+                    {% csrf_token %}
+                    <!-- مقدار مخفی برای تعیین حالت (افزودن/ویرایش) -->
+                    <input type="hidden" id="address_id" name="address_id" value="">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="address_line" name="address_line" placeholder="آدرس خیابان را وارد کنید..." required>
+                                <label for="address_line" class="form-label label-float fw-bold">آدرس خیابان <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="city" name="city" placeholder="شهر را وارد کنید..." required>
+                                <label for="city" class="form-label label-float fw-bold">شهر <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="state" name="state" placeholder="استان را وارد کنید..." required>
+                                <label for="state" class="form-label label-float fw-bold">استان <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="comment-item">
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="کد پستی را وارد کنید..." required>
+                                <label for="postal_code" class="form-label label-float fw-bold">کد پستی <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn main-color-one-bg border-0" id="modalSubmitButton">
+                                    افزودن آدرس
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>                
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalTitle = document.getElementById("addressModalLabel");
+        const addressForm = document.getElementById("addressForm");
+        const addressIdInput = document.getElementById("address_id");
+        const addressLineInput = document.getElementById("address_line");
+        const cityInput = document.getElementById("city");
+        const stateInput = document.getElementById("state");
+        const postalCodeInput = document.getElementById("postal_code");
+        const submitButton = document.getElementById("modalSubmitButton");
+    
+        // مدیریت دکمه‌های ویرایش
+        document.querySelectorAll(".edit-address-btn").forEach((button) => {
+            button.addEventListener("click", function () {
+                const addressId = button.getAttribute("data-id");
+                const addressLine = button.getAttribute("data-address_line");
+                const city = button.getAttribute("data-city");
+                const state = button.getAttribute("data-state");
+                const postalCode = button.getAttribute("data-postal_code");
+    
+                // پر کردن فرم با اطلاعات آدرس
+                addressIdInput.value = addressId;
+                addressLineInput.value = addressLine;
+                cityInput.value = city;
+                stateInput.value = state;
+                postalCodeInput.value = postalCode;
+    
+                // تغییر عنوان و متن دکمه
+                modalTitle.textContent = "ویرایش آدرس";
+                submitButton.textContent = "ویرایش آدرس";
+            });
+        });
+    
+        // مدیریت حالت افزودن
+        document.getElementById("addressModal").addEventListener("show.bs.modal", function () {
+            if (!addressIdInput.value) {
+                modalTitle.textContent = "افزودن آدرس جدید";
+                submitButton.textContent = "افزودن آدرس";
+            }
+        });
+    
+        // پاک کردن فرم هنگام بسته شدن مودال
+        document.getElementById("addressModal").addEventListener("hidden.bs.modal", function () {
+            addressForm.reset();
+            addressIdInput.value = ""; // ریست حالت به "افزودن"
+        });
+    });
+</script>    
 {% endblock %}
