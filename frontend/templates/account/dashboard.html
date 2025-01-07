@@ -11,18 +11,52 @@
                                 <i class="bi bi-exclamation-triangle-fill font-20"></i>
                                 <div class="d-grid gap-2 ms-3">
                                     <h4 class="font-16">تایید ایمیل</h4>
-                                    <h4 class="font-14 text-muted fw-normal">برای کار با پنل کاربری نیاز به تایید
-                                        ایمیل
-                                        دارید</h4>
+                                    <h4 class="font-14 text-muted fw-normal">برای کار با پنل کاربری نیاز به تایید ایمیل دارید</h4>
                                 </div>
                             </div>
                             <div class="left text-left mt-sm-0 mt-3">
-                                <a href="" class="btn border-0 main-color-one-bg font-14 waves-effect waves-light">بریم
-                                    واسه تایید !</a>
+                                <button id="request-otp-btn" class="btn border-0 main-color-one-bg font-14 waves-effect waves-light">
+                                    بریم واسه تایید!
+                                    <span id="spinner" class="spinner-border spinner-border-sm ms-2" style="display: none;" role="status" aria-hidden="true"></span>
+                                </button>                                
                             </div>
                         </div>
                     </div>
                     {% endif %}
+                
+                    <div id="otp-section" style="display: none;">
+                        <div class="alert text-center alert-success" style="display: none;">
+                            کد برای شما ایمیل شد. لطفا آن را وارد کنید
+                        </div>
+                
+                        <div id="otp-input" class="text-center">
+                            <label>
+                                <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*"/>
+                            </label>
+                            <label>
+                                <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*"/>
+                            </label>
+                            <label>
+                                <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*"/>
+                            </label>
+                            <label>
+                                <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*"/>
+                            </label>
+                            <label>
+                                <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*"/>
+                            </label>
+                            <label>
+                                <input placeholder="_" type="number" step="1" min="0" max="9" autocomplete="no" pattern="\d*"/>
+                            </label>
+                            <input id="otp-value" placeholder="_" type="hidden" name="otp"/>
+                        </div>            
+                        <div class="text-center mt-3">
+                            <button id="resend-otp-btn" class="btn btn-link" style="display: none;">
+                                ارسال مجدد کد
+                            </button>
+                            <div id="timer" class="text-muted"></div>
+                        </div>
+                    </div>
                     <div class="content-box">
                         <div class="container-fluid">
                             <div class="row gy-3">
@@ -518,4 +552,153 @@
 
                     </div>
                 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const requestOtpBtn = document.getElementById('request-otp-btn');
+        const otpSection = document.getElementById('otp-section');
+        const successAlert = document.querySelector('.alert-success');
+        const inputs = document.querySelectorAll('#otp-input input[type="number"]');
+        const otpValue = document.getElementById('otp-value');
+    
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        
+        console.log('Script loaded');
+    
+        requestOtpBtn.addEventListener('click', async function() {
+            console.log('Button clicked');
+            try {
+                const csrfToken = getCookie('csrftoken');
+                console.log('CSRF Token:', csrfToken);
+        
+                const formData = new FormData();
+                formData.append('email', '{{ email }}');
+        
+                const spinner = document.getElementById('spinner');
+                spinner.style.display = 'inline-block';
+                requestOtpBtn.disabled = true;
+        
+                const response = await fetch(`${API_BASE_URL}/api/login/otp/request/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData,
+                    credentials: 'include'
+                });
+        
+                spinner.style.display = 'none';
+                requestOtpBtn.disabled = false;
+        
+                const responseText = await response.text();
+                console.log('Response text:', responseText);
+        
+                try {
+                    const data = JSON.parse(responseText);
+                    if (response.ok) {
+                        otpSection.style.display = 'block';
+                        successAlert.style.display = 'block';
+                        successAlert.textContent = data.message;
+                        inputs[0].focus();
+                    } else {
+                        throw new Error(data.error || 'خطا در ارسال کد');
+                    }
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    throw new Error('خطا در دریافت پاسخ از سرور');
+                }
+            } catch (error) {
+                console.error('Error details:', error);
+                alert(error.message);
+        
+                const spinner = document.getElementById('spinner');
+                spinner.style.display = 'none';
+                requestOtpBtn.disabled = false;
+            }
+        });                                                      
+    
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                if (this.value.length > 0) {
+                    this.value = this.value[0];
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                }
+                otpValue.value = Array.from(inputs).map(input => input.value).join('');
+                
+                if (otpValue.value.length === 6) {
+                    verifyOtp(otpValue.value);
+                }
+            });
+    
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    
+        async function verifyOtp(otp) {
+            try {
+                const formData = new FormData();
+                formData.append('email', '{{ email }}');
+                formData.append('otp', otp);
+        
+                const spinner = document.getElementById('spinner');
+                spinner.style.display = 'block';
+        
+                const response = await fetch(`${API_BASE_URL}/api/login/otp/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: formData,
+                    credentials: 'include'
+                });
+        
+                spinner.style.display = 'none';
+        
+                const data = await response.json();
+        
+                if (response.ok) {
+                    const alertSection = document.querySelector('.alert-warning');
+                    const otpSection = document.getElementById('otp-section');
+                    if (alertSection) alertSection.remove();
+                    if (otpSection) otpSection.remove();
+        
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'alert alert-success text-center mt-3';
+                    successMessage.textContent = data.message || 'ورود شما موفقیت‌آمیز بود!';
+                    document.body.appendChild(successMessage);
+                } else {
+                    throw new Error(data.error || 'کد وارد شده صحیح نیست');
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                alert(error.message);
+                inputs.forEach(input => input.value = '');
+                otpValue.value = '';
+                inputs[0].focus();
+        
+                const spinner = document.getElementById('spinner');
+                spinner.style.display = 'none';
+            }
+        }                                                                                              
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 {% endblock %}

@@ -1,10 +1,11 @@
 # customer/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.timezone import now
 from django.core.validators import validate_email
 from core.models import BaseModel, LogicalDeleteModel
 from core.managers import CustomUserManager
-import uuid
+
 
 class Customer(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100)
@@ -12,7 +13,8 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, validators=[validate_email])
     phone = models.CharField(max_length=15, blank=True, null=True, unique=True)
     image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.png')
-
+    
+    date_joined = models.DateTimeField(default=now)
     is_otp_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -33,7 +35,6 @@ class Address(BaseModel, LogicalDeleteModel):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self):
         return f"{self.address_line}, {self.city}"
