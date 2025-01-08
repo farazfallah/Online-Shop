@@ -3,17 +3,16 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken, TokenError
-from .models import Cart, CartItem
-from .serializers import CartSerializer, CartItemSerializer
+from orders.models import Cart, CartItem
+from orders.serializers import CartSerializer
+from product.models import Product
+
 import json
 
 class CartView(APIView):
     permission_classes = [AllowAny]
 
     def get_user_from_token(self, request):
-        """
-        Validate user using access_token from cookies.
-        """
         access_token = request.COOKIES.get('access_token')
 
         if not access_token:
@@ -27,62 +26,99 @@ class CartView(APIView):
             raise AuthenticationFailed('توکن نامعتبر است یا منقضی شده است')
 
     def get_cart_from_cookie(self, request):
-        """
-        Retrieve cart data from cookies for unauthenticated users.
-        """
         cart_data = request.COOKIES.get('cart')
         return json.loads(cart_data) if cart_data else {'items': []}
 
     def get(self, request):
-        """
-        Get the cart for the current user or from cookies if unauthenticated.
-        """
         try:
             user_id = self.get_user_from_token(request)
-            # Logged-in user: Retrieve or create a cart in the database
             cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
             serializer = CartSerializer(cart)
             return Response(serializer.data)
         except AuthenticationFailed:
-            # Anonymous user: Retrieve cart from cookies
             cart_data = self.get_cart_from_cookie(request)
             return Response({'id': None, 'customer': None, 'items': cart_data['items']})
 
     def post(self, request):
-        """
-        Add or update cart item for the current user or in cookies if unauthenticated.
-        """
         try:
             user_id = self.get_user_from_token(request)
-            # Logged-in user: Add or update cart item in the database
             cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
-            data = request.data
+            product_id = request.data['product']
+
+            try:
+                product = Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                return Response({'error': 'محصول یافت نشد'}, status=404)
+
+            product_image_url = request.build_absolute_uri(product.image.url) if product.image else None
+
             item, created = CartItem.objects.update_or_create(
                 cart=cart,
-                product_id=data['product'],
+                product_id=product.id,
                 defaults={
-                    'product_name': data['product_name'],
-                    'product_price': data['product_price'],
-                    'quantity': data['quantity']
+                    'product_name': product.name,
+                    'product_price': product.price,
+                    'quantity': request.data.get('quantity', 1),
+                    'product_image': product_image_url,
                 }
             )
-            cart.total_price = sum(item.price for item in cart.items.all())
+            cart.total_price = sum(item.product_price * item.quantity for item in cart.items.all())
             cart.save()
             serializer = CartSerializer(cart)
             return Response(serializer.data)
+
         except AuthenticationFailed:
-            # Anonymous user: Add or update cart item in cookies
             cart_data = self.get_cart_from_cookie(request)
+            product_id = request.data['product']
+
+            try:
+                product = Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                return Response({'error': 'محصول یافت نشد'}, status=404)
+
+            product_image_url = request.build_absolute_uri(product.image.url) if product.image else None
             items = cart_data['items']
             updated = False
             for item in items:
-                if item['product'] == request.data['product']:
-                    item['quantity'] += request.data['quantity']
+                if item['product'] == product_id:
+                    item['quantity'] += request.data.get('quantity', 1)
                     updated = True
                     break
             if not updated:
-                items.append(request.data)
+                items.append({
+                    'product': product.id,
+                    'product_name': product.name,
+                    'product_price': product.price,
+                    'product_image': product_image_url,
+                    'quantity': request.data.get('quantity', 1)
+                })
             cart_data['items'] = items
             response = Response({'message': 'Cart updated in cookie'})
+            response.set_cookie('cart', json.dumps(cart_data), httponly=True)
+            return response
+
+    def delete(self, request):
+        try:
+            user_id = self.get_user_from_token(request)
+            product_id = request.data.get('product')
+
+            cart = Cart.objects.filter(customer_id=user_id, is_active=True).first()
+            if not cart:
+                return Response({'error': 'سبد خرید یافت نشد'}, status=404)
+
+            cart_item = cart.items.filter(product_id=product_id).first()
+            if cart_item:
+                cart_item.delete()
+                cart.total_price = sum(item.product_price * item.quantity for item in cart.items.all())
+                cart.save()
+            serializer = CartSerializer(cart)
+            return Response(serializer.data)
+
+        except AuthenticationFailed:
+            cart_data = self.get_cart_from_cookie(request)
+            product_id = request.data.get('product')
+            cart_data['items'] = [item for item in cart_data['items'] if item['product'] != product_id]
+
+            response = Response({'message': 'Cart updated in cookie', 'items': cart_data['items']})
             response.set_cookie('cart', json.dumps(cart_data), httponly=True)
             return response

@@ -585,106 +585,7 @@
 </footer>
 
 <!--============ end footer   ==============-->
-<script>
-    async function updateCartDrawer() {
-      try {
-        const cartDrawer = document.querySelector('.cart-canvas-parent');
-        const cartTotalElement = document.querySelector('.cart-canvas-foot-sum h5');
-        const cartCountElement = document.querySelector('#offcanvasCartLabel small');
-  
-        // فراخوانی API برای دریافت اطلاعات کارت
-        const response = await fetch('/api/cart/', {
-          method: 'GET',
-          credentials: 'include', // برای ارسال کوکی‌ها
-        });
-  
-        if (!response.ok) {
-          throw new Error('خطا در دریافت اطلاعات سبد خرید');
-        }
-  
-        const cartData = await response.json();
-  
-        // پاک کردن محتوای قبلی کارت
-        cartDrawer.innerHTML = '';
-  
-        // اگر کارت خالی است
-        if (!cartData.items || cartData.items.length === 0) {
-          cartDrawer.innerHTML = '<p class="text-muted text-center">سبد خرید شما خالی است.</p>';
-          cartTotalElement.textContent = '0 تومان';
-          cartCountElement.textContent = '(0 مورد)';
-          return;
-        }
-  
-        // اضافه کردن آیتم‌های کارت
-        let total = 0;
-        cartData.items.forEach((item) => {
-          total += item.price;
-  
-          const cartItemHTML = `
-            <li class="nav-item">
-              <div class="cart-canvas">
-                <div class="row align-items-center">
-                  <div class="col-4 ps-0">
-                    <img src="${item.product_image || 'assets/image/default-product.jpg'}" alt="">
-                  </div>
-                  <div class="col-8">
-                    <h3 class="text-overflow-3 font-16">${item.product_name}</h3>
-                    <div class="product-box-suggest-price my-2 d-flex align-items-center justify-content-between">
-                      <ins class="font-25">${item.product_price.toLocaleString()} <span>تومان</span></ins>
-                    </div>
-                    <div class="cart-canvas-foot d-flex align-items-center justify-content-between">
-                      <div class="cart-canvas-count">
-                        <span>تعداد:</span>
-                        <span class="fw-bold">${item.quantity}</span>
-                      </div>
-                      <div class="cart-canvas-delete">
-                        <button class="btn delete-cart-item" data-id="${item.id}">
-                          <i class="bi bi-x"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>`;
-          cartDrawer.innerHTML += cartItemHTML;
-        });
-  
-        // به‌روزرسانی جمع کل و تعداد آیتم‌ها
-        cartTotalElement.textContent = `${total.toLocaleString()} تومان`;
-        cartCountElement.textContent = `(${cartData.items.length} مورد)`;
-  
-        // افزودن قابلیت حذف آیتم از کارت
-        document.querySelectorAll('.delete-cart-item').forEach((btn) => {
-          btn.addEventListener('click', async (e) => {
-            const itemId = e.target.closest('.delete-cart-item').dataset.id;
-            await deleteCartItem(itemId);
-            updateCartDrawer(); // به‌روزرسانی دوباره کارت
-          });
-        });
-      } catch (error) {
-        console.error('خطا:', error.message);
-      }
-    }
-  
-    async function deleteCartItem(itemId) {
-      try {
-        const response = await fetch(`/api/cart/items/${itemId}/`, {
-          method: 'DELETE',
-          credentials: 'include',
-        });
-  
-        if (!response.ok) {
-          throw new Error('خطا در حذف آیتم از سبد خرید');
-        }
-      } catch (error) {
-        console.error('خطا در حذف آیتم:', error.message);
-      }
-    }
-  
-    // اجرای به‌روزرسانی کارت در بارگذاری صفحه
-    document.addEventListener('DOMContentLoaded', updateCartDrawer);
-</script>
+
   
 <!--============ start cart drawer ==============-->
 
@@ -697,7 +598,6 @@
     </div>
     <div class="offcanvas-body">
         <ul class="navbar-nav cart-canvas-parent">
-            
         </ul>
 
         <div class="cart-canvas-foots bg-white shadow-md">
@@ -783,6 +683,7 @@
 
 <!--============ end mobile menu ==============-->
 <script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>
+<script src="{% static 'js/cart-items.js' %}"></script>
 <script src="{% static 'js/auth-validator.js' %}"></script>
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.bundle-5.3.2.min.js' %}"></script>

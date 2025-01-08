@@ -326,12 +326,10 @@ class EditAddressView(APIView):
     def put(self, request, address_id):
         customer = request.user
         try:
-            # بررسی اینکه آدرس متعلق به کاربر فعلی است
             address = Address.objects.get(id=address_id, customer=customer)
         except Address.DoesNotExist:
             return Response({'detail': 'آدرس موردنظر یافت نشد.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # بررسی داده‌های ورودی
         data = request.data
         serializer = AddressSerializer(address, data=data, partial=True)
         if serializer.is_valid():
