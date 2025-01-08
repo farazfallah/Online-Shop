@@ -4,6 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
+from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -254,9 +255,55 @@ class CustomerProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        customer = request.user 
+        customer = request.user
         serializer = CustomerSerializer(customer)
         return Response(serializer.data)
+    
+    def patch(self, request):
+        try:
+            with transaction.atomic():
+                customer = request.user
+                serializer = CustomerSerializer(
+                    customer,
+                    data=request.data,
+                    partial=True
+                )
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(
+                        {
+                            "message": "پروفایل با موفقیت بروزرسانی شد",
+                            "data": serializer.data
+                        },
+                        status=status.HTTP_200_OK
+                    )
+                
+                return Response(
+                    {
+                        "message": "خطا در اطلاعات ورودی",
+                        "errors": serializer.errors
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+        except ValidationError as e:
+            return Response(
+                {
+                    "message": "خطا در اعتبارسنجی داده‌ها",
+                    "errors": str(e)
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        except Exception as e:
+            return Response(
+                {
+                    "message": "خطای سیستمی",
+                    "errors": str(e)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class AddAddressView(APIView):
@@ -325,5 +372,6 @@ class LogoutView(APIView):
        response = Response({'message': 'با موفقیت خارج شدید.'})
        response.delete_cookie('access_token')
        response.delete_cookie('refresh_token')
+       response.delete_cookie('cart')
        logout(request)
        return response

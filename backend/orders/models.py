@@ -45,3 +45,36 @@ class DiscountCode(BaseModel, LogicalDeleteModel):
 
     def __str__(self):
         return self.code
+    
+
+class Cart(BaseModel):
+    customer = models.ForeignKey(
+        'customers.Customer', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name='carts'
+    )
+    session_id = models.CharField(max_length=255, null=True, blank=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        if self.customer:
+            return f"Cart of {self.customer}"
+        return f"Cart (Session: {self.session_id})"
+
+class CartItem(BaseModel):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
+    product_name = models.CharField(max_length=255)
+    product_price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        self.price = self.quantity * self.product_price
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product_name} in Cart {self.cart.id}"

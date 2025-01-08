@@ -9,7 +9,8 @@ urlpatterns = [
     path('products/<int:product_id>/', product_detail.product_detail, name='product_detail'),    
     
     path('account/', dashboard.dashboard_home, name='dashboard-home'),
-    path('account/address', dashboard.dashboard_address, name='dashboard-address'),
+    path('account/profile/', dashboard.customer_profile_page, name='profile_page'),
+    path('account/address', dashboard.dashboard_address, name='dashboard_address'),
     path('account/login/', login_page, name='login'),
     path('account/register/', register_page, name='register'),
     path('account/logout/', auth.logout_view, name='logout'),

@@ -60,7 +60,7 @@
                                                    <i class="bi bi-pencil"></i> ویرایش
                                                 </a>
                                             </li>                                            
-                                            <form method="POST" action="{% url 'dashboard-address' %}" style="display: inline;">
+                                            <form method="POST" action="{% url 'dashboard_address' %}" style="display: inline;">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="address_id" value="{{ address.id }}">
                                                 <button type="submit" class="btn btn-link text-danger" style="text-decoration: none" name="delete_address">

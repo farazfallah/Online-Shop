@@ -43,6 +43,9 @@ from product.api import (
     ProductCommentAPIView,
     ProductSearchView
 )
+from orders.api import (
+    CartView
+)
 
 
 urlpatterns = [
@@ -78,6 +81,8 @@ apipath = [
     path('api/addresses/delete/<int:address_id>/', DeleteAddressView.as_view(), name='delete-address'),
     # Comment 
     path('api/products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),
+    # Cart 
+    path('api/cart/', CartView.as_view(), name='cart'), 
     # Product router
     path('api/', include(router.urls)),
 ]

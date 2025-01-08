@@ -64,7 +64,7 @@ def dashboard_address(request):
 
             if not all(address_data.values()):
                 messages.error(request, 'لطفا همه فیلدها را پر کنید.')
-                return redirect('dashboard-address')
+                return redirect('dashboard_address')
 
             token = request.COOKIES.get('access_token')
             if not token:
@@ -100,9 +100,68 @@ def dashboard_address(request):
             except Exception as e:
                 messages.error(request, f'خطا در ارتباط با سرور: {str(e)}')
 
-        return redirect('dashboard-address')
+        return redirect('dashboard_address')
 
     addresses = profile_data.get('addresses', [])
     return render(request, 'account/address.html', {
         'addresses': addresses,
     })
+    
+
+def customer_profile_page(request):
+    if request.method == 'POST':
+        # آپلود تصویر
+        if 'profile_image' in request.FILES:
+            try:
+                access_token = request.COOKIES.get('access_token')
+                headers = {'Authorization': f'Bearer {access_token}'}
+                
+                files = {'profile_image': request.FILES['profile_image']}
+                response = requests.patch(
+                    'http://127.0.0.1:8000/api/profile/',
+                    headers=headers,
+                    files=files,
+                    cookies=request.COOKIES
+                )
+                
+                if response.status_code != 200:
+                    print(f"Error uploading image: {response.text}")
+                    
+            except Exception as e:
+                print(f"Exception in image upload: {str(e)}")
+
+        # آپدیت نام و نام خانوادگی
+        else:
+            try:
+                access_token = request.COOKIES.get('access_token')
+                headers = {
+                    'Authorization': f'Bearer {access_token}',
+                    'Content-Type': 'application/json'
+                }
+                
+                data = {
+                    'first_name': request.POST.get('first_name'),
+                    'last_name': request.POST.get('last_name')
+                }
+                
+                response = requests.patch(
+                    'http://127.0.0.1:8000/api/profile/',
+                    headers=headers,
+                    json=data,
+                    cookies=request.COOKIES
+                )
+                
+                if response.status_code != 200:
+                    print(f"Error updating profile: {response.text}")
+                    
+            except Exception as e:
+                print(f"Exception in profile update: {str(e)}")
+
+        return redirect('profile_page')  # ریدایرکت به همین صفحه برای نمایش تغییرات
+
+    # برای درخواست GET
+    profile_data = fetch_customer_profile(request)
+    if profile_data is None:
+        return redirect('login')
+
+    return render(request, 'account/edit_profile.html')

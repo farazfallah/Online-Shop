@@ -44,15 +44,18 @@ def user_profile_context(request):
         last_name = profile_data.get('last_name', '')
         email = profile_data.get('email', '')
         image = profile_data.get('image', '')
+        is_otp_verified = profile_data.get('is_otp_verified', False)
     else:
         first_name = 'کاربر'
         last_name = ''
         email = ''
         image = ''
-
+        is_otp_verified = False
+        
     return {
         'first_name': first_name,
         'last_name': last_name,
         'email': email,
         'image': f"{settings.BACK_END_URL}{image}",
+        'is_otp_verified': is_otp_verified
     }

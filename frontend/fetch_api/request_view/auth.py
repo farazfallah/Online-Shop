@@ -18,6 +18,7 @@ def logout_view(request):
             response = redirect(reverse_lazy('login'))
             response.delete_cookie('access_token')
             response.delete_cookie('refresh_token')
+            response.delete_cookie('cart')
             return response
         else:
             return JsonResponse({'error': 'Logout failed on API'}, status=500)

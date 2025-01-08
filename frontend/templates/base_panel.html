@@ -33,9 +33,9 @@
                                                          alt="">
                                                     <div class="d-grid gap-2">
                                                         <h6 class="h6 main-color-one-color">{{first_name}} {{last_name}}</h6>
-                                                        <h6 class="font-14 text-muted">{{email}}<a href=""
+                                                        <h6 class="font-14 text-muted">{{email}}<a href="{% url 'profile_page'%}"
                                                             class="ms-2 text-muted"><i
-                                                                class="bi bi-pencil-square"></i> </a><h6>
+                                                                class="bi bi-pencil-square"></i></a><h6>
                                                     </div>
                                                 </div>
                                             </div>
@@ -53,8 +53,8 @@
                                                                 <span class="badge text-dark ms-2 rounded-pill main-color-one-bg">5</span>
                                                             </a>
                                                         </li>
-                                                        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-address' %}active{% endif %}">
-                                                            <a href="{% url 'dashboard-address'%}" class="nav-link">
+                                                        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard_address' %}active{% endif %}">
+                                                            <a href="{% url 'dashboard_address'%}" class="nav-link">
                                                                 <i class="bi bi-pin-map me-3"></i>آدرس های من
                                                             </a>
                                                         </li>
@@ -92,9 +92,9 @@
                                              class="img-fluid img-profile-panel rounded-circle me-3 shadow-md" alt="">
                                         <div class="d-grid gap-2">
                                             <h6 class="h6 main-color-one-color">{{ first_name }} {{ last_name }}</h6>
-                                            <h6 class="font-14 text-muted">{{ email }}<a href=""
+                                            <h6 class="font-14 text-muted">{{ email }}<a href="{% url 'profile_page'%}"
                                                 class="ms-2 text-muted"><i
-                                                    class="bi bi-pencil-square"></i> </a></h6>
+                                                    class="bi bi-pencil-square"></i></a></h6>
                                         </div>
                                     </div>
                                 </div>
@@ -114,8 +114,8 @@
                                                 </a>
                                             </li>
                                         
-                                            <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-address' %}active{% endif %}">
-                                                <a href="{% url 'dashboard-address'%}" class="nav-link">
+                                            <li class="nav-item {% if request.resolver_match.url_name == 'dashboard_address' %}active{% endif %}">
+                                                <a href="{% url 'dashboard_address'%}" class="nav-link">
                                                     <i class="bi bi-pin-map me-3"></i>آدرس های من
                                                 </a>
                                             </li>
