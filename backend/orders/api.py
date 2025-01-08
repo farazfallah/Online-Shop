@@ -6,8 +6,15 @@ from rest_framework_simplejwt.tokens import AccessToken, TokenError
 from orders.models import Cart, CartItem
 from orders.serializers import CartSerializer
 from product.models import Product
-
 import json
+from decimal import Decimal
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
+
 
 class CartView(APIView):
     permission_classes = [AllowAny]
@@ -26,8 +33,18 @@ class CartView(APIView):
             raise AuthenticationFailed('توکن نامعتبر است یا منقضی شده است')
 
     def get_cart_from_cookie(self, request):
+        """
+        Retrieve cart data from cookies for unauthenticated users.
+        """
         cart_data = request.COOKIES.get('cart')
-        return json.loads(cart_data) if cart_data else {'items': []}
+        if cart_data:
+            cart_data = json.loads(cart_data)
+            for item in cart_data['items']:
+                item['product_price'] = float(item['product_price'])
+                item['price'] = float(item['price'])
+            return cart_data
+        return {'items': []}
+
 
     def get(self, request):
         try:
@@ -62,10 +79,18 @@ class CartView(APIView):
                     'product_image': product_image_url,
                 }
             )
+
             cart.total_price = sum(item.product_price * item.quantity for item in cart.items.all())
             cart.save()
+
             serializer = CartSerializer(cart)
-            return Response(serializer.data)
+
+            response_data = serializer.data
+            for item in response_data['items']:
+                item['product_price'] = float(item['product_price'])
+                item['price'] = float(item['price'])
+
+            return Response(response_data)
 
         except AuthenticationFailed:
             cart_data = self.get_cart_from_cookie(request)
@@ -93,8 +118,13 @@ class CartView(APIView):
                     'quantity': request.data.get('quantity', 1)
                 })
             cart_data['items'] = items
+
+            for item in cart_data['items']:
+                item['product_price'] = float(item['product_price'])
+                item['price'] = float(item['product_price']) * item['quantity']
+
             response = Response({'message': 'Cart updated in cookie'})
-            response.set_cookie('cart', json.dumps(cart_data), httponly=True)
+            response.set_cookie('cart', json.dumps(cart_data, cls=DecimalEncoder), httponly=True)
             return response
 
     def delete(self, request):
