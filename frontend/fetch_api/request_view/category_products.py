@@ -13,7 +13,7 @@ def category_products(request, category_id):
 
     # دریافت اطلاعات کتگوری
     try:
-        category_response = requests.get(category_check_url)
+        category_response = requests.get(category_check_url, proxies={"http": None, "https": None})
         category_response.raise_for_status()
         category_data = category_response.json()
         category_name = category_data.get('name', 'دسته‌بندی ناشناخته')
@@ -30,7 +30,7 @@ def category_products(request, category_id):
         params['ordering'] = ordering
 
     try:
-        response = requests.get(api_url, params=params)
+        response = requests.get(api_url, params=params, proxies={"http": None, "https": None})
         response.raise_for_status()
         data = response.json()
 

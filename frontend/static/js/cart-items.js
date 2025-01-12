@@ -1,12 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
     const apiUrl = "http://127.0.0.1:8000/api/cart/";
 
-    // نمایش اطلاعات سبد خرید
     async function fetchCart() {
         try {
             const response = await fetch(apiUrl, {
                 method: "GET",
-                credentials: "include", // برای ارسال کوکی‌ها
+                credentials: "include",
             });
             if (!response.ok) {
                 throw new Error("خطا در دریافت سبد خرید");
@@ -39,7 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let totalPrice = 0;
         const uniqueItemsCount = cartData.items.length;
         cartData.items.forEach((item) => {
-            const productPrice = item.product_price || 0;
+            const originalPrice = item.original_price || 0;
+            const productPrice = item.product_price || 0; 
             const productQuantity = item.quantity || 1;
     
             totalPrice += productPrice * productQuantity;
@@ -49,12 +49,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="cart-canvas">
                         <div class="row align-items-center">
                             <div class="col-4 ps-0">
-                                <img src="${item.product_image || 'assets/image/default-product.jpg'}" alt="">
+                                <img src="${item.product_image || 'assets/image/default-product.jpg'}" alt="تصویر محصول">
                             </div>
                             <div class="col-8">
                                 <h3 class="text-overflow-3 font-16">${item.product_name || "نام محصول"}</h3>
                                 <div class="product-box-suggest-price my-2 d-flex align-items-center justify-content-between">
-                                    <ins class="font-25">${productPrice.toLocaleString()} <span>تومان</span></ins>
+                                    ${
+                                        originalPrice > productPrice
+                                            ? `<del class="text-muted">${originalPrice.toLocaleString()} تومان</del>`
+                                            : ""
+                                    }
+                                    <ins class="font-25">${productPrice.toLocaleString()} تومان</ins>
                                 </div>
                                 <div class="cart-canvas-foot d-flex align-items-center justify-content-between">
                                     <div class="cart-canvas-count">
@@ -83,29 +88,33 @@ document.addEventListener("DOMContentLoaded", () => {
     function addDeleteEventListeners() {
         const deleteButtons = document.querySelectorAll(".delete-cart-item");
         deleteButtons.forEach((button) => {
-            button.addEventListener("click", (event) => {
+            button.addEventListener("click", async (event) => {
                 const productId = button.getAttribute("data-product-id");
-
-                fetch("http://127.0.0.1:8000/api/cart/", {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ product: productId }),
-                })
-                    .then((response) => {
-                        if (response.ok) {
-                            return response.json();
-                        } else {
-                            throw new Error("خطا در حذف محصول");
-                        }
-                    })
-                    .then((data) => {
-                        renderCart(data);
-                    })
-                    .catch((error) => {
-                        console.error(error);
+                if (!productId) return;
+    
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: "DELETE",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ product: productId })
                     });
+    
+                    if (!response.ok) {
+                        throw new Error("خطا در حذف محصول");
+                    }
+    
+                    const data = await response.json();
+                    if (data) {
+                        renderCart(data);
+                    } else {
+                        console.error("داده‌های نامعتبر از سرور دریافت شد");
+                    }
+                } catch (error) {
+                    console.error("خطا:", error);
+                }
             });
         });
     }

@@ -7,7 +7,7 @@ from django.conf import settings
 def product_detail(request, product_id):
     api_url = f"{settings.API_BASE_URL}products/{product_id}/"
     try:
-        response = requests.get(api_url)
+        response = requests.get(api_url, proxies={"http": None, "https": None})
         if response.status_code == 200:
             product_data = response.json()
             

@@ -7,7 +7,7 @@ def site_info(request):
     api_url = f"{settings.API_BASE_URL}site-info"
 
     try:
-        response = requests.get(api_url)
+        response = requests.get(api_url, proxies={"http": None, "https": None})
 
         if response.status_code == 200:
             data = response.json()
@@ -24,7 +24,7 @@ def categories(request):
     api_url = f"{settings.API_BASE_URL}categories/"
 
     try:
-        response = requests.get(api_url)
+        response = requests.get(api_url, proxies={"http": None, "https": None})
 
         if response.status_code == 200:
             data = response.json()
