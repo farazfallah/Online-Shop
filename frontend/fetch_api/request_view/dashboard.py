@@ -54,7 +54,6 @@ def dashboard_address(request):
                 messages.error(request, f'خطا در ارتباط با سرور: {str(e)}')
 
         else:
-            # اضافه یا ویرایش آدرس
             address_data = {
                 'address_line': request.POST.get('address_line', '').strip(),
                 'city': request.POST.get('city', '').strip(),
@@ -110,7 +109,6 @@ def dashboard_address(request):
 
 def customer_profile_page(request):
     if request.method == 'POST':
-        # آپلود تصویر
         if 'profile_image' in request.FILES:
             try:
                 access_token = request.COOKIES.get('access_token')
@@ -130,7 +128,6 @@ def customer_profile_page(request):
             except Exception as e:
                 print(f"Exception in image upload: {str(e)}")
 
-        # آپدیت نام و نام خانوادگی
         else:
             try:
                 access_token = request.COOKIES.get('access_token')
@@ -157,9 +154,8 @@ def customer_profile_page(request):
             except Exception as e:
                 print(f"Exception in profile update: {str(e)}")
 
-        return redirect('profile_page')  # ریدایرکت به همین صفحه برای نمایش تغییرات
+        return redirect('profile_page')
 
-    # برای درخواست GET
     profile_data = fetch_customer_profile(request)
     if profile_data is None:
         return redirect('login')

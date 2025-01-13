@@ -233,14 +233,26 @@
                             </div>
                         </div>
                         <div class="se-cart-item">
-                            <form action=""
-                                  class="w-100 d-flex flex-column justify-content-center align-items-center mt-3">
+                            {% if messages %}
+                            <div class="messages">
+                                {% for message in messages %}
+                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            {# فرم اضافه کردن به سبد خرید #}
+                            <form method="post" class="w-100 d-flex flex-column justify-content-center align-items-center mt-3">
+                                {% csrf_token %}
                                 <div class="counter">
                                     <label>
                                         <input type="text" name="count" class="counter" value="1">
                                     </label>
                                 </div>
-                                <button class="btn justify-content-center main-color-green w-100 text-center btn-add-to-cart text-white  mt-3">
+                                <button type="submit" class="btn justify-content-center main-color-green w-100 text-center btn-add-to-cart text-white mt-3">
                                     <i class="bi bi-basket me-3 lh-sm fs-4"></i> افزودن به سبد خرید
                                 </button>
                             </form>
@@ -860,58 +872,6 @@
                                 </button>
                             </form>
                         </div>
-                        <script>
-                            document.querySelector('.btn-add-to-cart').addEventListener('click', async (event) => {
-                                event.preventDefault();
-                            
-                                const countInput = document.querySelector('input[name="count"]');
-                                const quantity = parseInt(countInput.value) || 1;
-                                const productId = 1;
-                            
-                                try {
-                                    const response = await fetch('http://127.0.0.1:8000/api/cart/', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRFToken': getCookie('csrftoken')
-                                        },
-                                        body: JSON.stringify({
-                                            product: productId,
-                                            quantity: quantity
-                                        })
-                                    });
-                            
-                                    if (response.ok) {
-                                        const data = await response.json();
-                                        alert('محصول با موفقیت به سبد خرید اضافه شد.');
-                                        console.log(data); // مشاهده داده‌های بازگشتی از سرور
-                                    } else {
-                                        const errorData = await response.json();
-                                        console.error('خطا:', errorData);
-                                        alert('خطا در اضافه کردن محصول به سبد خرید');
-                                    }
-                                } catch (error) {
-                                    console.error('خطای شبکه:', error);
-                                    alert('خطا در اتصال به سرور');
-                                }
-                            });
-                            
-                            // تابع کمکی برای دریافت CSRF Token از کوکی‌ها
-                            function getCookie(name) {
-                                let cookieValue = null;
-                                if (document.cookie && document.cookie !== '') {
-                                    const cookies = document.cookie.split(';');
-                                    for (let i = 0; i < cookies.length; i++) {
-                                        const cookie = cookies[i].trim();
-                                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                            break;
-                                        }
-                                    }
-                                }
-                                return cookieValue;
-                            }                            
-                        </script>
                     </div>
                 </div>
             </div>

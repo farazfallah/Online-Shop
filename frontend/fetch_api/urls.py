@@ -1,5 +1,5 @@
 from django.urls import path
-from fetch_api.request_view import auth, category_products, dashboard, product_detail
+from fetch_api.request_view import auth, category_products, dashboard, product_detail, search
 from fetch_api.views import HomeView, login_page, register_page
 
 
@@ -7,6 +7,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('category/<int:category_id>/', category_products.category_products, name='category-detail'),
     path('products/<int:product_id>/', product_detail.product_detail, name='product_detail'),    
+    path('search/', search.search_view, name='search_results'),
     
     path('account/', dashboard.dashboard_home, name='dashboard-home'),
     path('account/profile/', dashboard.customer_profile_page, name='profile_page'),

@@ -569,7 +569,7 @@
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination flex-wrap justify-content-center">
                                         <!-- قبلی -->
-                                        {% if pagination.current_page > 1 %}
+                                    {% if pagination.current_page > 1 %}
                                         <li class="page-item">
                                             <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:-1 }}">قبلی</a>
                                         </li>

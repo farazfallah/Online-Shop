@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}نتایج جستجو برای {{ query }}{% endblock %}
+{% load static %}
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row gy-3">
+            {% if products %}
+            <div class="col-lg-12">
+                <div class="category-sort mb-3">
+                    <div class="content-box">
+                        <div class="container-fluid">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="box_filter d-lg-block d-none">
+                                    <ul class="list-inline text-start mb-0">
+                                        <li class="list-inline-item title-font ms-0">جستجو بر اساس : {{ query }}</li>
+                                    </ul>
+                                </div>
+                                <div class="box_filter_counter fs-6"><i class="bi bi-card-list me-2"></i>{{ product_count }} کالا</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-pro">
+                    <div class="row g-3">
+                        {% for result in products %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="product-box border-ui">
+                                <a href="{% url 'product_detail' product_id=result.id %}">
+                                    <div class="product-image">
+                                        <img src="{{ result.image }}" loading="lazy" alt="{{ result.name }}"
+                                             class="img-fluid">
+                                    </div>
+                                    <div class="product-title mb-3">
+                                        <div class="title">
+                                            <p class="text-overflow-1 mt-2">{{ result.name }}</p>
+                                        </div>
+                                        <div class="rating">
+                                            <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
+                                            <div class="icon"><i class="bi bi-star-fill"></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="product-action">
+                                        {% if result.discount != 0 %}
+                                        <div class="discount">
+                                            <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
+                                                <span class="text-white">{{ result.discount }}%</span>
+                                            </div>
+                                        </div>
+                                        <div class="price">
+                                            <p class="new-price">{{ result.final_price }} تومان</p>
+                                            <p class="old-price">{{ result.price }} تومان</p>
+                                        </div>
+                                        {% else %}
+                                        <div class="price">
+                                            <p class="new-price">{{ result.price }} تومان</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="col-12">
+                            <div class="my-paginate my-4">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination flex-wrap justify-content-center">
+                                        {% if pagination.current_page > 1 %}
+                                        <li class="page-item">
+                                            <a class="page-link rounded-3" href="?query={{ query }}&page={{ pagination.current_page|add:-1 }}">قبلی</a>
+                                        </li>
+                                        {% endif %}
+                                        
+                                        {% for page in pagination.page_range %}
+                                            <li class="page-item {% if page == pagination.current_page %}active{% endif %}">
+                                                <a class="page-link rounded-3" href="?query={{ query }}&page={{ page }}">{{ page }}</a>
+                                            </li>
+                                        {% endfor %}
+                                        
+                                        {% if pagination.current_page < pagination.page_range|last %}
+                                            <li class="page-item">
+                                                <a class="page-link rounded-3" href="?query={{ query }}&page={{ pagination.current_page|add:1 }}">بعدی</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-lg-12">
+                <div class="content-box d-flex justify-content-center align-items-center">
+                    <div class="text-center">
+                        <h3 class="title-font">نتیجه‌ای یافت نشد !</h3>
+                        <p class="my-3">- از عبارت‌های متداول‌تر استفاده کنید.</p>
+                        <p>- املای عبارت وارد شده را بررسی کنید.</p>
+                    </div>
+                </div>                
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!--============ end main content ==============-->
+
+
+{% endblock %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتایج جستجو</title>
+</head>
+<body>
+    <h1>نتایج جستجو برای "{{ query }}"</h1>
+
+    {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+    {% elif results %}
+        <div class="search-results">
+            {% for result in results %}
+                <div class="product-card">
+                    <img src="{{ result.image }}" alt="{{ result.name }}" class="product-image">
+                    <h5>{{ result.name }}</h5>
+                    <p>{{ result.description }}</p>
+                    <p>قیمت: {{ result.price }} تومان</p>
+                    <a href="/product/{{ result.id }}" class="btn btn-primary">مشاهده محصول</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>هیچ نتیجه‌ای یافت نشد.</p>
+    {% endif %}
+</body>
+</html>
