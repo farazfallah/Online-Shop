@@ -105,7 +105,7 @@ ROOT_URLCONF = 'onlineshop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core/templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -113,8 +113,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.site_info',
-                'product.context_processors.category',
             ],
         },
     },
@@ -129,15 +127,15 @@ AUTHENTICATION_BACKENDS = [
 CELERY_BEAT_SCHEDULE = {
     'deactivate-unverified-customers-every-day': {
         'task': 'customers.tasks.deactivate_unverified_customers',
-        'schedule': crontab(hour=0, minute=0),  # هر روز در نیمه‌شب اجرا می‌شود
+        'schedule': crontab(hour='*/12'),
     },
 }
-
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
 
 WSGI_APPLICATION = 'onlineshop.wsgi.application'
 
@@ -173,7 +171,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -243,10 +241,6 @@ AUTH_USER_MODEL = 'customers.customer'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
 
 STATIC_URL = 'static/'
 

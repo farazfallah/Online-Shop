@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}سبد خرید{% endblock %}
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        {% if cart and cart.items %}
+        <div class="payment_navigtions">
+            <div class="checkout-headers">
+                <nav class="navbar navbar-expand">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a href="" class="nav-link">
+                                <span>1</span>
+                                <p>سبد خرید</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">
+                                <span>2</span>
+                                <p>جزییات پرداخت</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <h2 class="fw-900 main-color-one-color mt-4 h4">سبد خرید شما <span
+                    class="main-color-three-color">(3 کالا)</span>
+            </h2>
+        </div>
+
+    </div>
+    <div class="container-fluid">
+        <div class="cart-product">
+            <div class="row gy-4">
+                <div class="col-lg-9">
+                    {% for item in cart.items %}
+                    <div class="cart-product-item {% if forloop.counter > 1 %}mt-3{% endif %}">
+                        <div class="content-box">
+                            <div class="container-fluid">
+                                <div class="cart-items">
+                                    <div class="item">
+                                        <div class="row gy-2">
+                                            <div class="col-md-2 w-100-in-400">
+                                                <a href="{% url 'product_detail' product_id=item.product %}">
+                                                    <div class="image">
+                                                        <img src="{{ item.product_image }}" alt="{{ item.product_name }}"
+                                                            class="img-fluid">
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="col-md-10 w-100-in-400">
+                                                <div class="d-flex justify-content-between align-items-md-start align-items-end flex-wrap">
+                                                    <div class="d-flex align-items-start flex-column me-2">
+                                                        <div class="title d-flex align-items-center flex-wrap">
+                                                            <h6 class="font-16">{{ item.product_name }}<span
+                                                                        class="badge ms-2 danger-label rounded-pill"></span>
+                                                            </h6>
+                                                        </div>
+                                                        <div class="cart-item-feature d-flex flex-column align-items-start flex-wrap mt-3">
+                                                            <div class="item d-flex align-items-center mt-3">
+                                                                <div class="counter">
+                                                                    <label>
+                                                                        <input type="text" name="count" class="counter"
+                                                                               value="{{ item.quantity }}">
+                                                                    </label>
+                                                                </div>
+                                                                <div class="remove danger-label ms-3">
+                                                                    <a href="#" data-product-id="{{ item.product }}" class="remove-product">
+                                                                        <i class="bi bi-trash-fill"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="action d-flex flex-wrap flex-column justify-content-sm-end justify-content-center align-items-center">
+                                                        <div class="product-box-price flex-column justify-content-end align-items-end">
+                                                            <div class="product-box-price-price d-flex">
+                                                                <h5 class="title-font main-color-green-color h2 mb-2">
+                                                                    {{ item.product_price|floatformat:0 }}</h5>
+                                                                <p class="mb-0 text-muted-two ms-1 ">تومان</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <a href="{% url 'product_detail' product_id=item.product %}"
+                                                               class="btn btn-sm main-color-one-outline  rounded-pill"><i
+                                                                    class="bi bi-eye me-1"></i>مشاهده محصول
+                                                                </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% block product_quantity_selector %}
+                    <script>
+                        $(document).ready(function () {
+                            $("input[name='count']").TouchSpin({
+                                min: 1,
+                                max: '10',
+                                buttondown_class: "btn-counter waves-effect waves-light",
+                                buttonup_class: "btn-counter waves-effect waves-light"
+                            });
+                        });
+                    </script>
+                    {% endblock %}
+                    {% endfor %}
+                </div>
+                <div class="col-lg-3">
+                    <div class="cart-canvases position-sticky top-0">
+                        <div class="item">
+                            <div class="factor">
+                                <div class="d-flex factor-item mb-3 align-items-center justify-content-between">
+                                    <h5 class="title-font mb-0 h6">مجموع سبد خرید</h5>
+                                    <p class="mb-0 font-17">{{ cart.total_price|floatformat:0 }} تومان</p>
+                                </div>
+                                <div class="action mt-3 d-flex align-items-center justify-content-center">
+                                    <a href="#"
+                                       class="btn main-color-one-outline py-2 rounded-pill rounded-3 d-block w-100">تسویه
+                                        حساب</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="content-box">
+            <div class="text-center">
+                <img src="{% static 'image/cart/empty.svg' %}" class="cart-empty-image" alt="">
+                <h5 class="text-center mt-5 h2 mt-3">سبد خرید شما خالی است</h5>
+                <a href="{% url 'home'%}" class="btn mt-3 main-color-one-bg">بازگشت به فروشگاه</a>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+</section>
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    document.querySelectorAll('.remove-product').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const cartItem = this.closest('.cart-product-item');
+            const productId = this.getAttribute('data-product-id');
+            
+            if (productId) {
+                removeFromCart(productId, cartItem);
+            }
+        });
+    });
+    
+    function removeFromCart(productId, cartItemElement) {
+        const accessToken = getCookie('access_token');
+        const headers = {};
+        if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+        }
+    
+        fetch(`http://127.0.0.1:8000/api/cart/?product=${productId}`, {
+            method: 'DELETE',
+            headers: headers,
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('خطا در حذف محصول');
+            }
+            return response.json();
+        })
+        .then(data => {
+            cartItemElement.style.transition = 'all 0.3s ease';
+            cartItemElement.style.opacity = '0';
+            cartItemElement.style.transform = 'translateX(100px)';
+            
+            setTimeout(() => {
+                cartItemElement.remove();
+                
+                const remainingItemsCount = data.items.length;
+                
+                if (remainingItemsCount === 0) {
+                    const cartContent = document.querySelector('.cart-product');
+                    cartContent.innerHTML = `
+                                <div class="content-box">
+                                    <div class="text-center">
+                                        <img src="{% static 'image/cart/empty.svg' %}" class="cart-empty-image" alt="">
+                                        <h5 class="text-center mt-5 h2 mt-3">سبد خرید شما خالی است</h5>
+                                        <a href="{% url 'home'%}" class="btn mt-3 main-color-one-bg">بازگشت به فروشگاه</a>
+                                    </div>
+                                </div>
+                    `;
+                    
+                    const paymentNav = document.querySelector('.payment_navigtions');
+                    if (paymentNav) {
+                        paymentNav.remove();
+                    }
+                } else {
+                    const cartCount = document.querySelector('.main-color-three-color');
+                    if (cartCount) {
+                        cartCount.textContent = `(${remainingItemsCount} کالا)`;
+                    }
+                    
+                    const totalPriceElement = document.querySelector('.factor-item p');
+                    if (totalPriceElement && data.total_price) {
+                        const formattedPrice = new Intl.NumberFormat('fa-IR').format(
+                            parseFloat(data.total_price)
+                        );
+                        totalPriceElement.textContent = `${formattedPrice} تومان`;
+                    }
+                }
+            }, 300);
+        })
+        .catch(error => {
+            alert('خطا در حذف محصول از سبد خرید');
+            console.error('Error:', error);
+        });
+    }
+</script>
+{% endblock %}

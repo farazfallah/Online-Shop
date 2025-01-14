@@ -824,6 +824,7 @@
             </div>
             <div class="col-xl-3 d-xl-block d-none">
                 <div class="position-sticky top-0">
+                    {% if product.stock_quantity > 0 %}
                     <div class="se-cart bg-white border-ui">
                         <div class="se-cart-item">
                             <div class="d-flex">
@@ -874,6 +875,16 @@
                         </div>
                     </div>
                 </div>
+                {% else %}
+                <div class="se-cart border-ui">
+                    <div class="se-cart-item">
+                        <button disabled
+                                class="btn justify-content-center btn-dark  w-100 text-center btn-add-to-cart text-white  mt-3">
+                            محصول ناموجود
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

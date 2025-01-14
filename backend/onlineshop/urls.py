@@ -42,8 +42,10 @@ from product.api import (
     ProductCommentAPIView,
     ProductSearchView
 )
-from orders.api import (
-    CartView
+from orders import (
+    api,
+    cart,
+    checkout
 )
 
 
@@ -53,7 +55,7 @@ urlpatterns = [
     path('', include('product.urls')),
     path('account/', include('customers.urls')),
     path('order/', include('orders.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
 
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet, basename='category')
@@ -82,7 +84,9 @@ apipath = [
     # Comment 
     path('api/products/<int:product_id>/comments/', ProductCommentAPIView.as_view(), name='product-comments'),
     # Cart 
-    path('api/cart/', CartView.as_view(), name='cart'), 
+    path('api/cart/', cart.CartView.as_view(), name='cart'), 
+    path('api/checkout/', checkout.CheckoutView.as_view(), name='checkout'),
+    path('api/orders/', api.OrderListView.as_view(), name='order-list'),
     # Product router
     path('api/', include(router.urls)),
 ]

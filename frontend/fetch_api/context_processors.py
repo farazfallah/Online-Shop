@@ -40,19 +40,22 @@ def categories(request):
 def user_profile_context(request):
     profile_data = fetch_customer_profile(request)
     if profile_data:
-        first_name = profile_data.get('first_name', 'کاربر')
+        is_logged_in = True
+        first_name = profile_data.get('first_name', '')
         last_name = profile_data.get('last_name', '')
         email = profile_data.get('email', '')
         image = profile_data.get('image', '')
         is_otp_verified = profile_data.get('is_otp_verified', False)
     else:
-        first_name = 'کاربر'
+        is_logged_in = False
+        first_name = ''
         last_name = ''
         email = ''
         image = ''
         is_otp_verified = False
         
     return {
+        'is_logged_in': is_logged_in,
         'first_name': first_name,
         'last_name': last_name,
         'email': email,

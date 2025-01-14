@@ -1,6 +1,7 @@
 import requests
 import json
 from django.contrib import messages
+from django.utils import timezone
 from django.conf import settings
 from django.shortcuts import redirect, render
 from .utils import fetch_customer_profile
@@ -107,6 +108,8 @@ def dashboard_address(request):
     })
     
 
+from django.contrib import messages
+
 def customer_profile_page(request):
     if request.method == 'POST':
         if 'profile_image' in request.FILES:
@@ -116,18 +119,20 @@ def customer_profile_page(request):
                 
                 files = {'profile_image': request.FILES['profile_image']}
                 response = requests.patch(
-                    'http://127.0.0.1:8000/api/profile/',
+                    f'{settings.API_BASE_URL}profile/',
                     headers=headers,
                     files=files,
                     cookies=request.COOKIES
                 )
                 
-                if response.status_code != 200:
-                    print(f"Error uploading image: {response.text}")
+                if response.status_code == 200:
+                    messages.success(request, "تصویر پروفایل با موفقیت بروزرسانی شد.")
+                else:
+                    messages.error(request, f"خطا در آپلود تصویر: {response.text}")
                     
             except Exception as e:
-                print(f"Exception in image upload: {str(e)}")
-
+                messages.error(request, f"خطای سیستمی: {str(e)}")
+        
         else:
             try:
                 access_token = request.COOKIES.get('access_token')
@@ -142,18 +147,20 @@ def customer_profile_page(request):
                 }
                 
                 response = requests.patch(
-                    'http://127.0.0.1:8000/api/profile/',
+                    f'{settings.API_BASE_URL}profile/',
                     headers=headers,
                     json=data,
                     cookies=request.COOKIES
                 )
                 
-                if response.status_code != 200:
-                    print(f"Error updating profile: {response.text}")
+                if response.status_code == 200:
+                    messages.success(request, "اطلاعات پروفایل با موفقیت بروزرسانی شد.")
+                else:
+                    messages.error(request, f"خطا در بروزرسانی پروفایل: {response.text}")
                     
             except Exception as e:
-                print(f"Exception in profile update: {str(e)}")
-
+                messages.error(request, f"خطای سیستمی: {str(e)}")
+        
         return redirect('profile_page')
 
     profile_data = fetch_customer_profile(request)
@@ -161,3 +168,54 @@ def customer_profile_page(request):
         return redirect('login')
 
     return render(request, 'account/edit_profile.html')
+
+
+
+
+def order_list(request):
+    profile_data = fetch_customer_profile(request)
+    if profile_data is None:
+        return redirect('login')
+    
+    try:
+        access_token = request.COOKIES.get('access_token')
+
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.get(
+            f'{settings.API_BASE_URL}orders/',
+            headers=headers
+        )
+
+        if response.status_code == 200:
+            orders = response.json()
+            
+            for order in orders:
+                created_at = timezone.datetime.fromisoformat(order['created_at'].replace('Z', '+00:00'))
+                order['created_at_formatted'] = created_at.strftime('%Y/%m/%d')
+                
+            context = {
+                'orders': orders,
+            }
+            
+            return render(request, 'account/order_list.html', context)
+        elif response.status_code == 401:
+            context = {
+                'error': 'Authentication failed. Please log in again.',
+            }
+            return render(request, 'account/order_list.html', context)
+        else:
+            context = {
+                'error': 'Unable to fetch orders',
+                'status_code': response.status_code
+            }
+            return render(request, 'account/order_list.html', context)
+    
+    except requests.RequestException as e:
+        context = {
+            'error': f'Network error: {str(e)}',
+        }
+        return render(request, 'account/order_list.html', context)

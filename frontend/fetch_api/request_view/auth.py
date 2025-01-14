@@ -1,5 +1,5 @@
 import requests
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.conf import settings
 from django.http import JsonResponse
 from django.urls import reverse_lazy
