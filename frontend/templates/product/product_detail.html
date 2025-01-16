@@ -64,27 +64,25 @@
                         <div class="title mt-md-0 mt-3">
                             <h6 class="font-16 mb-2">{{ product.name }}
                             </h6>
+                            {% if product.comments_count > 0 %}
                             <div class="d-flex align-items-center pb-2">
-                                <div class="star">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i>
-                                    <i class="bi bi-star"></i>
-                                </div>
-                                <div class="ms-3">
-                                    <a href="" class="main-color-one-color font-14">
-                                        <span>11</span>
-                                        <span>دیدگاه</span>
-                                    </a>
-                                </div>
-                                <div class="ms-3">
-                                    <a href="" class="main-color-one-color font-14">
-                                        <span>3</span>
-                                        <span> پرسش</span>
-                                    </a>
-                                </div>
+                               <div class="star">
+                                   {% for i in "12345" %}
+                                       {% if product.average_rating >= forloop.counter %}
+                                           <i class="bi bi-star-fill"></i>
+                                       {% else %}
+                                           <i class="bi bi-star"></i>
+                                       {% endif %}
+                                   {% endfor %}
+                               </div>
+                               <div class="ms-3">
+                                   <a class="main-color-one-color font-14">
+                                       <span>{{ product.comments_count }}</span>
+                                       <span>دیدگاه</span>
+                                   </a>
+                               </div>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="product-feature py-2">
                             {% if product.attributes %}
@@ -268,18 +266,6 @@
                         </div>
                     </div>
                     {% endif %}
-                    <a href="">
-                        <div
-                                class="d-flex border rounded-3 align-items-center justify-content-between mt-3 px-3 py-2">
-                            <div>
-                                <i class="bi bi-info-circle"></i>
-                                <span class="font-14">گزارش محصول به پشتیبانی</span>
-                            </div>
-                            <div>
-                                <i class="bi bi-chevron-left"></i>
-                            </div>
-                        </div>
-                    </a>
                 </div>
                 <div class="col-12">
                     <div class="shop-feature">
@@ -347,7 +333,7 @@
                     <button aria-selected="false" class="d-flex waves-effect waves-light"
                             data-bs-target="#productComment-pane" data-bs-toggle="tab" id="productComment"
                             role="button" type="button">
-                        نظرات <span class="badge main-color-one-bg ms-2 lh-sm">17</span>
+                        نظرات <span class="badge main-color-one-bg ms-2 lh-sm">{% if product.comments_count > 0 %}{{ product.comments_count }}{% endif %}</span>
                     </button>
                 </li>
             </ul>
@@ -403,52 +389,102 @@
                                             <h6 class="font-26 mb-2 title-font title-line-bottom">نظرت در مورد این
                                                 محصول
                                                 چیه؟</h6>
-                                                {% if user.is_authenticated %}
-                                                <form method="POST" action="{% url 'product-comments' product.id %}">
-                                                    {% csrf_token %}
+                                                {% if is_logged_in %}
+                                                <form action="" data-product-id="{{ product.id }}">
                                                     <div class="row gy-4">
-                                                        <div class="col-sm-6">
-                                                            <div class="form-floating mb-3">
-                                                                <input type="email" class="form-control" value="{{ user.email }}" disabled>
-                                                                <label>ایمیل خود را وارد کنید</label>
+                                                        <div class="col-md-4">
+                                                            <div class="product-rateing position-sticky top-0">
+                                                                <div class="row gy-2 align-items-center">
+                                                                    <div class="number">
+                                                                        <h4 class="fw-light">متوسط امتیاز ها</h4>
+                                                                        <h2>{{ product.average_rating|floatformat:1 }}</h2>
+                                                                        <div class="star">
+                                                                            {% for i in "12345" %}
+                                                                                {% if product.average_rating >= forloop.counter %}
+                                                                                    <i class="bi bi-star-fill"></i>
+                                                                                {% else %}
+                                                                                    <i class="bi bi-star"></i>
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6">
-                                                            <div class="form-floating mb-3">
-                                                                <input type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}" disabled>
-                                                                <label>نام و نام خانوادگی خود را وارد کنید</label>
+                                                        <div class="col-md-8">
+                                                            <div class="row">
+                                                                <div class="col-sm-6">
+                                                                    <div class="form-floating mb-3 form-group">
+                                                                        <input class="form-control"
+                                                                               id="floatingInputEmail1"
+                                                                               placeholder="{{ email }}"
+                                                                               type="email" disabled>
+                                                                        <label for="floatingInputEmail1">{{ email }}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <div class="form-floating mb-3 form-group">
+                                                                        <input class="form-control"
+                                                                               id="floatingInputName"
+                                                                               placeholder="{{ first_name }} {{ last_name }}"
+                                                                               type="text" disabled>
+                                                                        <label for="floatingInputName">{{ first_name }} {{ last_name }}
+                                                                            </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <div class="form-group">
+                                                                        <label class="my-3" for="commentRating">امتیاز
+                                                                            شما</label>
+                                                                        <fieldset class="rating" id="commentRating">
+                                                                            <input id="star5" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="5"/>
+                                                                            <label for="star5">5 stars</label>
+                                                                            <input id="star4" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="4"/>
+                                                                            <label for="star4">4 stars</label>
+                                                                            <input id="star3" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="3"/>
+                                                                            <label for="star3">3 stars</label>
+                                                                            <input id="star2" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="2"/>
+                                                                            <label for="star2">2 stars</label>
+                                                                            <input id="star1" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="1"/>
+                                                                            <label for="star1">1 star</label>
+                                                                        </fieldset>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <div class="form-floating">
+                                                                <textarea class="form-control"
+                                                                          id="floatingTextarea2"
+                                                                          placeholder="Leave a comment here"
+                                                                          style="height: 150px"></textarea>
+                                                                        <label for="floatingTextarea2">متن نظر!</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <button type="submit"
+                                                                            class="btn main-color-two-bg px-5 btn-lg border-0">
+                                                                        ثبت نظر
+                                                                    </button>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="my-3">امتیاز شما</label>
-                                                            <fieldset class="rating">
-                                                                <input id="star5" name="rating" type="radio" value="5" required>
-                                                                <label for="star5">5 stars</label>
-                                                                <input id="star4" name="rating" type="radio" value="4" required>
-                                                                <label for="star4">4 stars</label>
-                                                                <input id="star3" name="rating" type="radio" value="3" required>
-                                                                <label for="star3">3 stars</label>
-                                                                <input id="star2" name="rating" type="radio" value="2" required>
-                                                                <label for="star2">2 stars</label>
-                                                                <input id="star1" name="rating" type="radio" value="1" required>
-                                                                <label for="star1">1 star</label>
-                                                            </fieldset>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <div class="form-floating">
-                                                                <textarea name="comment" class="form-control" placeholder="متن نظر شما" style="height: 150px" required></textarea>
-                                                                <label>متن نظر!</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <button type="submit" class="btn btn-lg main-color-two-bg px-5 border-0">ثبت نظر</button>
                                                         </div>
                                                     </div>
-                                                </form>
+                                                </form>                                                
                                                 {% else %}
                                                 <p class="loginTermsDesc lh-lg mt-3">برای ثبت نظر لطفاً <a href="{% url 'login' %}" class="underlined main-color-one-color fw-bold">وارد حساب کاربری</a> خود شوید.</p>
                                                 {% endif %}                                                
                                         </div>
+                                        {% if product.comments_count %}
                                         <div class="box_filter mt-5 pb-3">
                                             <div class="row align-items-end">
                                                 <div class="col-md-4 bf1">
@@ -456,365 +492,65 @@
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div class="box_users_comment mt-3 p-4">
-                                            <div class="row">
-                                                <div class="col-lg-3">
-                                                    <div class="box_message_light">
-                                                        <svg class="bi bi-cart3" fill="currentColor" height="16"
-                                                             viewBox="0 0 16 16" width="16"
-                                                             xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"></path>
-                                                        </svg>
-                                                        خریدار این محصول
-                                                    </div>
-                                                    <div class="box_shopping mt-lg-5 mt-3">
-                                                        <span>خریداری شده از :</span>
-                                                        <p>
-                                                            <i class="bi bi-shop"></i>
-                                                            <a href="#">اسمارت الکترونیک</a>
-                                                        </p>
-                                                    </div>
-                                                    <div class="box_message_dislike mt-2">
-                                                        <i class="bi bi-hand-thumbs-down"></i>
-                                                        خرید این محصول را توصیه نمی
-                                                        کنم
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-9 pr-5" style="margin-top:-10px">
-                                                    <div class="box_comment_header mt-4 mt-lg-0">
-                                                        <span class="span1">نخرید</span>
-                                                        <br>
-                                                        <span class="span2">توسط مسلم ابراهیمی در تاریخ ۳۰ شهریور ۱۳۹۷
-                                                </span>
-                                                    </div>
-                                                    <div class="border-bottom mt-3"></div>
-                                                    <div class="row mt-4">
-                                                        <div class="col-md-6 evaluation-positive">
-                                                            <div class="list-inline">
-                                                                <span>نقاط قوت</span>
-                                                                <div class="list-inline-item ml-3">هیچی</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 evaluation-negative">
-                                                            <div class="list-inline">
-                                                                <span>نقاط ضعف</span>
-                                                                <div class="list-inline-item ml-3">کیفیت صدا , موقع
-                                                                    زنگ اصلا
-                                                                    صدا
-                                                                    نمیره
-                                                                </div>
+                                        {% for comment in product.comments %}
+                                            <div class="box_users_comment mt-3 p-4">
+                                                <div class="row">
+                                                    <div class="col-lg-3 text-center">
+                                                        <img src="{{ comment.customer.profile_image_url }}" alt="{{ comment.customer.full_name }}" class="img-fluid rounded-circle mb-2" style="max-width: 95px;">
+                                                        <div class="user-details text-center">
+                                                            <h5 class="user-name mb-1">{{ comment.customer.full_name }}</h5>
+                                                            <div class="user-rating">
+                                                                {% for i in 5|make_list %}
+                                                                    {% if i < comment.rating %}
+                                                                        <span class="star text-warning">★</span>
+                                                                    {% else %}
+                                                                        <span class="star text-muted">★</span>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <small class="text-muted">({{ comment.rating }}/5)</small>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="row mt-4">
-                                                        <div class="col-md-12">
-                                                            <p class="box_text_comment">
-                                                                دوستان سلام من این رو خریدم اصلا خوب نیست صدا نمیره
-                                                                اونایی
-                                                                که
-                                                                میگن خوبه
-                                                                همشون
-                                                                فروشنده این بسته هستن با اکانت هایی که ساختن میام
-                                                                الکی نظر
-                                                                میدن
-                                                                نخرید به خدا
-                                                                نخرید اصلا خوب نیست
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row justify-content-end">
-                                                        <div class="col-12">
-                                                            <div class="comments_likes">
-                                                        <span class="mr-4 mt-1">
-                                                            ایا این نظر برایتان مفید بود ؟
-                                                        </span>
-                                                                <a class="btn btn-like btn-like-like mt-1 mt-md-0 ms-2"
-                                                                   href="#"><i
-                                                                        class="bi bi-hand-thumbs-up"></i> 70</a>
-                                                                <a class="btn btn-like btn-like-dislike mt-1 mt-md-0"
-                                                                   href="#"> <i
-                                                                        class="bi bi-hand-thumbs-down"></i> 7</a>
+                                                    <div class="col-lg-9 pr-5" style="margin-top:-10px">
+                                                        <div class="row mt-4">
+                                                            <div class="col-md-12">
+                                                                <p class="box_text_comment">
+                                                                    {{ comment.comment }}
+                                                                </p>
                                                             </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="box_users_comment mt-3 p-4">
-                                            <div class="row">
-                                                <div class="col-lg-3">
-                                                    <div class="box_message_light">
-                                                        <svg class="bi bi-cart3" fill="currentColor" height="16"
-                                                             viewBox="0 0 16 16" width="16"
-                                                             xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"></path>
-                                                        </svg>
-                                                        خریدار این محصول
-                                                    </div>
-                                                    <div class="box_shopping mt-lg-5 mt-3">
-                                                        <span>خریداری شده از :</span>
-                                                        <p>
-                                                            <i class="bi bi-shop"></i>
-                                                            <a href="#">اسمارت الکترونیک</a>
-                                                        </p>
-                                                    </div>
-                                                    <div class="box_message_dislike text-success mt-2">
-                                                        <i class="bi bi-hand-thumbs-up"></i>
-                                                        خرید این محصول را توصیه می
-                                                        کنم
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-9 pr-5" style="margin-top:-10px">
-                                                    <div class="box_comment_header mt-4 mt-lg-0">
-                                                        <span class="span1">نخرید</span>
-                                                        <br>
-                                                        <span class="span2">توسط مسلم ابراهیمی در تاریخ ۳۰ شهریور ۱۳۹۷
-                                                </span>
-                                                    </div>
-                                                    <div class="border-bottom mt-3"></div>
-                                                    <div class="row mt-4">
-                                                        <div class="col-md-6 evaluation-positive">
-                                                            <div class="list-inline">
-                                                                <span>نقاط قوت</span>
-                                                                <div class="list-inline-item ml-3">هیچی</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 evaluation-negative">
-                                                            <div class="list-inline">
-                                                                <span>نقاط ضعف</span>
-                                                                <div class="list-inline-item ml-3">کیفیت صدا , موقع
-                                                                    زنگ اصلا
-                                                                    صدا
-                                                                    نمیره
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mt-4">
-                                                        <div class="col-md-12">
-                                                            <p class="box_text_comment">
-                                                                دوستان سلام من این رو خریدم اصلا خوب نیست صدا نمیره
-                                                                اونایی
-                                                                که
-                                                                میگن خوبه
-                                                                همشون
-                                                                فروشنده این بسته هستن با اکانت هایی که ساختن میام
-                                                                الکی نظر
-                                                                میدن
-                                                                نخرید به خدا
-                                                                نخرید اصلا خوب نیست
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row justify-content-end">
-                                                        <div class="col-12">
-                                                            <div class="comments_likes">
-                                                        <span class="mr-4 mt-1">
-                                                            ایا این نظر برایتان مفید بود ؟
-                                                        </span>
-                                                                <a class="btn btn-like btn-like-like mt-1 mt-md-0 ms-2"
-                                                                   href="#"><i
-                                                                        class="bi bi-hand-thumbs-up"></i> 70</a>
-                                                                <a class="btn btn-like btn-like-dislike mt-1 mt-md-0"
-                                                                   href="#"> <i
-                                                                        class="bi bi-hand-thumbs-down"></i> 7</a>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="container">
-                                            <div class="text-center">
-                                                <a class="btn main-color-one-bg border-0" href="">بارگذاری کامنت
-                                                    ها</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div aria-labelledby="#productAnswer" class="tab-pane fade"
-                                         id="productAnswer-pane"
-                                         role="tabpanel">
-                                        <h4 class="title-font title-line-bottom">پرسش و پاسخ</h4>
-                                        <span class="fw-bold d-block mt-2 text-muted font-12">پرسش خود را در مورد محصول مطرح
-                                نمایید</span>
-
-                                        <div class="box_questions mt-4">
-                                            <form>
-                                                <div class="form-group">
-                                                    <label class="d-block">
-                                                            <textarea class="form-control"
-                                                                      placeholder="هر سوالی در مورد این محصول به ذهنتان میرسید بپرسید!"
-                                                                      rows="7"></textarea>
-                                                    </label>
-                                                    <button class="btn main-color-three-bg mt-3 btn-lg"
-                                                            type="submit">ثبت پرسش
-                                                    </button>
-                                                </div>
-                                            </form>
-
-                                            <div class="box_filter mt-5 pb-3">
-                                                <div class="row align-items-end">
-                                                    <div class="col-md-4 bf1">
-                                                        <h4 class="title-font title-line-bottom">پرسش های
-                                                            کاربران</h4>
-                                                    </div>
-                                                    <div class="col-md-8 bf2">
-                                                        <ul class="list-inline text-end mb-0">
-                                                            <li class="list-inline-item title-font">مرتب سازی بر
-                                                                اساس :
-                                                            </li>
-                                                            <li class="list-inline-item"><a href="#">نظر
-                                                                خریداران</a></li>
-                                                            <li class="list-inline-item"><a class="active_custom"
-                                                                                            href="#">مفیدترین
-                                                                نظرات</a>
-                                                            </li>
-                                                            <li class="list-inline-item"><a href="#">جدیدترین
-                                                                نظرات</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="box_questions mt-4">
-                                                <div class="row bs-qu">
-                                                    <div class="col-lg-2 bq1 text-center">
-                                                        <i class="bi bi-question-circle-fill"></i>
-                                                        <br>
-                                                        <span class="span1">پرسش</span>
-                                                        <br>
-                                                        <span class="span2">فرزاد عباسقلی زاده</span>
-                                                    </div>
-                                                    <div class="col-lg-10 bq2">
-                                                        <p>سلام چطوری دو گوشی همزمان پخش میکنه ؟ </p>
-
-                                                        <div class="row bq-footer">
-                                                            <div class="col-md-5 col-6 my-flex-align-end">
-                                                    <span class="date"> ۱۶ مهر ۱۳۹۷
-                                                    </span>
-                                                            </div>
-                                                            <div class="col-md-7 col-6 text-end pe-0">
-                                                                <a class="d-none d-sm-block" href="#">
-                                                                    <span class="main-color-one-color">به این پرسش پاسخ دهید (۱ پاسخ)</span>
-                                                                </a><a class="d-sm-none d-block" href="#">پاسخ</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row bs-qu">
-                                                    <div class="col-lg-2 bq1 text-center">
-                                                        <i class="bi bi-chat-dots-fill"></i>
-                                                        <br>
-                                                        <span class="span1">پاسخ</span>
-                                                        <br>
-                                                        <span class="span2">حسین زارع</span>
-                                                    </div>
-                                                    <div class="col-lg-10 bq2 bg-transparent">
-                                                        <p>درباره راه اندازی: (خیلی دربارش پرسیده بودند): اول:
-                                                            بلوتوث گوشی خود
-                                                            را
-                                                            خاموش کنید.
-                                                            دوم: لطفا
-                                                            کلید های چند منظوره در هر دو هدفون را همزمان فشار دهید
-                                                        </p>
-                                                        <div class="row align-items-center bq-footer">
-                                                            <div class="col-lg-5 col-12 my-flex-align-end">
-                                                    <span class="date">۲۲ مهر ۱۳۹۷
-                                                    </span>
-                                                            </div>
-                                                            <div class="col-lg-7 col-12 text-start p-0 ">
-                                                                <div class="comments_likes">
-                                                                            <span class="mr-4 mt-1">
-                                                                                ایا این نظر برایتان مفید بود ؟
-                                                                            </span>
-                                                                    <a class="btn btn-like btn-like-like mt-1 mt-md-0 ms-2"
-                                                                       href="#"><i
-                                                                            class="bi bi-hand-thumbs-up"></i> 70</a>
-                                                                    <a class="btn btn-like btn-like-dislike mt-1 mt-md-0"
-                                                                       href="#">
-                                                                        <i class="bi bi-hand-thumbs-down"></i> 7</a>
+                                                            <div class="border-top mt-3">
+                                                                <div class="box_comment_header mt-4 mt-lg-0">
+                                                                    <br>
+                                                                    <span class="span2">
+                                                                        توسط {{ comment.customer.full_name }}
+                                                                        در تاریخ {{ comment.created_at }}
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div class="box_questions mt-4">
-                                                <div class="row bs-qu">
-                                                    <div class="col-lg-2 bq1 text-center">
-                                                        <i class="bi bi-question-circle-fill"></i>
-                                                        <br>
-                                                        <span class="span1">پرسش</span>
-                                                        <br>
-                                                        <span class="span2">فرزاد عباسقلی زاده</span>
-                                                    </div>
-                                                    <div class="col-lg-10 bq2">
-                                                        <p>سلام چطوری دو گوشی همزمان پخش میکنه ؟ </p>
-
-                                                        <div class="row bq-footer">
-                                                            <div class="col-md-5 col-6 my-flex-align-end">
-                                                    <span class="date"> ۱۶ مهر ۱۳۹۷
-                                                    </span>
-                                                            </div>
-                                                            <div class="col-md-7 col-6 text-end pe-0">
-                                                                <a class="d-none d-sm-block" href="#">
-                                                                    <span class="main-color-one-color">به این پرسش پاسخ دهید (۱ پاسخ)</span>
-                                                                </a><a class="d-sm-none d-block" href="#">پاسخ</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row bs-qu">
-                                                    <div class="col-lg-2 bq1 text-center">
-                                                        <i class="bi bi-chat-dots-fill"></i>
-                                                        <br>
-                                                        <span class="span1">پاسخ</span>
-                                                        <br>
-                                                        <span class="span2">حسین زارع</span>
-                                                    </div>
-                                                    <div class="col-lg-10 bq2 bg-transparent">
-                                                        <p>درباره راه اندازی: (خیلی دربارش پرسیده بودند): اول:
-                                                            بلوتوث گوشی خود
-                                                            را
-                                                            خاموش کنید.
-                                                            دوم: لطفا
-                                                            کلید های چند منظوره در هر دو هدفون را همزمان فشار دهید
-                                                        </p>
-                                                        <div class="row align-items-center bq-footer">
-                                                            <div class="col-lg-5 col-12 my-flex-align-end">
-                                                    <span class="date">۲۲ مهر ۱۳۹۷
-                                                    </span>
-                                                            </div>
-                                                            <div class="col-lg-7 col-12 text-start p-0 ">
-                                                                <div class="comments_likes">
-                                                                            <span class="mr-4 mt-1">
-                                                                                ایا این نظر برایتان مفید بود ؟
-                                                                            </span>
-                                                                    <a class="btn btn-like btn-like-like mt-1 mt-md-0 ms-2"
-                                                                       href="#"><i
-                                                                            class="bi bi-hand-thumbs-up"></i> 70</a>
-                                                                    <a class="btn btn-like btn-like-dislike mt-1 mt-md-0"
-                                                                       href="#">
-                                                                        <i class="bi bi-hand-thumbs-down"></i> 7</a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="container mt-4">
-                                                <div class="text-center">
-                                                    <a class="btn main-color-one-bg border-0" href="">بارگذاری کامنت
-                                                        ها</a>
-                                                </div>
-                                            </div>
-
-                                        </div>
+                                        {% empty %}
+                                            <p class="text-center text-muted mt-4">هنوز نظری ثبت نشده است.</p>
+                                        {% endfor %}
+                                        <style>
+                                            .star {
+                                                font-size: 1.2em;
+                                            }
+                                            .user-details {
+                                                margin-top: 10px;
+                                            }
+                                            .user-name {
+                                                font-weight: bold;
+                                            }
+                                            .box_users_comment {
+                                                background-color: #f8f9fa;
+                                                border-radius: 10px;
+                                                margin-bottom: 15px;
+                                            }
+                                        </style>
+                                    {% endif %}                                    
                                     </div>
                                 </div>
                             </div>
@@ -981,5 +717,94 @@
 
         document.getElementById('show-more-link').style.display = 'inline-block';
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const commentForm = document.querySelector('.comment-form form');
+        const submitButton = commentForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+
+        // Get product ID from form's data attribute
+        const productId = commentForm.getAttribute('data-product-id');
+        if (!productId) {
+            console.error('Product ID not found in form data attributes');
+            return;
+        }
+
+        // Create message container
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'alert d-none mt-3';
+        commentForm.insertBefore(messageContainer, commentForm.firstChild);
+
+        commentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Show loading spinner
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                در حال ارسال...
+            `;
+
+            // Get form data
+            const rating = document.querySelector('input[name="rating"]:checked')?.value;
+            const comment = document.querySelector('#floatingTextarea2').value;
+
+            if (!rating || !comment) {
+                showMessage('لطفا تمامی فیلدها را پر کنید.', 'danger');
+                resetButton();
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/comments/`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        rating: parseInt(rating),
+                        comment: comment
+                    })
+                });
+
+                const data = await response.json();
+                console.log('Response:', data); // Log the response for debugging
+
+                if (response.ok) {
+                    showMessage('نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد.', 'success');
+                    commentForm.reset();
+                } else {
+                    const errorMessage = typeof data === 'object' ? 
+                        JSON.stringify(data, null, 2) : 
+                        data.toString();
+                    showMessage(`خطا: ${errorMessage}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage(`خطا در برقراری ارتباط با سرور: ${error.message}`, 'danger');
+            } finally {
+                resetButton();
+            }
+        });
+
+        function showMessage(message, type) {
+            messageContainer.className = `alert alert-${type} mt-3`;
+            messageContainer.innerHTML = message;
+            messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageContainer.className = 'alert d-none mt-3';
+                }, 5000);
+            }
+        }
+
+        function resetButton() {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+        }
+    });
 </script>
 {% endblock %}

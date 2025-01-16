@@ -1,0 +1,198 @@
+{% extends "../base_panel.html" %}
+{% block title %}سفارش {{ order.id }}{% endblock %}
+{% load static %}
+{% block dashboard_content %}
+{% if error %}
+<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    {{ error }}
+</div>
+{% else %}
+<div class="col-xl-9">
+    <div class="section-title-title">
+        <h2 class="fw-900 h4">سفارش<span class="with-highlight ms-1">#{{ order.id }}</span>
+        </h2>
+        <div class="Dottedsquare"></div>
+    </div>
+    <div class="content">
+        <div class="shoping-proccess rounded-4 border-ui py-5 pb-2 slider-parent">
+            <div class="steps d-flex flex-wrap flex-sm-nowrap justify-content-between padding-top-2x padding-bottom-1x">
+                <div class="step {% if order.status in 'registered,confirmed,shipped,completed' %}completed{% endif %}">
+                    <div class="step-icon-wrap">
+                        <div class="step-icon"><i class="bi bi-gear fs-2"></i></div>
+                    </div>
+                    <h4 class="step-title">ثبت شده</h4>
+                </div>
+                
+                <div class="step {% if order.status in 'confirmed,shipped,completed' %}completed{% endif %}">
+                    <div class="step-icon-wrap">
+                        <div class="step-icon"><i class="bi bi-cart-check fs-2"></i></div>
+                    </div>
+                    <h4 class="step-title">پرداخت شده</h4>
+                </div>
+                
+                <div class="step {% if order.status in 'shipped,completed' %}completed{% endif %}">
+                    <div class="step-icon-wrap">
+                        <div class="step-icon"><i class="bi bi-bus-front fs-2"></i></div>
+                    </div>
+                    <h4 class="step-title">تحویل به پست</h4>
+                </div>
+                
+                <div class="step {% if order.status == 'completed' %}completed{% endif %}">
+                    <div class="step-icon-wrap">
+                        <div class="step-icon"><i class="fs-2 bi bi-house-check"></i></div>
+                    </div>
+                    <h4 class="step-title">تکمیل شده</h4>
+                </div>
+                
+                <div class="step {% if order.status == 'canceled' %}completed{% endif %}">
+                    <div class="step-icon-wrap">
+                        <div class="step-icon"><i class="fs-2 bi bi-x-circle"></i></div>
+                    </div>
+                    <h4 class="step-title">لغو شده</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="orders-item mt-5">
+            <div class="ui-boxs">
+                <div class="ui-box">
+                    <div class="ui-box-item border-ui slider-parent ui-box-white">
+                        <div class="ui-box-item-desc p-0">
+                            <div class="orders">
+                                <div class="order-item">
+                                    <div class="order-item-detail">
+                                        <ul class="nav">
+                                            <li class="nav-item">
+                                                <span class="text-mute">کد پیگیری سفارش</span>
+                                                <strong>{{ order.id }}</strong>
+                                            </li>
+                                            <li class="nav-item">
+                                                <span class="text-mute">تاریخ ثبت سفارش</span>
+                                                <strong>{{ order.created_at_formatted }}</strong>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="order-item-detail">
+                                        <ul class="nav">
+                                            <li class="nav-item">
+                                                <span class="text-mute">استان</span>
+                                                <strong>{{ order.shipping_address.state }}</strong>
+                                            </li>
+                                            <li class="nav-item">
+                                                <span class="text-mute">شهرستان</span>
+                                                <strong>{{ order.shipping_address.city }}</strong>
+                                            </li>
+                                            <li class="nav-item w-100">
+                                            </li>
+                                            <li class="nav-item">
+                                                <span class="text-mute">آدرس</span>
+                                                <strong>{{ order.shipping_address.address_line }}
+                                                    </strong>
+                                            </li>
+                                            <li class="nav-item">
+                                                <span class="text-mute">کد پستی</span>
+                                                <strong>{{ order.shipping_address.postal_code }}
+                                                    </strong>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="orders-item">
+            <div class="ui-boxs">
+                <div class="ui-box">
+                    <div class="ui-box-item border-ui slider-parent ui-box-white">
+                        <div class="ui-box-item-desc p-0">
+                            <div class="orders">
+                                <div class="order-item">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>محصول</th>
+                                                    <th>نام محصول</th> 
+                                                    <th>قیمت واحد</th>
+                                                    <th>تعداد</th>
+                                                    <th>قیمت کل</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in order.items %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="avatar avatar-md" data-bs-toggle="tooltip" 
+                                                             data-bs-placement="top"
+                                                             aria-label="{{ item.product_name }}"
+                                                             data-bs-original-title="{{ item.product_name }}">
+                                                            <a href="{% url 'product_detail' product_id=item.product %}">
+                                                                <img src="{{ item.product_image }}"
+                                                                     alt="{{ item.product_name }}" 
+                                                                     class="rounded-circle pull-up">
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex flex-column">
+                                                            <h6 class="mb-0 text-truncate" style="max-width: 200px;">
+                                                                {{ item.product_name }}
+                                                            </h6>
+                                                            <small class="text-truncate text-muted">
+                                                                کد محصول: {{ item.product }}
+                                                            </small>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-nowrap">
+                                                        {% if item.product_price != item.price %}
+                                                            <small class="text-muted text-decoration-line-through">
+                                                                {{ item.product_price }} تومان
+                                                            </small>
+                                                            <br>
+                                                        {% endif %}
+                                                        <span>{{ item.price }} تومان</span>
+                                                    </td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td class="text-nowrap">
+                                                        {{ item.total_price }} تومان
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot class="table-border-bottom-0">
+                                                <tr>
+                                                    <td colspan="3"></td>
+                                                    <td class="text-end"><strong>جمع کل محصولات:</strong></td>
+                                                    <td>{{ order.items_total }} تومان</td>
+                                                </tr>
+                                                {% if order.total_discount > 0 %}
+                                                <tr>
+                                                    <td colspan="3"></td>
+                                                    <td class="text-end text-danger"><strong>تخفیف:</strong></td>
+                                                    <td class="text-danger">{{ order.total_discount }} تومان</td>
+                                                </tr>
+                                                {% endif %}
+                                                <tr>
+                                                    <td colspan="3"></td>
+                                                    <td class="text-end"><strong>مبلغ قابل پرداخت:</strong></td>
+                                                    <td><strong>{{ order.total_price }} تومان</strong></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}

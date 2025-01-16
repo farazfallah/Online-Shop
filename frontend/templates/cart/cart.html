@@ -25,8 +25,7 @@
                     </ul>
                 </nav>
             </div>
-            <h2 class="fw-900 main-color-one-color mt-4 h4">سبد خرید شما <span
-                    class="main-color-three-color">(3 کالا)</span>
+            <h2 class="fw-900 main-color-one-color mt-4 h4">سبد خرید شما
             </h2>
         </div>
 
@@ -121,7 +120,7 @@
                                     <p class="mb-0 font-17">{{ cart.total_price|floatformat:0 }} تومان</p>
                                 </div>
                                 <div class="action mt-3 d-flex align-items-center justify-content-center">
-                                    <a href="#"
+                                    <a href="{% url 'checkout' %}"
                                        class="btn main-color-one-outline py-2 rounded-pill rounded-3 d-block w-100">تسویه
                                         حساب</a>
                                 </div>

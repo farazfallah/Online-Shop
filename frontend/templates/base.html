@@ -63,39 +63,51 @@
                                             <li class="nav-item bg-ul-f7"><a class="nav-link" href="{% url 'home' %}">صفحه
                                                 اصلی</a>
                                             </li>
-                                                <ul class="navbar-nav">
-                                                    {% for category in category_list %}
-                                                        {% if not category.parent_category %}
-                                                            <li class="nav-item bg-ul-f7">
-                                                                <a class="nav-link" href="{% url 'category-detail' category_id=category.id %}">{% autoescape off %}{{ category.name }}{% endautoescape %}</a>
-                                                                {% if category.subcategories.exists %}
-                                                                    <span class="showSubMenu">
-                                                                        <i class="bi bi-chevron-left"></i>
-                                                                    </span>
-                                                                    <ul class="navbar-nav h-0">
-                                                                        {% for subcategory in category.subcategories.all %}
-                                                                            <li class="nav-item">
-                                                                                <a class="nav-link" href="">{% autoescape off %}{{ subcategory.name }}{% endautoescape %}</a>
-                                                                                {% if subcategory.subcategories.exists %}
-                                                                                    <span class="showSubMenu">
-                                                                                        <i class="bi bi-chevron-left"></i>
-                                                                                    </span>
-                                                                                    <ul class="navbar-nav h-0 bg-ul-f7">
-                                                                                        {% for subsubcategory in subcategory.subcategories.all %}
-                                                                                            <li class="nav-item">
-                                                                                                <a class="nav-link" href="">{% autoescape off %}{{ subsubcategory.name }}{% endautoescape %}</a>
-                                                                                            </li>
-                                                                                        {% endfor %}
-                                                                                    </ul>
-                                                                                {% endif %}
-                                                                            </li>
-                                                                        {% endfor %}
-                                                                    </ul>
-                                                                {% endif %}
-                                                            </li>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </ul>
+                                            <ul class="navbar-nav">
+                                                {% for category in category_list %}
+                                                    {% if not category.parent_category %}
+                                                        <li class="nav-item bg-ul-f7">
+                                                            <a class="nav-link" href="{% url 'category-detail' category_id=category.id %}">
+                                                                {% autoescape off %}{{ category.name }}{% endautoescape %}
+                                                            </a>
+                                                            
+                                                            {% if category.subcategories %}
+                                                                <span class="showSubMenu">
+                                                                    <i class="bi bi-chevron-left"></i>
+                                                                </span>
+                                                                <ul class="navbar-nav h-0">
+                                                                    {% for subcategory in category.subcategories %}
+                                                                        <li class="nav-item">
+                                                                            <a class="nav-link" href="{% url 'category-detail' category_id=subcategory.id %}">
+                                                                                {% autoescape off %}{{ subcategory.name }}{% endautoescape %}
+                                                                            </a>
+                                                                            
+                                                                            {% if subcategory.subcategories %}
+                                                                                <span class="showSubMenu">
+                                                                                    <i class="bi bi-chevron-left"></i>
+                                                                                </span>
+                                                                                <ul class="navbar-nav h-0 bg-ul-f7">
+                                                                                    {% for subsubcategory in subcategory.subcategories %}
+                                                                                        <li class="nav-item">
+                                                                                            <a class="nav-link" href="{% url 'category-detail' category_id=subsubcategory.id %}">
+                                                                                                {% autoescape off %}{{ subsubcategory.name }}{% endautoescape %}
+                                                                                            </a>
+                                                                                        </li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            {% endif %}
+                                                                        </li>
+                                                                    {% empty %}
+                                                                        <li class="nav-item">
+                                                                            <span class="nav-link text-muted">هیچ زیر دسته ای وجود ندارد</span>
+                                                                        </li>
+                                                                    {% endfor %}
+                                                                </ul>
+                                                            {% endif %}
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
                                             </li>
                                         </ul>
                                     </div>
@@ -183,22 +195,30 @@
                                 <ul class="main-menu mega-container" id="category-menu">
                                     {% for category in category_list %}
                                         {% if not category.parent_category %}
-                                            <li class=""><a href="{% url 'category-detail' category_id=category.id %}"><i class="{{ category.icon }}"></i>
-                                                {% autoescape off %}{{ category.name }}{% endautoescape %}</a>
-                                                <ul class="main-menu-sub back-menu"
-                                                {% if category.image %}
-                                                style="background: #fff url('{{ category.image }}') no-repeat;"
-                                                {% else %}
-                                                    style="background: none;"
-                                                {% endif %}>
-                                                {% for subcategory in category.subcategories.all %}
-                                                <li class="">
-                                                    <a class="title my-flex-baseline" href="">{% autoescape off %}{{ subcategory.name }}{% endautoescape %}</a>
-                                                </li>
-                                                {% empty %}
-                                                    <h6 class="my-4">هیچ زیر دسته ای وجود ندارد</h6>
-                                                {% endfor %}
-                                                </ul>
+                                            <li class="">
+                                                <a href="{% url 'category-detail' category_id=category.id %}">
+                                                    <i class="{{ category.icon }}"></i>
+                                                    {% autoescape off %}{{ category.name }}{% endautoescape %}
+                                                </a>
+                                                
+                                                {% if category.subcategories %}
+                                                    <ul class="main-menu-sub back-menu"
+                                                    {% if category.image %}
+                                                        style="background: #fff url('{{ category.image }}') no-repeat;"
+                                                    {% else %}
+                                                        style="background: none;"
+                                                    {% endif %}>
+                                                        {% for subcategory in category.subcategories %}
+                                                            <li class="">
+                                                                <a class="title my-flex-baseline" href="{% url 'category-detail' category_id=subcategory.id %}">
+                                                                    {% autoescape off %}{{ subcategory.name }}{% endautoescape %}
+                                                                </a>
+                                                            </li>
+                                                        {% empty %}
+                                                            <h6 class="my-4">هیچ زیر دسته ای وجود ندارد</h6>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endif %}
                                             </li>
                                         {% endif %}
                                     {% endfor %}
@@ -405,43 +425,11 @@
                             {% endif %}
                         </div>
                         {% endif %}
-                        <div class="footer-form title-col-social">
-                            <h6 class="my-4">در خبرنامه پر تخفیف ما عضو شوید</h6>
-                            <form action="">
-                                <div class="d-flex">
-                                    <label>
-                                        <input type="email" name="rss" class="form-control text-start"
-                                               placeholder="آدرس ایمیل خود را وارد کنید">
-                                    </label>
-                                    <button class="btn main-color-one-bg border-0 ms-1" type="submit">ثبت</button>
-                                </div>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="footer-app">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <h5 class="text-white text-sm-start text-center">دانلود اپلیکیشن مهیار</h5>
-                </div>
-                <div class="col-md-8">
-                    <nav class="navbar navbar-expand justify-content-sm-end">
-                        <ul class="navbar-nav flex-sm-nowrap flex-wrap justify-content-center">
-                            <li class="nav-item"><a href="" class="nav-link"><img
-                                    src="assets/image/application/app-sibapp.svg" alt=""></a></li>
-                            <li class="nav-item"><a href="" class="nav-link"><img
-                                    src="assets/image/application/myket-app.png" alt=""></a></li>
-                            <li class="nav-item"><a href="" class="nav-link"><img
-                                    src="assets/image/application/bazar-app.svg" alt=""></a></li>
-                            <li class="nav-item"><a href="" class="nav-link"><img
-                                    src="assets/image/application/google-play-app.svg" alt=""></a></li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
+        <hr class="dot">
         <div class="footer-description">
             <div class="row align-items-center gy-3">
                 <div class="col-lg-8">

@@ -19,6 +19,79 @@ class DecimalEncoder(json.JSONEncoder):
 
 class CartView(APIView):
     permission_classes = [AllowAny]
+    
+    def sync_cookie_cart_with_db(self, request, user_id):
+        """
+        Synchronize cookie cart with database cart when user logs in
+        """
+        try:
+            # Get or create user's cart in database
+            db_cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
+            
+            # Get cookie cart data
+            cookie_cart_data = self.get_cart_from_cookie(request)
+            cookie_items = cookie_cart_data.get('items', [])
+            
+            # Process each item from cookie cart
+            for cookie_item in cookie_items:
+                try:
+                    product = Product.objects.get(id=cookie_item['product'])
+                    
+                    if product.stock_quantity == 0:
+                        continue
+                        
+                    # Calculate current price with discount
+                    discount_price = product.price - (product.price * Decimal(product.discount) / 100)
+                    product_image_url = request.build_absolute_uri(product.image.url) if product.image else None
+                    
+                    # Check if item already exists in database cart
+                    db_cart_item = CartItem.objects.filter(
+                        cart=db_cart,
+                        product_id=product.id
+                    ).first()
+                    
+                    if db_cart_item:
+                        # Update existing cart item
+                        new_quantity = db_cart_item.quantity + cookie_item['quantity']
+                        
+                        # Check stock availability
+                        if new_quantity > product.stock_quantity:
+                            new_quantity = product.stock_quantity
+                            
+                        db_cart_item.quantity = new_quantity
+                        db_cart_item.product_name = product.name
+                        db_cart_item.product_price = discount_price
+                        db_cart_item.product_image = product_image_url
+                        db_cart_item.save()
+                    else:
+                        # Create new cart item
+                        quantity = min(cookie_item['quantity'], product.stock_quantity)
+                        CartItem.objects.create(
+                            cart=db_cart,
+                            product_id=product.id,
+                            product_name=product.name,
+                            product_price=discount_price,
+                            quantity=quantity,
+                            product_image=product_image_url,
+                        )
+                        
+                except Product.DoesNotExist:
+                    continue
+                    
+            # Update cart total price
+            db_cart.total_price = sum(item.product_price * item.quantity for item in db_cart.items.all())
+            db_cart.save()
+            
+            # Clear cookie cart
+            response = Response()
+            response.delete_cookie('cart')
+            
+            return db_cart
+            
+        except Exception as e:
+            print(f"Error syncing cart: {str(e)}")
+            return None
+        
 
     def update_cart_prices(self, cart):
         total_price = Decimal('0')
@@ -103,11 +176,25 @@ class CartView(APIView):
     def get(self, request):
         try:
             user_id = get_user_from_token(request)
-            cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
+            
+            # Sync cart if there's cookie data
+            if request.COOKIES.get('cart'):
+                cart = self.sync_cookie_cart_with_db(request, user_id)
+            else:
+                cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
+                
             cart = self.update_cart_prices(cart)
             serializer = CartSerializer(cart)
-            return Response(serializer.data)
+            response = Response(serializer.data)
+            
+            # Delete cart cookie after sync
+            if request.COOKIES.get('cart'):
+                response.delete_cookie('cart')
+                
+            return response
+            
         except AuthenticationFailed:
+            # Rest of the code remains the same for unauthenticated users
             try:
                 cart_data = self.get_cart_from_cookie(request)
                 response = Response({

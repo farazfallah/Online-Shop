@@ -11,6 +11,7 @@
     </div>
     <div class="content">
         <div class="alert slider-parent bg-white mt-3 shadow-box rounded-4">
+            {% if orders %}
             <div class="tab-product-nav tab-panel-tbl  p-3 rounded-3">
                 <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -21,6 +22,7 @@
                     </li>
                 </ul>
             </div>
+            {% endif %}
             <div class="tab-content tab-product-content" id="myTabContent">
                 <div class="tab-pane fade active show" id="latest-order-pane" role="tabpanel"
                      aria-labelledby="latest-order" tabindex="0">
@@ -82,7 +84,7 @@
                                     </td>
                                     <td colspan="2" class="align-middle">
                                         <div class="text-center">
-                                            <a href="" class="btn main-color-one-bg">مشاهده</a>
+                                            <a href="{% url 'order_detail' order_id=order.id %}" class="btn main-color-one-bg">مشاهده</a>
                                         </div>
                                     </td>
                                 </tr>

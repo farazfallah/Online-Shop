@@ -43,7 +43,7 @@ class LoginWithPasswordView(APIView):
 
             response = Response({
                 "message": "ورود موفقیت‌آمیز بود.",
-                "redirect_url": reverse_lazy('home')
+                "redirect_url": "/"
             }, status=200)
 
             response.set_cookie(
@@ -102,7 +102,7 @@ class LoginWithOtpView(APIView):
                 refresh = RefreshToken.for_user(customer)
                 access_token = str(refresh.access_token)
 
-                redirect_url = reverse_lazy('home')
+                redirect_url = "/"
 
                 delete_otp_from_redis(email)
                 
@@ -353,16 +353,6 @@ class DeleteAddressView(APIView):
 
 
 
-def register_page(request):
-    if request.user.is_authenticated:
-        return redirect(reverse_lazy('home'))
-    return render(request, 'customers/register.html')
-
-
-def login_page(request):
-    if request.user.is_authenticated:
-        return redirect(reverse_lazy('home'))
-    return render(request, 'customers/login.html')
 
 
 class LogoutView(APIView):

@@ -52,7 +52,6 @@ from orders import (
 urlpatterns = [
     path('jet/', include('jet.urls', 'jet')),
     path('admin/', admin.site.urls),
-    path('', include('product.urls')),
     path('account/', include('customers.urls')),
     path('order/', include('orders.urls')),
 ]
@@ -87,10 +86,10 @@ apipath = [
     path('api/cart/', cart.CartView.as_view(), name='cart'), 
     path('api/checkout/', checkout.CheckoutView.as_view(), name='checkout'),
     path('api/orders/', api.OrderListView.as_view(), name='order-list'),
+    path('api/orders/<int:order_id>/', api.OrderDetailView.as_view(), name='order-detail'),
     # Product router
     path('api/', include(router.urls)),
 ]
-
 
 
 if settings.DEBUG:

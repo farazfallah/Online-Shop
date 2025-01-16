@@ -529,10 +529,12 @@
                                         <div class="title">
                                             <p class="text-overflow-1 mt-2">{{ product.name }}</p>
                                         </div>
+                                        {% if product.comments_count > 0 %}
                                         <div class="rating">
                                             <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
                                             <div class="icon"><i class="bi bi-star-fill"></i></div>
                                         </div>
+                                        {% endif %}
                                     </div>
                                     <div class="product-action">
                                         {% if product.discount != 0 %}

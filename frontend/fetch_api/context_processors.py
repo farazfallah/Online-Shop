@@ -22,17 +22,27 @@ def site_info(request):
 
 def categories(request):
     api_url = f"{settings.API_BASE_URL}categories/"
-
+    
     try:
         response = requests.get(api_url, proxies={"http": None, "https": None})
-
+        
         if response.status_code == 200:
             data = response.json()
             categories = data.get("results", [])
-            return {"category_list": categories}
+            
+            full_categories = []
+            for category in categories:
+                if not category.get('parent_category'):
+                    category_detail_url = f"{settings.API_BASE_URL}categories/{category['id']}/"
+                    category_response = requests.get(category_detail_url)
+                    if category_response.status_code == 200:
+                        full_category = category_response.json()
+                        full_categories.append(full_category)
+            
+            return {"category_list": full_categories}
         else:
             return {"category_list": []}
-
+    
     except requests.exceptions.RequestException as e:
         return {"category_list": [], "error": f"An error occurred: {str(e)}"}
     

@@ -11,7 +11,7 @@ class Category(BaseModel, LogicalDeleteModel):
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
     def __str__(self):
         return self.name
-
+    
 
 class Attribute(BaseModel, LogicalDeleteModel):
     name = models.CharField(max_length=100)

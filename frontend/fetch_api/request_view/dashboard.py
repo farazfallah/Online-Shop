@@ -219,3 +219,56 @@ def order_list(request):
             'error': f'Network error: {str(e)}',
         }
         return render(request, 'account/order_list.html', context)
+    
+    
+def order_detail(request, order_id):
+    profile_data = fetch_customer_profile(request)
+    if profile_data is None:
+        return redirect('login')
+    
+    try:
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+            return redirect('login')
+
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.get(
+            f'{settings.API_BASE_URL}orders/{order_id}/',
+            headers=headers
+        )
+
+        if response.status_code == 200:
+            order = response.json()
+            
+            created_at = timezone.datetime.fromisoformat(order['created_at'].replace('Z', '+00:00'))
+            order['created_at_formatted'] = created_at.strftime('%Y/%m/%d')
+            
+            for item in order['items']:
+                item['total_price'] = item['quantity'] * float(item['price'])
+                item['price'] = float(item['price'])
+                item['product_price'] = float(item['product_price'])
+            
+            context = {
+                'order': order,
+            }
+            
+            return render(request, 'account/order_detail.html', context)
+            
+        elif response.status_code == 401:
+            return redirect('login')
+            
+        elif response.status_code == 403 or response.status_code == 404:
+            messages.error(request, 'سفارش مورد نظر یافت نشد.')
+            return redirect('order_list')
+            
+        else:
+            messages.error(request, 'خطا در دریافت اطلاعات سفارش.')
+            return redirect('order_list')
+    
+    except requests.RequestException as e:
+        messages.error(request, 'خطا در ارتباط با سرور.')
+        return redirect('order_list')
