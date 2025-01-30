@@ -47,12 +47,9 @@ class UserCommentSerializer(serializers.ModelSerializer):
     def get_profile_image_url(self, obj):
         request = self.context.get('request')
         if obj.image:
-            # Use request.build_absolute_uri if request is available
             if request:
                 return request.build_absolute_uri(obj.image.url)
-            # Fallback to relative URL if no request
             return obj.image.url
-        # Return default image URL if no image
         return '/media/users/default.png'
 
 class ProductCommentSerializer(serializers.ModelSerializer):
@@ -64,15 +61,12 @@ class ProductCommentSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'status', 'created_at', 'updated_at']
 
     def create(self, validated_data):
-        # Ensure we're using the customer ID, not the object
         customer = self.context.get('customer')
         if not customer:
             raise serializers.ValidationError("Customer is required")
         
-        # Explicitly set the customer_id
         validated_data['customer_id'] = customer
         
-        # Remove 'customer' from validated_data if it exists
         validated_data.pop('customer', None)
         
         return super().create(validated_data)

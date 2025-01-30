@@ -5,14 +5,12 @@ from django.core.validators import validate_email
 from core.models import BaseModel, LogicalDeleteModel
 from core.managers import CustomUserManager
 
-
 class Customer(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100, db_index=True)
     last_name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True, validators=[validate_email])
+    email = models.EmailField(unique=True, validators=[validate_email], db_index=True)
     phone = models.CharField(max_length=15, blank=True, null=True, unique=True)
     image = models.ImageField(upload_to='users/', blank=True, null=True, default='users/default.png')
-    
     date_joined = models.DateTimeField(default=now)
     is_otp_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -27,13 +25,12 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         return f"{self.first_name} {self.last_name}"
 
 
-
 class Address(BaseModel, LogicalDeleteModel):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='addresses')
     address_line = models.CharField(max_length=255)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
+    city = models.CharField(max_length=100, db_index=True)
+    state = models.CharField(max_length=100, db_index=True)
+    postal_code = models.CharField(max_length=20, db_index=True)
 
     def __str__(self):
         return f"{self.address_line}, {self.city}"

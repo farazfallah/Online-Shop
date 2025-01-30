@@ -66,19 +66,26 @@ def product_detail(request, product_id):
                     'quantity': requested_quantity
                 },
                 cookies=cookies,
-                proxies={"http": None, "https": None}
+                proxies={"http": None, "https": None},
+                allow_redirects=False  # Prevent automatic redirects
             )
-            
+
             if cart_response.status_code in [200, 201]:
                 messages.success(request, 'محصول با موفقیت به سبد خرید اضافه شد')
                 
                 redirect_response = HttpResponseRedirect(request.path)
                 
-                cart_cookie = cart_response.cookies.get('cart')
-                if cart_cookie:
-                    redirect_response.set_cookie('cart', cart_cookie)
-                    
+                # Directly use the cart data from the response
+                cart_data = cart_response.json()
+                if 'items' in cart_data:
+                    redirect_response.set_cookie(
+                        'cart', 
+                        json.dumps(cart_data), 
+                        httponly=True
+                    )
+                
                 return redirect_response
+            
             else:
                 error_data = cart_response.json()
                 messages.error(request, error_data.get('error', 'خطا در افزودن به سبد خرید'))

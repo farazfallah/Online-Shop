@@ -6,6 +6,7 @@ from orders.models import Cart, CartItem
 from orders.serializers import CartSerializer
 from core.utils import get_user_from_token
 from product.models import Product
+from django.db.models import Prefetch
 import json
 from decimal import Decimal
 
@@ -21,68 +22,72 @@ class CartView(APIView):
     permission_classes = [AllowAny]
     
     def sync_cookie_cart_with_db(self, request, user_id):
-        """
-        Synchronize cookie cart with database cart when user logs in
-        """
         try:
-            # Get or create user's cart in database
-            db_cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
+            db_cart, _ = Cart.objects.prefetch_related(
+                Prefetch('items', queryset=CartItem.objects.select_related('product'))
+            ).get_or_create(customer_id=user_id, is_active=True)
             
-            # Get cookie cart data
             cookie_cart_data = self.get_cart_from_cookie(request)
             cookie_items = cookie_cart_data.get('items', [])
             
-            # Process each item from cookie cart
+            product_ids = [item['product'] for item in cookie_items]
+            products = {
+                str(p.id): p for p in Product.objects.filter(id__in=product_ids)
+            }
+            
+            items_to_create = []
+            items_to_update = []
+            
             for cookie_item in cookie_items:
-                try:
-                    product = Product.objects.get(id=cookie_item['product'])
-                    
-                    if product.stock_quantity == 0:
-                        continue
-                        
-                    # Calculate current price with discount
-                    discount_price = product.price - (product.price * Decimal(product.discount) / 100)
-                    product_image_url = request.build_absolute_uri(product.image.url) if product.image else None
-                    
-                    # Check if item already exists in database cart
-                    db_cart_item = CartItem.objects.filter(
-                        cart=db_cart,
-                        product_id=product.id
-                    ).first()
-                    
-                    if db_cart_item:
-                        # Update existing cart item
-                        new_quantity = db_cart_item.quantity + cookie_item['quantity']
-                        
-                        # Check stock availability
-                        if new_quantity > product.stock_quantity:
-                            new_quantity = product.stock_quantity
-                            
-                        db_cart_item.quantity = new_quantity
-                        db_cart_item.product_name = product.name
-                        db_cart_item.product_price = discount_price
-                        db_cart_item.product_image = product_image_url
-                        db_cart_item.save()
-                    else:
-                        # Create new cart item
-                        quantity = min(cookie_item['quantity'], product.stock_quantity)
-                        CartItem.objects.create(
-                            cart=db_cart,
-                            product_id=product.id,
-                            product_name=product.name,
-                            product_price=discount_price,
-                            quantity=quantity,
-                            product_image=product_image_url,
-                        )
-                        
-                except Product.DoesNotExist:
+                product = products.get(str(cookie_item['product']))
+                if not product or product.stock_quantity == 0:
                     continue
+                        
+                discount_price = product.price - (product.price * Decimal(product.discount) / 100)
+                product_image_url = request.build_absolute_uri(product.image.url) if product.image else None
+                
+                db_cart_item = next(
+                    (item for item in db_cart.items.all() if item.product_id == product.id),
+                    None
+                )
+                
+                if db_cart_item:
+                    new_quantity = min(
+                        db_cart_item.quantity + cookie_item['quantity'],
+                        product.stock_quantity
+                    )
                     
-            # Update cart total price
-            db_cart.total_price = sum(item.product_price * item.quantity for item in db_cart.items.all())
+                    db_cart_item.quantity = new_quantity
+                    db_cart_item.product_name = product.name
+                    db_cart_item.product_price = discount_price
+                    db_cart_item.product_image = product_image_url
+                    db_cart_item.price = discount_price * new_quantity  # Add this line
+                    items_to_update.append(db_cart_item)
+                else:
+                    quantity = min(cookie_item['quantity'], product.stock_quantity)
+                    price = discount_price * quantity  # Calculate price
+                    items_to_create.append(CartItem(
+                        cart=db_cart,
+                        product_id=product.id,
+                        product_name=product.name,
+                        product_price=discount_price,
+                        quantity=quantity,
+                        product_image=product_image_url,
+                        price=price  # Add price field
+                    ))
+            
+            if items_to_create:
+                CartItem.objects.bulk_create(items_to_create)
+            
+            if items_to_update:
+                CartItem.objects.bulk_update(
+                    items_to_update,
+                    ['quantity', 'product_name', 'product_price', 'product_image', 'price']  # Add price
+                )
+                        
+            db_cart.total_price = sum(item.price for item in db_cart.items.all())  # Use price instead of calculating
             db_cart.save()
             
-            # Clear cookie cart
             response = Response()
             response.delete_cookie('cart')
             
@@ -94,41 +99,49 @@ class CartView(APIView):
         
 
     def update_cart_prices(self, cart):
+        cart_items = cart.items.select_related('product').all()
+        
         total_price = Decimal('0')
         items_to_remove = []
         items_to_update = []
         
-        for item in cart.items.all():
-            try:
-                product = Product.objects.get(id=item.product_id)
-                
-                if product.stock_quantity == 0:
-                    items_to_remove.append(item)
-                    continue
-                
-                if item.quantity > product.stock_quantity:
-                    item.quantity = product.stock_quantity
-                    items_to_update.append(item)
-                    
-                new_price = product.price - (product.price * Decimal(product.discount) / 100)
-                
-                if item.product_price != new_price:
-                    item.product_price = new_price
-                    item.product_name = product.name
-                    if product.image:
-                        item.product_image = product.image.url
-                    item.save()
-                elif item in items_to_update:
-                    item.save()
-                
-                total_price += new_price * item.quantity
-                
-            except Product.DoesNotExist:
+        product_ids = [item.product_id for item in cart_items]
+        
+        products = {
+            p.id: p for p in Product.objects.filter(id__in=product_ids)
+        }
+        
+        for item in cart_items:
+            product = products.get(item.product_id)
+            if not product or product.stock_quantity == 0:
                 items_to_remove.append(item)
                 continue
+            
+            if item.quantity > product.stock_quantity:
+                item.quantity = product.stock_quantity
+                items_to_update.append(item)
+                
+            new_price = product.price - (product.price * Decimal(product.discount) / 100)
+            
+            if item.product_price != new_price:
+                item.product_price = new_price
+                item.product_name = product.name
+                if product.image:
+                    item.product_image = product.image.url
+                items_to_update.append(item)
+            elif item in items_to_update:
+                items_to_update.append(item)
+            
+            total_price += new_price * item.quantity
         
-        for item in items_to_remove:
-            item.delete()
+        if items_to_remove:
+            CartItem.objects.filter(id__in=[item.id for item in items_to_remove]).delete()
+        
+        if items_to_update:
+            CartItem.objects.bulk_update(
+                items_to_update,
+                ['quantity', 'product_name', 'product_price', 'product_image']
+            )
         
         cart.total_price = total_price
         cart.save()
@@ -145,13 +158,20 @@ class CartView(APIView):
             except json.JSONDecodeError:
                 return {'items': []}
 
+            # Get all product IDs from cart items
+            product_ids = [item['product'] for item in cart_data.get('items', [])]
+            
+            # Fetch all products in one query
+            products = {
+                str(p.id): p for p in Product.objects.filter(id__in=product_ids)
+            }
+            
             updated_items = []
             
             for item in cart_data.get('items', []):
                 try:
-                    product = Product.objects.get(id=item['product'])
-                    
-                    if product.stock_quantity == 0:
+                    product = products.get(str(item['product']))
+                    if not product or product.stock_quantity == 0:
                         continue
                         
                     new_price = float(product.price - (product.price * Decimal(product.discount) / 100))
@@ -163,15 +183,14 @@ class CartView(APIView):
                         'price': new_price * item['quantity']
                     })
                     updated_items.append(item)
-                except Product.DoesNotExist:
-                    continue
-                except KeyError:
+                except (KeyError, AttributeError):
                     continue
                 
             cart_data['items'] = updated_items
             return cart_data
         except Exception:
             return {'items': []}
+        
 
     def get(self, request):
         try:
@@ -180,8 +199,14 @@ class CartView(APIView):
             # Sync cart if there's cookie data
             if request.COOKIES.get('cart'):
                 cart = self.sync_cookie_cart_with_db(request, user_id)
+                if cart is None:  # Add this check
+                    cart, _ = Cart.objects.prefetch_related(
+                        Prefetch('items', queryset=CartItem.objects.select_related('product'))
+                    ).get_or_create(customer_id=user_id, is_active=True)
             else:
-                cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
+                cart, _ = Cart.objects.prefetch_related(
+                    Prefetch('items', queryset=CartItem.objects.select_related('product'))
+                ).get_or_create(customer_id=user_id, is_active=True)
                 
             cart = self.update_cart_prices(cart)
             serializer = CartSerializer(cart)
@@ -194,7 +219,7 @@ class CartView(APIView):
             return response
             
         except AuthenticationFailed:
-            # Rest of the code remains the same for unauthenticated users
+            # For unauthenticated users
             try:
                 cart_data = self.get_cart_from_cookie(request)
                 response = Response({
@@ -226,7 +251,10 @@ class CartView(APIView):
     def post(self, request):
         try:
             user_id = get_user_from_token(request)
-            cart, _ = Cart.objects.get_or_create(customer_id=user_id, is_active=True)
+            cart, _ = Cart.objects.prefetch_related(
+                Prefetch('items', queryset=CartItem.objects.select_related('product'))
+            ).get_or_create(customer_id=user_id, is_active=True)
+            
             product_id = request.data['product']
             requested_quantity = int(request.data.get('quantity', 1))
 
@@ -243,7 +271,7 @@ class CartView(APIView):
                 product_image_url = request.build_absolute_uri(product.image.url) if product.image else None
 
                 try:
-                    cart_item = CartItem.objects.get(cart=cart, product_id=product.id)
+                    cart_item = cart.items.get(product_id=product.id)
                     new_quantity = cart_item.quantity + requested_quantity
                     
                     if new_quantity > product.stock_quantity:
@@ -295,7 +323,7 @@ class CartView(APIView):
             requested_quantity = int(request.data.get('quantity', 1))
 
             try:
-                product = Product.objects.get(id=product_id)
+                product = Product.objects.select_related().get(id=product_id)
                 
                 if product.stock_quantity == 0:
                     return Response(
@@ -346,11 +374,18 @@ class CartView(APIView):
                 cart_data['items'] = items
 
                 response = Response({'message': 'Cart updated in cookie', 'items': items})
-                response.set_cookie('cart', json.dumps(cart_data, cls=DecimalEncoder), httponly=True)
+                response.set_cookie(
+                    'cart', 
+                    json.dumps(cart_data, cls=DecimalEncoder), 
+                    httponly=True,
+                    secure=True,  # Use only over HTTPS
+                    samesite='Lax'
+                )
                 return response
                 
             except Product.DoesNotExist:
                 return Response({'error': 'محصول یافت نشد'}, status=404)
+
 
     def delete(self, request):
         try:

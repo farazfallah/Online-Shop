@@ -6,18 +6,59 @@ from django.conf import settings
 from django.shortcuts import redirect, render
 from .utils import fetch_customer_profile
 
+import requests
+from django.shortcuts import render, redirect
+from django.db.models import Count
+
 def dashboard_home(request):
     profile_data = fetch_customer_profile(request)
     if profile_data is None:
         return redirect('login')
-
-    context = {
-        'first_name': profile_data.get('first_name'),
-        'last_name': profile_data.get('last_name'),
-        'email': profile_data.get('email'),
-        'phone': profile_data.get('phone'),
-        'is_otp_verified': profile_data.get('is_otp_verified')
+    
+    # تنظیم هدرها و دریافت توکن از کوکی
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
     }
+    
+    access_token = request.COOKIES.get('access_token')
+    headers['Authorization'] = f"Bearer {access_token}"
+    
+    try:
+        api_url = 'http://127.0.0.1:8000/api/orders/'
+        response = requests.get(
+            api_url, 
+            headers=headers, 
+            proxies={"http": None, "https": None}
+        )
+        
+        if response.status_code == 200:
+            orders_data = response.json()
+            
+            # محاسبه تعداد سفارش‌ها بر اساس وضعیت
+            status_counts = {
+                'confirmed': sum(1 for order in orders_data if order['status'] == 'confirmed'),
+                'delivered': sum(1 for order in orders_data if order['status'] == 'shipped'),
+                'completed': sum(1 for order in orders_data if order['status'] == 'completed'),
+                'canceled': sum(1 for order in orders_data if order['status'] == 'canceled')
+            }
+            
+            context = {
+                'paid_orders': status_counts.get('confirmed', 0),
+                'delivered_orders': status_counts.get('shipped', 0),
+                'completed_orders': status_counts.get('completed', 0),
+                'canceled_orders': status_counts.get('canceled', 0),
+            }
+        else:
+            context = {
+                'error_message': f'خطا در دریافت اطلاعات: {response.status_code}'
+            }
+            
+    except Exception as e:
+        context = {
+            'error_message': f'خطا در ارتباط با سرور: {str(e)}'
+        }
+
     return render(request, 'account/dashboard.html', context)
 
 
@@ -108,16 +149,16 @@ def dashboard_address(request):
     })
     
 
-from django.contrib import messages
-
 def customer_profile_page(request):
     if request.method == 'POST':
-        if 'profile_image' in request.FILES:
+        if 'image' in request.FILES:
             try:
                 access_token = request.COOKIES.get('access_token')
                 headers = {'Authorization': f'Bearer {access_token}'}
                 
-                files = {'profile_image': request.FILES['profile_image']}
+                # Create a new dictionary with the file
+                files = {'image': request.FILES['image']}
+                
                 response = requests.patch(
                     f'{settings.API_BASE_URL}profile/',
                     headers=headers,
@@ -168,8 +209,6 @@ def customer_profile_page(request):
         return redirect('login')
 
     return render(request, 'account/edit_profile.html')
-
-
 
 
 def order_list(request):
@@ -248,7 +287,7 @@ def order_detail(request, order_id):
             order['created_at_formatted'] = created_at.strftime('%Y/%m/%d')
             
             for item in order['items']:
-                item['total_price'] = item['quantity'] * float(item['price'])
+                item['total_price'] = item['quantity'] * float(item['product_price'])
                 item['price'] = float(item['price'])
                 item['product_price'] = float(item['product_price'])
             

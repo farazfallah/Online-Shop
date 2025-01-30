@@ -11,6 +11,8 @@ urlpatterns = [
     
     path('cart/', cart.cart_view, name='cart'),
     path('cart/checkout/', cart.checkout_view, name='checkout'),
+    # path('payment/success/', cart.payment_success, name='payment_success'),
+    # path('payment/failed/', cart.payment_failed, name='payment_failed'),
     
     path('account/', dashboard.dashboard_home, name='dashboard-home'),
     path('account/profile/', dashboard.customer_profile_page, name='profile_page'),

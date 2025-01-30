@@ -29,3 +29,18 @@ def send_otp_email(customer_email, otp_code):
 
 def generate_otp():
     return str(random.randint(100000, 999999))
+
+
+def send_email(email, subject, message):
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Email send error: {e}")
+        return False

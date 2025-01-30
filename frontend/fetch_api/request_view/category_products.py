@@ -11,7 +11,6 @@ def category_products(request, category_id):
 
     page_size = settings.PRODUCTS_PER_PAGE
 
-    # دریافت اطلاعات کتگوری
     try:
         category_response = requests.get(category_check_url, proxies={"http": None, "https": None})
         category_response.raise_for_status()
@@ -48,7 +47,6 @@ def category_products(request, category_id):
 
         product_count_in_page = len(products)
 
-        # محاسبه قیمت نهایی برای محصولات
         for product in products:
             original_price = float(product['price'])
             discount = product['discount']
@@ -80,7 +78,7 @@ def category_products(request, category_id):
             'product_count': total_count,
             'product_count_in_page': product_count_in_page,
             'current_ordering': ordering,
-            'category_name': category_name,  # اضافه کردن نام کتگوری به کانتکست
-            'category_data': category_data,  # اضافه کردن کل اطلاعات کتگوری به کانتکست
+            'category_name': category_name,
+            'category_data': category_data,
         }
     )

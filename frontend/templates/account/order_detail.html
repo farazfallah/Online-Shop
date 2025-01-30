@@ -150,11 +150,11 @@
                                                     <td class="text-nowrap">
                                                         {% if item.product_price != item.price %}
                                                             <small class="text-muted text-decoration-line-through">
-                                                                {{ item.product_price }} تومان
+                                                                {{ item.price }} تومان
                                                             </small>
                                                             <br>
                                                         {% endif %}
-                                                        <span>{{ item.price }} تومان</span>
+                                                        <span>{{ item.product_price }} تومان</span>
                                                     </td>
                                                     <td>{{ item.quantity }}</td>
                                                     <td class="text-nowrap">

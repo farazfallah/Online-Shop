@@ -1,12 +1,11 @@
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from customers.models import Address
 from orders.models import Cart, Order, OrderItem, DiscountCode
-from orders.serializers import OrderSerializer, AddressSerializer
+from orders.serializers import OrderSerializer, CartItemSerializer, AddressSerializer
 from core.utils import get_user_from_token
-from product.models import Product
 from decimal import Decimal
 
 
@@ -18,46 +17,53 @@ class CheckoutView(APIView):
         except AuthenticationFailed as e:
             return Response({'error': str(e)}, status=401)
 
+        # بررسی وجود سبد خرید فعال
         cart = Cart.objects.filter(
             customer_id=user_id,
             is_active=True
         ).first()
 
         if not cart or not cart.items.exists():
-            raise ValidationError({'error': 'سبد خرید خالی است'})
+            return Response({'error': 'سبد خرید خالی است'}, status=400)
 
-        address_data = request.data.get('shipping_address')
-        if not address_data:
-            raise ValidationError({'error': 'آدرس تحویل الزامی است'})
+        # دریافت شناسه آدرس
+        address_id = request.data.get('address_id')
+        if not address_id:
+            return Response({'error': 'آدرس تحویل الزامی است'}, status=400)
 
-        address_serializer = AddressSerializer(data=address_data)
-        if not address_serializer.is_valid():
-            raise ValidationError(address_serializer.errors)
-        
-        shipping_address = address_serializer.save(customer_id=user_id)
+        try:
+            shipping_address = Address.objects.get(id=address_id, customer_id=user_id)
+        except Address.DoesNotExist:
+            return Response({'error': 'آدرس انتخاب شده معتبر نیست'}, status=400)
 
+        # محاسبه قیمت کل و آماده‌سازی آیتم‌های سفارش
         total_price = Decimal('0')
         order_items = []
 
-        for cart_item in cart.items.all():
-            product = get_object_or_404(Product, id=cart_item.product.id)
+        for cart_item in cart.items.select_related('product').all():
+            product = cart_item.product
             
+            # بررسی موجودی محصول
             if product.stock_quantity < cart_item.quantity:
-                raise ValidationError({
+                return Response({
                     'error': f'محصول {product.name} به تعداد درخواستی موجود نیست'
-                })
+                }, status=400)
             
+            # محاسبه قیمت با اعمال تخفیف
             current_price = product.price - (product.price * Decimal(product.discount) / 100)
             
             order_items.append({
                 'product': product,
                 'quantity': cart_item.quantity,
-                'product_price': current_price
+                'product_price': current_price,
             })
             
             total_price += current_price * cart_item.quantity
 
+        # اعمال کد تخفیف
         discount_code = request.data.get('discount_code')
+        applied_discount = None
+        
         if discount_code:
             try:
                 discount = DiscountCode.objects.get(
@@ -65,9 +71,11 @@ class CheckoutView(APIView):
                     is_active=True
                 )
                 total_price = total_price - (total_price * discount.discount_percentage / 100)
+                applied_discount = discount
             except DiscountCode.DoesNotExist:
-                raise ValidationError({'error': 'کد تخفیف نامعتبر است'})
+                return Response({'error': 'کد تخفیف نامعتبر است'}, status=400)
 
+        # ایجاد سفارش
         order = Order.objects.create(
             customer_id=user_id,
             shipping_address=shipping_address,
@@ -75,6 +83,7 @@ class CheckoutView(APIView):
             status='registered'
         )
 
+        # ایجاد آیتم‌های سفارش و بروزرسانی موجودی
         for item in order_items:
             OrderItem.objects.create(
                 order=order,
@@ -85,22 +94,38 @@ class CheckoutView(APIView):
                 price=item['product_price'] * item['quantity']
             )
             
+            # بروزرسانی موجودی محصول
             product = item['product']
             product.stock_quantity -= item['quantity']
             product.save()
 
+        # غیرفعال کردن سبد خرید
         cart.is_active = False
         cart.save()
 
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
+        response_data = {
+            'order': OrderSerializer(order, context={'request': request}).data,
+            'message': 'سفارش با موفقیت ثبت شد'
+        }
+
+        if applied_discount:
+            response_data['applied_discount'] = {
+                'code': applied_discount.code,
+                'percentage': float(applied_discount.discount_percentage)
+            }
+
+        return Response(response_data, status=201)
 
     def get(self, request):
+        """
+        دریافت اطلاعات سبد خرید فعال کاربر
+        """
         try:
             user_id = get_user_from_token(request)
         except AuthenticationFailed as e:
             return Response({'error': str(e)}, status=401)
 
+        # دریافت سبد خرید فعال
         cart = Cart.objects.filter(
             customer_id=user_id,
             is_active=True
@@ -109,22 +134,24 @@ class CheckoutView(APIView):
         if not cart or not cart.items.exists():
             raise ValidationError({'error': 'سبد خرید خالی است'})
 
-        total_price = Decimal('0')
-        items_summary = []
+        # سریالایز کردن آیتم‌های سبد خرید
+        cart_items = CartItemSerializer(
+            cart.items.select_related('product').all(), 
+            many=True,
+            context={'request': request}
+        ).data
 
+        # محاسبه قیمت کل
+        total_price = Decimal('0')
         for cart_item in cart.items.all():
-            product = get_object_or_404(Product, id=cart_item.product.id)
+            product = cart_item.product
             current_price = product.price - (product.price * Decimal(product.discount) / 100)
-            
-            items_summary.append({
-                'product_name': product.name,
-                'quantity': cart_item.quantity,
-                'price': current_price * cart_item.quantity
-            })
-            
             total_price += current_price * cart_item.quantity
 
-        return Response({
-            'items': items_summary,
-            'total_price': total_price
-        })
+        response_data = {
+            'items': cart_items,
+            'total_price': float(total_price),
+            'items_count': cart.items.count(),
+        }
+
+        return Response(response_data)

@@ -12,7 +12,6 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from core.utils import get_user_from_token
 from customers.models import Customer
-
 from product.models import (
     Category,
     Attribute,
@@ -68,20 +67,40 @@ class ProductsByCategoryView(RetrieveAPIView):
     
     
 class ProductPagination(PageNumberPagination):
-    page_size = 10  # تعداد محصولات در هر صفحه
-    page_size_query_param = 'page_size'  # امکان تغییر تعداد محصولات در هر صفحه از طریق URL
-    max_page_size = 100  # حداکثر تعداد محصولات در هر صفحه
+    page_size = 10 
+    page_size_query_param = 'page_size'
+    max_page_size = 100 
+
 
 class ProductSearchView(generics.ListAPIView):
-    queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    pagination_class = ProductPagination  # اضافه کردن کلاس صفحه‌بندی
-
+    pagination_class = ProductPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'description', 'category__name', 'attributes__value']
     ordering_fields = ['price', 'stock_quantity', 'discount']
-    filterset_fields = ['category', 'price', 'stock_quantity', 'discount']
-    
+    filterset_fields = {
+        'price': ['gte', 'lte'],
+        'stock_quantity': ['gte', 'lte'],
+        'discount': ['gte', 'lte'],
+    }
+
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        category_id = self.request.query_params.get('category', None)
+
+        if category_id:
+            try:
+                category = Category.objects.get(id=category_id)
+                subcategory_ids = list(category.subcategories.values_list('id', flat=True))
+                subcategory_ids.append(int(category_id))
+                queryset = queryset.filter(category_id__in=subcategory_ids)
+            except Category.DoesNotExist:
+                pass
+            except ValueError:
+                pass
+
+        return queryset
+        
 
 class ProductCommentAPIView(APIView):
     def get(self, product_id):
@@ -95,7 +114,7 @@ class ProductCommentAPIView(APIView):
     def post(self, request, product_id):
         try:
             user_id = get_user_from_token(request)
-            user = Customer.objects.get(id=user_id)  # Get the full user object
+            user = Customer.objects.get(id=user_id)
         except AuthenticationFailed as e:
             return Response({'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         except Customer.DoesNotExist:
@@ -110,7 +129,7 @@ class ProductCommentAPIView(APIView):
             data=data, 
             context={
                 'customer': user.id,
-                'request': request  # Pass request for generating absolute URLs
+                'request': request
             }
         )
         

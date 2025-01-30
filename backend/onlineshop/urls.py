@@ -30,7 +30,8 @@ from customers.api import (
     CustomerProfileView,
     AddAddressView,
     EditAddressView,
-    DeleteAddressView
+    DeleteAddressView,
+    AddressListView
     )
 from product.api import (
     CategoryViewSet,
@@ -77,6 +78,7 @@ apipath = [
     path('api/profile/', CustomerProfileView.as_view(), name='customer-profile'),
     path('api/search/', ProductSearchView.as_view(), name='product-search'),
     # Addresses
+    path('api/addresses/', AddressListView.as_view(), name='address_list'),
     path('api/addresses/add/', AddAddressView.as_view(), name='add_address'),
     path('api/addresses/edit/<int:address_id>/', EditAddressView.as_view(), name='edit_address'),
     path('api/addresses/delete/<int:address_id>/', DeleteAddressView.as_view(), name='delete-address'),
@@ -87,6 +89,7 @@ apipath = [
     path('api/checkout/', checkout.CheckoutView.as_view(), name='checkout'),
     path('api/orders/', api.OrderListView.as_view(), name='order-list'),
     path('api/orders/<int:order_id>/', api.OrderDetailView.as_view(), name='order-detail'),
+    path('api/verify-discount/', api.VerifyDiscountView.as_view(), name='verify-discount'),
     # Product router
     path('api/', include(router.urls)),
 ]

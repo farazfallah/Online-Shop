@@ -34,7 +34,7 @@
                 <div class="account-settings d-flex align-items-center">
                     <div class="user-profile d-flex align-items-center">
                         <div class="user-avatar">
-                            <img src="{{ image }}" alt="{{first_name}} {{last_name}}">
+                            <img src="{{ image }}" alt="{{first_name}} {{last_name}}" style="max-width: 150px;" class="img rounded-4">
                         </div>
                         <div class="ms-3">
                             <h5 class="user-name font-15">{{first_name}} {{last_name}}</h5>
@@ -45,7 +45,7 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="uploadProfile" class="form-label">بارگذاری عکس پروفایل</label>
-                            <input type="file" name="profile_image" class="form-control" id="uploadProfile">
+                            <input type="file" name="image" class="form-control" id="uploadProfile">
                         </div>
                         <button type="submit" class="btn btn-primary mt-3">
                             آپلود و بروزرسانی

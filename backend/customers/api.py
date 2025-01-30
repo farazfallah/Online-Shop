@@ -1,9 +1,7 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.urls import reverse_lazy
 from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
@@ -12,7 +10,6 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.permissions import AllowAny
 from rest_framework.throttling import AnonRateThrottle
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from customers.serializers import CustomerSerializer, AddressSerializer
 from customers.models import Customer, Address
@@ -31,7 +28,7 @@ class LoginWithPasswordView(APIView):
         email = request.data.get("email")
         password = request.data.get("password")
         try:
-            customer = Customer.objects.get(email=email)
+            customer = Customer.objects.select_related().get(email=email)
             if not customer.check_password(password):
                 return Response({"error": "ایمیل یا رمز عبور اشتباه است."}, status=401)
 
@@ -49,9 +46,9 @@ class LoginWithPasswordView(APIView):
             response.set_cookie(
                 key='access_token',
                 value=access_token,
-                httponly=True,  # Ensures the token is not accessible via JavaScript
-                max_age=15 * 60,  # Expiry in seconds (same as your access token lifetime)
-                secure=True,  # Use only over HTTPS in production
+                httponly=True,
+                max_age=15 * 60,
+                secure=True,
             )
             response.set_cookie(
                 key='refresh_token',
@@ -76,7 +73,7 @@ class RequestOtpView(APIView):
     def post(self, request):
         email = request.data.get('email')
         try:
-            customer = Customer.objects.get(email=email)
+            customer = Customer.objects.select_related().get(email=email)
             otp_code = generate_otp()
             store_otp_in_redis(email, otp_code)
             send_otp_email(customer.email, otp_code)
@@ -91,7 +88,7 @@ class LoginWithOtpView(APIView):
         otp = request.data.get('otp')
 
         try:
-            customer = Customer.objects.get(email=email)
+            customer = Customer.objects.select_related().get(email=email)
             stored_otp = get_otp_from_redis(email)
 
             if stored_otp and stored_otp == otp:
@@ -184,7 +181,7 @@ class ValidateTokenView(APIView):
             access_token_obj = AccessToken(access_token)
             user_id = access_token_obj.payload.get('user_id')
             
-            customer = Customer.objects.get(id=user_id)
+            customer = Customer.objects.select_related().get(id=user_id)
             return Response({
                 'is_valid': True,
                 'user': {
@@ -211,7 +208,7 @@ class ValidateTokenView(APIView):
                 new_access_token = str(refresh_token_obj.access_token)
                 
                 user_id = refresh_token_obj.payload.get('user_id')
-                customer = Customer.objects.get(id=user_id)
+                customer = Customer.objects.select_related().get(id=user_id)
                 
                 response = Response({
                     'is_valid': True,
@@ -255,18 +252,26 @@ class CustomerProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        customer = request.user
+        customer = Customer.objects.select_related().prefetch_related(
+            'addresses'
+        ).get(id=request.user.id)
         serializer = CustomerSerializer(customer)
         return Response(serializer.data)
     
     def patch(self, request):
         try:
             with transaction.atomic():
-                customer = request.user
+                customer = Customer.objects.select_related().get(id=request.user.id)
+                
+                # request.data and request.FILES
+                update_data = request.data.copy()
+                update_data.update(request.FILES)
+                
                 serializer = CustomerSerializer(
                     customer,
-                    data=request.data,
-                    partial=True
+                    data=update_data,
+                    partial=True,
+                    context={'request': request}
                 )
                 
                 if serializer.is_valid():
@@ -279,6 +284,8 @@ class CustomerProfileView(APIView):
                         status=status.HTTP_200_OK
                     )
                 
+                # If not valid, print errors
+                print("Validation errors:", serializer.errors)
                 return Response(
                     {
                         "message": "خطا در اطلاعات ورودی",
@@ -286,17 +293,10 @@ class CustomerProfileView(APIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-                
-        except ValidationError as e:
-            return Response(
-                {
-                    "message": "خطا در اعتبارسنجی داده‌ها",
-                    "errors": str(e)
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-            
+                    
         except Exception as e:
+            import traceback
+            print("Full exception:", str(e), traceback.format_exc())
             return Response(
                 {
                     "message": "خطای سیستمی",
@@ -352,9 +352,16 @@ class DeleteAddressView(APIView):
         return Response({'detail': 'آدرس با موفقیت حذف شد.'}, status=status.HTTP_204_NO_CONTENT)
 
 
-
-
-
+class AddressListView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        customer = request.user
+        addresses = Address.objects.filter(customer=customer)
+        serializer = AddressSerializer(addresses, many=True)
+        return Response(serializer.data)
+    
+    
 class LogoutView(APIView):
    def post(self, request):
        response = Response({'message': 'با موفقیت خارج شدید.'})

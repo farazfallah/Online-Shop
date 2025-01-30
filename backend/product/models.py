@@ -4,17 +4,18 @@ from customers.models import Customer
 
 
 class Category(BaseModel, LogicalDeleteModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     description = models.TextField(blank=True, null=True)
     icon = models.CharField(max_length=50)
     parent_category = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subcategories')
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
+
     def __str__(self):
         return self.name
-    
+
 
 class Attribute(BaseModel, LogicalDeleteModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -22,11 +23,11 @@ class Attribute(BaseModel, LogicalDeleteModel):
 
 
 class Product(BaseModel, LogicalDeleteModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock_quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, db_index=True)
+    stock_quantity = models.PositiveIntegerField(db_index=True)
     image = models.ImageField(upload_to='products/', blank=True, null=True, default='products/default.jpg')
     discount = models.PositiveIntegerField(default=0)
 
@@ -52,8 +53,8 @@ class ProductComment(BaseModel, LogicalDeleteModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     comment = models.TextField()
-    rating = models.PositiveIntegerField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    rating = models.PositiveIntegerField(db_index=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
 
     def __str__(self):
         return f"Comment by {self.customer} on {self.product}"

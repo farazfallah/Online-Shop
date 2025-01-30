@@ -30,9 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'jet',
     'django.contrib.admin',
@@ -127,11 +125,15 @@ AUTHENTICATION_BACKENDS = [
 CELERY_BEAT_SCHEDULE = {
     'deactivate-unverified-customers-every-day': {
         'task': 'customers.tasks.deactivate_unverified_customers',
-        'schedule': crontab(hour='*/12'),
+        'schedule': crontab(minute='*/1'),
+    },
+    'send-nightly-email-to-users': {
+        'task': 'customers.tasks.send_nightly_email',
+        'schedule': crontab(hour=0, minute=0),
     },
 }
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True

@@ -52,46 +52,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a>
                         <ul class="dropdown-menu flex-column" style="min-width: 250px;">
                             <li class="w-100">
-                                <a href="/profile/" class="dropdown-item fs-6">
-                                    <i class="bi bi-house-door me-2"></i>پروفایل
+                                <a href="/account" class="dropdown-item fs-6">
+                                    <i class="bi bi-house-door me-2"></i>داشبورد
                                 </a>
                             </li>
                             <li class="w-100">
-                                <a href="/orders/" class="dropdown-item fs-6 py-2">
+                                <a href="/account/orders" class="dropdown-item fs-6 py-2">
                                     <i class="bi bi-cart-check me-2"></i>سفارش های من
                                 </a>
                             </li>
                             <li class="w-100">
-                                <a href="/addresses/" class="dropdown-item fs-6 py-2">
+                                <a href="/account/address" class="dropdown-item fs-6 py-2">
                                     <i class="bi bi-pin-map me-2"></i>آدرس های من
                                 </a>
                             </li>
-                            <li class="w-100">
-                                <a href="/notifications/" class="dropdown-item fs-6 py-2">
-                                    <i class="bi bi-bell me-2"></i>پیام ها و اطلاعیه ها
-                                </a>
-                            </li>
-                            <li class="w-100">
-                                <a href="/reviews/" class="dropdown-item fs-6 py-2">
-                                    <i class="bi bi-chat-dots me-2"></i>نظرات من
-                                </a>
-                            </li>
-                            <li class="w-100">
-                            <a href="/favorites/" class="dropdown-item fs-6 py-2">
-                            <i class="bi bi-heart me-2"></i>محصولات مورد علاقه
-                            </a>
-                            </li>
-                            <li class="w-100">
-                            <a href="/coupons/" class="dropdown-item fs-6 py-2">
-                            <i class="bi bi-gift me-2"></i>کد های تخفیف من
-                            </a>
-                            </li>
-                            ${user.is_staff ? `
-                            <li class="w-100">
-                                <a href="/admin/" class="dropdown-item fs-6 py-2">
-                                    <i class="bi bi-gear me-2"></i>پنل ادمین
-                                </a>
-                            </li>` : ''}
                             <li class="w-100">
                                 <a href="/account/logout" class="dropdown-item fs-6 py-2 mct-hover">
                                     <i class="bi bi-arrow-right-square me-2"></i>خروج از حساب کاربری

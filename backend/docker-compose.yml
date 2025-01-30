@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=0
+      - SECRET_KEY=django-insecure-c)j&_lv&3*fd2(_h+ire-ba#&h36o*ms3!c984nk#7-&ejlsp7
+      - DATABASE_URL=postgres://yourdbuser:your_postgres_password@db/main
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app_network
+
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=main
+      - POSTGRES_USER=faraz
+      - POSTGRES_PASSWORD=Fa33590207@
+    networks:
+      - app_network
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  app_network:
