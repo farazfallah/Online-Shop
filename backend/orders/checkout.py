@@ -17,7 +17,6 @@ class CheckoutView(APIView):
         except AuthenticationFailed as e:
             return Response({'error': str(e)}, status=401)
 
-        # بررسی وجود سبد خرید فعال
         cart = Cart.objects.filter(
             customer_id=user_id,
             is_active=True
@@ -26,7 +25,6 @@ class CheckoutView(APIView):
         if not cart or not cart.items.exists():
             return Response({'error': 'سبد خرید خالی است'}, status=400)
 
-        # دریافت شناسه آدرس
         address_id = request.data.get('address_id')
         if not address_id:
             return Response({'error': 'آدرس تحویل الزامی است'}, status=400)
@@ -36,20 +34,17 @@ class CheckoutView(APIView):
         except Address.DoesNotExist:
             return Response({'error': 'آدرس انتخاب شده معتبر نیست'}, status=400)
 
-        # محاسبه قیمت کل و آماده‌سازی آیتم‌های سفارش
         total_price = Decimal('0')
         order_items = []
 
         for cart_item in cart.items.select_related('product').all():
             product = cart_item.product
             
-            # بررسی موجودی محصول
             if product.stock_quantity < cart_item.quantity:
                 return Response({
                     'error': f'محصول {product.name} به تعداد درخواستی موجود نیست'
                 }, status=400)
             
-            # محاسبه قیمت با اعمال تخفیف
             current_price = product.price - (product.price * Decimal(product.discount) / 100)
             
             order_items.append({
@@ -60,7 +55,6 @@ class CheckoutView(APIView):
             
             total_price += current_price * cart_item.quantity
 
-        # اعمال کد تخفیف
         discount_code = request.data.get('discount_code')
         applied_discount = None
         
@@ -75,7 +69,6 @@ class CheckoutView(APIView):
             except DiscountCode.DoesNotExist:
                 return Response({'error': 'کد تخفیف نامعتبر است'}, status=400)
 
-        # ایجاد سفارش
         order = Order.objects.create(
             customer_id=user_id,
             shipping_address=shipping_address,
@@ -83,7 +76,6 @@ class CheckoutView(APIView):
             status='registered'
         )
 
-        # ایجاد آیتم‌های سفارش و بروزرسانی موجودی
         for item in order_items:
             OrderItem.objects.create(
                 order=order,
@@ -94,12 +86,10 @@ class CheckoutView(APIView):
                 price=item['product_price'] * item['quantity']
             )
             
-            # بروزرسانی موجودی محصول
             product = item['product']
             product.stock_quantity -= item['quantity']
             product.save()
 
-        # غیرفعال کردن سبد خرید
         cart.is_active = False
         cart.save()
 
@@ -117,15 +107,11 @@ class CheckoutView(APIView):
         return Response(response_data, status=201)
 
     def get(self, request):
-        """
-        دریافت اطلاعات سبد خرید فعال کاربر
-        """
         try:
             user_id = get_user_from_token(request)
         except AuthenticationFailed as e:
             return Response({'error': str(e)}, status=401)
 
-        # دریافت سبد خرید فعال
         cart = Cart.objects.filter(
             customer_id=user_id,
             is_active=True
@@ -134,14 +120,12 @@ class CheckoutView(APIView):
         if not cart or not cart.items.exists():
             raise ValidationError({'error': 'سبد خرید خالی است'})
 
-        # سریالایز کردن آیتم‌های سبد خرید
         cart_items = CartItemSerializer(
             cart.items.select_related('product').all(), 
             many=True,
             context={'request': request}
         ).data
 
-        # محاسبه قیمت کل
         total_price = Decimal('0')
         for cart_item in cart.items.all():
             product = cart_item.product

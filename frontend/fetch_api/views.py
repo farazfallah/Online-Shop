@@ -1,3 +1,4 @@
+import requests
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
@@ -6,6 +7,19 @@ from django.conf import settings
 
 class HomeView(TemplateView):
     template_name = 'product/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            response = requests.get(f'{settings.API_BASE_URL}products/')
+            response.raise_for_status()
+            
+            data = response.json()
+            context['products'] = data.get('results', [])
+        except requests.RequestException as e:
+            context['products'] = []
+            context['error'] = str(e)
+        return context
     
     
 def register_page(request):
