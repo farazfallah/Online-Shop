@@ -67,7 +67,7 @@ def product_detail(request, product_id):
                 },
                 cookies=cookies,
                 proxies={"http": None, "https": None},
-                allow_redirects=False  # Prevent automatic redirects
+                allow_redirects=False
             )
 
             if cart_response.status_code in [200, 201]:
@@ -75,7 +75,6 @@ def product_detail(request, product_id):
                 
                 redirect_response = HttpResponseRedirect(request.path)
                 
-                # Directly use the cart data from the response
                 cart_data = cart_response.json()
                 if 'items' in cart_data:
                     redirect_response.set_cookie(

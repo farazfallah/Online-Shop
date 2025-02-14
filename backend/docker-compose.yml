@@ -1,45 +1,58 @@
 version: '3.8'
 
 services:
+  # django
   web:
     build: .
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=0
-      - SECRET_KEY=django-insecure-c)j&_lv&3*fd2(_h+ire-ba#&h36o*ms3!c984nk#7-&ejlsp7
-      - DATABASE_URL=postgres://yourdbuser:your_postgres_password@db/main
+      - DB_NAME=onlineshop
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
     depends_on:
       - db
       - redis
-    networks:
-      - app_network
 
+  # celery
+  celery:
+    build: .
+    command: celery -A onlineshop worker -l INFO
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  # celerybit
+  celery-beat:
+    build: .
+    command: celery -A onlineshop beat -l INFO
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  # redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # postgres
   db:
-    image: postgres:16
+    image: postgres:15-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=main
-      - POSTGRES_USER=faraz
-      - POSTGRES_PASSWORD=Fa33590207@
-    networks:
-      - app_network
-
-  redis:
-    image: redis:alpine
-    volumes:
-      - redis_data:/data
+      - POSTGRES_DB=onlineshop
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - "6379:6379"
-    networks:
-      - app_network
+      - "5432:5432"
 
 volumes:
   postgres_data:
-  redis_data:
-
-networks:
-  app_network:

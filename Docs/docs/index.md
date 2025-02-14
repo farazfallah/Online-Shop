@@ -123,3 +123,64 @@ This section outlines the available API endpoints for the project.
 - `GET /api/site-info/` - Retrieve site-wide information.  
 
 All product-related endpoints are registered under `/api/` through Django's `DefaultRouter`.
+
+## Deployment
+
+### Docker Deployment  
+To deploy the project using **Docker**, follow these steps:
+
+1. **Clone the repository:**  
+   ```sh
+   git clone https://github.com/farazfallah/Online-Shop.git
+   cd Online-Shop
+   ```
+
+2. **Create and configure the `.env` file:**  
+   ```sh
+   cp .env.example .env
+   ```
+   Update the `.env` file with your configurations.
+
+3. **Build and start the containers:**  
+   ```sh
+   docker-compose up --build -d
+   ```
+
+4. **Run database migrations:**  
+   ```sh
+   docker-compose exec web python manage.py migrate
+   ```
+
+5. **Create a superuser for admin access:**  
+   ```sh
+   docker-compose exec web python manage.py createsuperuser
+   ```
+
+6. **Collect static files:**  
+   ```sh
+   docker-compose exec web python manage.py collectstatic --noinput
+   ```
+
+7. **Access the application:**  
+   - Website: [http://localhost:8000](http://localhost:8000)  
+   - Admin Panel: [http://localhost:8000/admin](http://localhost:8000/admin)  
+
+### Production Deployment
+For production deployment, follow these additional steps:
+
+1. **Use Nginx and Gunicorn** to handle requests efficiently.
+2. Create a `docker-compose.prod.yml` file with configurations for **Nginx**, **Gunicorn**, and **SSL (HTTPS)**.
+3. Set `DEBUG=False` in `settings.py` for enhanced security.
+4. Use **Let’s Encrypt** to obtain an SSL certificate.
+5. Run **PostgreSQL** and **Redis** in separate services or use cloud providers like **AWS RDS** and **Redis Cloud**.
+
+### Managing Services
+- To stop the services:  
+  ```sh
+  docker-compose down
+  ```
+- To restart the services:  
+  ```sh
+  docker-compose up -d
+  ```
+

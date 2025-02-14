@@ -6,16 +6,11 @@ from django.conf import settings
 from django.shortcuts import redirect, render
 from .utils import fetch_customer_profile
 
-import requests
-from django.shortcuts import render, redirect
-from django.db.models import Count
-
 def dashboard_home(request):
     profile_data = fetch_customer_profile(request)
     if profile_data is None:
         return redirect('login')
     
-    # تنظیم هدرها و دریافت توکن از کوکی
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -35,7 +30,6 @@ def dashboard_home(request):
         if response.status_code == 200:
             orders_data = response.json()
             
-            # محاسبه تعداد سفارش‌ها بر اساس وضعیت
             status_counts = {
                 'confirmed': sum(1 for order in orders_data if order['status'] == 'confirmed'),
                 'delivered': sum(1 for order in orders_data if order['status'] == 'shipped'),
@@ -156,7 +150,6 @@ def customer_profile_page(request):
                 access_token = request.COOKIES.get('access_token')
                 headers = {'Authorization': f'Bearer {access_token}'}
                 
-                # Create a new dictionary with the file
                 files = {'image': request.FILES['image']}
                 
                 response = requests.patch(

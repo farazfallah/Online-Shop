@@ -15,7 +15,15 @@ class HomeView(TemplateView):
             response.raise_for_status()
             
             data = response.json()
-            context['products'] = data.get('results', [])
+            products = data.get('results', [])
+            
+            for product in products:
+                discount = product.get('discount', 0)
+                price = float(product.get('price', 0))
+                final_price = price - (price * discount / 100)
+                product['final_price'] = round(final_price, 2)
+            
+            context['products'] = products
         except requests.RequestException as e:
             context['products'] = []
             context['error'] = str(e)
