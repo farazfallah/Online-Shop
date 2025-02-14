@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}دسته بندی {{ category_name }}{% endblock %}
+{% load static %}
+{% block content %}
+<!--============ start category slider  ==============-->
+
+<section class="categories free-swiper py-30">
+    <div class="container-fluid position-relative">
+        <div class="section-title mb-5">
+            <div class="section-title-title">
+                <h2 class="fw-900 h4">دسته بندی<span class="with-highlight ms-1">{{ category_name }}</span>
+                </h2>
+                <div class="Dottedsquare"></div>
+            </div>
+        </div>
+        {% if subcategories %}
+        <div class="swiper cat-slider">
+            <div class="swiper-wrapper">
+                {% for subcategory in subcategories %}
+                <div class="swiper-slide">
+                    <a href="">
+                        <div class="cat-item d-flex align-items-center">
+                            <div class="cat-item-image">
+                                <img src="{{ category.image.url }}" alt="{{ subcategory.name }}">
+                            </div>
+                            <div class="cat-item-desc ms-3">
+                                <h5>{{ subcategory.name }}</h5>
+                                <p class="text-muted">{{ subcategory.description }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+        {% endif %} 
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--============ end category slider  ==============-->
+
+<!--============ start main content ==============-->
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row gy-3">
+            <div class="col-lg-12">
+                <div class="category-sort mb-3">
+                    <div class="content-box">
+                        <div class="container-fluid">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="box_filter d-lg-block d-none">
+                                    <ul class="list-inline text-start mb-0">
+                                        <li class="list-inline-item title-font ms-0">مرتب سازی بر اساس :</li>
+                                        <li class="list-inline-item">
+                                            <a href="?ordering=-price" class="{% if current_ordering == '-price' %}active_custom{% endif %}">
+                                                گران ترین
+                                            </a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="?ordering=price" class="{% if current_ordering == 'price' %}active_custom{% endif %}">
+                                                ارزان ترین
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                {% if product_count != 0 %}
+                                <div class="box_filter_counter fs-6"><i class="bi bi-card-list me-2"></i> {{product_count}} کالا</div>
+                                {% endif %}
+                            </div>
+                            <div class="d-lg-none d-block">
+                                <form action="" method="get">
+                                    <label for="ordering" class="form-label my-3 fw-bold">مرتب سازی بر اساس</label>
+                                    <select name="ordering" id="ordering" class="form-select" onchange="this.form.submit()">
+                                        <option value="-price" {% if current_ordering == '-price' %}selected{% endif %}>گران ترین</option>
+                                        <option value="price" {% if current_ordering == 'price' %}selected{% endif %}>ارزان ترین</option>
+                                    </select>
+                                </form>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-pro">
+                    <div class="row g-3">
+                        {% if products %}
+                        {% for product in products %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="product-box border-ui">
+                                <a href="{% url 'product_detail' product_id=product.id %}">
+                                    <div class="product-image">
+                                        <img src="{{ product.image }}" loading="lazy" alt="{{ product.name }}"
+                                        class="img-fluid">
+                                    </div>
+                                    <div class="product-title mb-3">
+                                        <div class="title">
+                                            <p class="text-overflow-1 mt-2">{{ product.name }}</p>
+                                        </div>
+                                        {% if product.comments_count > 0 %}
+                                        <div class="rating">
+                                            <div class="number"><span class="text-muted font-12">({{ product.comments_count }}+) {{ product.average_rating }}</span></div>
+                                            <div class="icon"><i class="bi bi-star-fill"></i></div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="product-action">
+                                        {% if product.discount != 0 %}
+                                        <div class="discount">
+                                            <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
+                                                <span class="text-white">{{ product.discount }}%</span>
+                                            </div>
+                                        </div>
+                                        <div class="price">
+                                            <p class="new-price">{{ product.final_price }} تومان</p>
+                                            <p class="old-price">{{ product.price }} تومان</p>
+                                        </div>
+                                        {% else %}
+                                        <div class="price">
+                                            <p class="new-price">{{ product.price }} تومان</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-lg-12">  
+                            <div class="content-box text-center">  
+                                <h3 class="title-font">نتیجه‌ای یافت نشد !</h3>  
+                                <p class="my-3">- از عبارت‌های متداول‌تر استفاده کنید.</p>  
+                                <p>- املای عبارت وارد شده را بررسی کنید.</p>  
+                            </div>  
+                        </div>                        
+                        {% endif %}
+                        <div class="col-12">
+                            <div class="my-paginate my-4">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination flex-wrap justify-content-center">
+                                        <!-- قبلی -->
+                                    {% if pagination.current_page > 1 %}
+                                        <li class="page-item">
+                                            <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:-1 }}">قبلی</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <!-- شماره صفحات -->
+                                    {% for page in pagination.page_range %}
+                                        <li class="page-item {% if page == pagination.current_page %}active{% endif %}">
+                                            <a class="page-link rounded-3" href="?page={{ page }}">{{ page }}</a>
+                                        </li>
+                                    {% endfor %}
+                                    
+                                    <!-- بعدی -->
+                                    {% if pagination.current_page < pagination.page_range|length %}
+                                        <li class="page-item">
+                                            <a class="page-link rounded-3" href="?page={{ pagination.current_page|add:1 }}">بعدی</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    </ul>
+                                </nav>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--============ end main content ==============-->
+
+{% endblock %}

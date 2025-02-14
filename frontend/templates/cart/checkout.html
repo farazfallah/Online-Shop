@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}صورتحساب{% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="payment_navigtions">
+            <div class="checkout-headers">
+                <nav class="navbar navbar-expand">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="{% url 'cart' %}" class="nav-link">
+                                <span>1</span>
+                                <p>سبد خرید</p>
+                            </a>
+                        </li>
+                        <li class="nav-item active">
+                            <a href="#" class="nav-link">
+                                <span>2</span>
+                                <p>صورتحساب</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-9">
+                    <div class="content-box">
+                        <div class="addresses-section mb-4">
+                            <div class="slider-title-desc mb-4">
+                                <div class="slider-title-title">
+                                    <h2 class="h4 icon-circle">انتخاب<span class="main-color-one-color fw-bold"> آدرس </span></h2>
+                                </div>
+                            </div>
+                            
+                            {% if addresses %}
+                                <select name="delivery_address" id="addressSelect" class="form-select" required>
+                                    <option value="">انتخاب آدرس تحویل</option>
+                                    {% for address in addresses %}
+                                    <option value="{{ address.id }}">
+                                        {{ address.city }} - {{ address.address_line }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <div class="no-address alert alert-warning">
+                                    <p class="mb-2">هنوز آدرسی ثبت نشده است.</p>
+                                    <a href="{% url 'dashboard_address' %}" class="btn btn-sm btn-primary">
+                                        برای افزودن آدرس به پروفایل مراجعه کنید
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="cart-product-item my-5">
+                            <div class="row">
+                                {% for item in checkout_preview.items %}
+                                <div class="col-lg-3">
+                                    <div class="cart-items border-end">
+                                        <div class="item">
+                                            <div class="image text-start">
+                                                <img src="{{ item.product_image }}" alt="{{ item.product_name }}"
+                                                     class="img-fluid d-inline-block w-100-px">
+                                            </div>
+                                            <div class="cart-item-feature mt-3">
+                                                <div class="item d-flex align-items-center">
+                                                    <div class="saller-name mx-2">نام:</div>
+                                                    <div class="saller-name text-muted">{{ item.product_name }}</div>
+                                                </div>
+                                                <div class="item d-flex align-items-center">
+                                                    <div class="saller-name mx-2">تعداد:</div>
+                                                    <div class="saller-name text-muted">{{ item.quantity }}</div>
+                                                </div>
+                                                <div class="item d-flex align-items-center">
+                                                    <div class="saller-name mx-2">قیمت:</div>
+                                                    <div class="saller-name text-muted">{{ item.price }} تومان</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="cart-canvases position-sticky top-0">
+                        <div class="item">
+                            <div class="factor">
+                                <div class="factor-details mb-3">
+                                    <h5 class="title-font mb-3 h6 border-bottom pb-2">جزئیات سفارش</h5>
+                                    
+                                    <div class="d-flex factor-item mb-2 align-items-center justify-content-between">
+                                        <span class="text-muted">تعداد اقلام:</span>
+                                        <p class="mb-0">{{ checkout_preview.total_items }} عدد</p>
+                                    </div>
+                                    
+                                    <div class="d-flex factor-item mb-2 align-items-center justify-content-between">
+                                        <span class="text-muted">مجموع سبد خرید:</span>
+                                        <p class="mb-0">{{ checkout_preview.total_price|floatformat:0 }} تومان</p>
+                                    </div>
+
+                                    <div class="d-flex factor-item mb-2 align-items-center justify-content-between fw-bold">
+                                        <span>مبلغ قابل پرداخت:</span>
+                                        <p class="mb-0 main-color-one-color">{{ checkout_preview.total_price|floatformat:0 }} تومان</p>
+                                    </div>
+                                </div>
+
+                                <div class="action mt-3">
+                                    <button type="submit" class="btn main-color-one-bg py-2 rounded-pill rounded-3 d-block w-100">
+                                        ثبت سفارش
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="discount-code mb-3">
+                            <div class="input-group">
+                                <input type="text" name="discount_code" id="discountCode" class="form-control" placeholder="کد تخفیف">
+                                <button type="button" id="applyDiscount" class="btn btn-secondary">اعمال</button>
+                            </div>
+                            <div id="discountMessage" class="mt-2"></div>
+                        </div>
+                        
+                        <script>
+                            document.getElementById('applyDiscount').addEventListener('click', function() {
+                                const discountCode = document.getElementById('discountCode').value;
+                                
+                                if (!discountCode) {
+                                    showDiscountMessage('لطفا کد تخفیف را وارد کنید', 'warning');
+                                    return;
+                                }
+                            
+                                // گرفتن توکن CSRF از جنگو
+                                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                            
+                                fetch('http://127.0.0.1:8000/api/verify-discount/', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': csrftoken
+                                    },
+                                    credentials: 'include',  // اضافه کردن کوکی‌ها به درخواست
+                                    body: JSON.stringify({
+                                        discount_code: discountCode
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.valid) {
+                                        showDiscountMessage(`کد تخفیف با موفقیت اعمال شد (${data.percentage}٪ تخفیف)`, 'success');
+                                        updateTotalPrice(data.new_total);
+                                    } else {
+                                        showDiscountMessage(data.message || 'کد تخفیف نامعتبر است', 'danger');
+                                    }
+                                })
+                                .catch(error => {
+                                    showDiscountMessage('خطا در بررسی کد تخفیف', 'danger');
+                                });
+                            });
+                            
+                            function showDiscountMessage(message, type) {
+                                const messageDiv = document.getElementById('discountMessage');
+                                messageDiv.innerHTML = `<div class="alert alert-${type} py-2 px-3">${message}</div>`;
+                            }
+                            
+                            function updateTotalPrice(newTotal) {
+                                document.querySelector('.factor-item .main-color-one-color').textContent = 
+                                    `${numberWithCommas(newTotal)} تومان`;
+                            }
+                            
+                            function numberWithCommas(x) {
+                                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            }
+                        </script>
+                        
+                        <style>
+                        .discount-code .input-group {
+                            direction: ltr;
+                        }
+                        .discount-code input {
+                            direction: rtl;
+                        }
+                        .discount-code .alert {
+                            font-size: 0.9rem;
+                        }
+                        </style>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fa.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#addressSelect').select2({
+        language: "fa",
+        dir: "rtl",
+        width: '100%',
+        placeholder: 'انتخاب آدرس تحویل'
+    });
+});
+</script>
+
+<style>
+.select2-container {
+    width: 100% !important;
+}
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    padding: 5px;
+    border-radius: 0.375rem;
+    border-color: #ced4da;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+.select2-dropdown {
+    border-color: #ced4da;
+}
+.cart-items .image img {
+    max-width: 100px;
+    height: auto;
+}
+</style>
+{% endblock %}

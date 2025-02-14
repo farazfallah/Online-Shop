@@ -1,0 +1,810 @@
+{% extends 'base.html' %}
+{% block title %}محصول {{ product.name }}{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<!--============ start main content ==============-->
+
+<section class="content">
+    <section class="bread-crumb py-0 mb-3">
+
+    </section>
+    <div class="container-fluid">
+        <div class="content-box">
+            <div class="row gy-3">
+                <div class="col-lg-4">
+                    <div class="pro_gallery">
+                        <div style="--swiper-navigation-color: #fff; --swiper-pagination-color: #fff"
+                             class="swiper product-gallery">
+                            <div class="swiper-wrapper" title="برای بزرگنمایی تصویر دابل کلیک کنید">
+                                {% if product.image %}
+                                <div class="swiper-slide">
+                                    <div class="swiper-zoom-container">
+                                        <img class="img-fluid" src="{{ product.image }}" alt="{{ product.name }}" />
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% for image in product.images.all %}
+                                <div class="swiper-slide">
+                                    <div class="swiper-zoom-container">
+                                        <img class="img-fluid" src="{{ image.image }}" alt="{{ product.name }}" />
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="swiper-button-next d-none d-lg-flex"></div>
+                            <div class="swiper-button-prev d-none d-lg-flex"></div>
+                            <div class="swiper-pagination d-none d-lg-block"></div>
+                        </div>
+
+                        <div class="swiper product-gallery-thumb">
+                            <div class="swiper-wrapper">
+                                {% if product.image %}
+                                <div class="swiper-slide">
+                                    <img class="img-fluid" src="{{ product.image }}" alt="{{ product.name }}" />
+                                </div>
+                                {% endif %}
+
+                                {% for image in product.images.all %}
+                                <div class="swiper-slide">
+                                    <img class="img-fluid" src="{{ image.image }}" alt="{{ product.name }}" />
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="col-lg-4">
+                    <div class="product-meta">
+                        <nav aria-label="breadcrumb" class="mb-3">
+                        </nav>
+                        <div class="title mt-md-0 mt-3">
+                            <h6 class="font-16 mb-2">{{ product.name }}
+                            </h6>
+                            {% if product.comments_count > 0 %}
+                            <div class="d-flex align-items-center pb-2">
+                               <div class="star">
+                                   {% for i in "12345" %}
+                                       {% if product.average_rating >= forloop.counter %}
+                                           <i class="bi bi-star-fill"></i>
+                                       {% else %}
+                                           <i class="bi bi-star"></i>
+                                       {% endif %}
+                                   {% endfor %}
+                               </div>
+                               <div class="ms-3">
+                                   <a class="main-color-one-color font-14">
+                                       <span>{{ product.comments_count }}</span>
+                                       <span>دیدگاه</span>
+                                   </a>
+                               </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="product-feature py-2">
+                            {% if product.attributes %}
+                            <div class="product-meta-feature-items">
+                                <h5 class="title font-16 mb-2 icon-circle">ویژگی های کالا</h5>
+                                <ul class="navbar-nav">
+                                {% for attr in product.attributes %}
+                                {% if forloop.counter <= 3 %}
+                                        <li class="nav item"><span> {{ attr.attribute_name }}:</span><strong>{{ attr.value }}</strong></li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if product.attributes|length > 3 %}
+                                    <li class="nav item"><a href="#product-details" class="view-more">مشاهده بیشتر...</a></li>
+                                {% endif %}                                   
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <div class="product-meta-color mt-4">
+                                <h5 class="title font-16 mb-2 icon-circle">توضیحات کالا</h5>
+                                <p class="text-muted" id="product-description">{{ product.description }}</p>
+                                <a id="show-more-link" href="#product-details" style="display:none;">مشاهده بیشتر...</a>
+                            </div>
+                            {% comment %} <div class="product-meta-color mt-4">
+                                <h5 class="font-16 icon-circle">
+                                    انتخاب رنگ کالا
+                                </h5>
+                                <div class="product-meta-color-items">
+                                    <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off"
+                                           checked="">
+                                    <label class="btn " for="option1">
+                                        <span style="background-color: #c00;"></span>
+                                        قرمز
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="options" id="option2"
+                                           autocomplete="off">
+                                    <label class="btn " for="option2">
+                                        <span style="background-color: #111;"></span>
+                                        مشکی
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="options" id="option3" autocomplete="off"
+                                           disabled="">
+                                    <label class="btn " for="option3">
+                                        <span style="background-color: #00cc5f;"></span>
+                                        سبز
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="options" id="option4"
+                                           autocomplete="off">
+                                    <label class="btn " for="option4">
+                                        <span style="background-color: #1b69f0;"></span>
+                                        آبی
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="product-meta-color mt-4">
+                                <h5 class="font-16 icon-circle">
+                                    انتخاب سایز
+                                </h5>
+                                <div class="product-meta-color-items">
+                                    <input type="radio" class="btn-check" name="options-two" id="option11"
+                                           autocomplete="off" checked="">
+                                    <label class="btn px-4 rounded-3 " for="option11">
+                                        sm
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="options-two" id="option12"
+                                           autocomplete="off" checked="">
+                                    <label class="btn px-4 rounded-3 " for="option12">
+                                        md
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="options-two" id="option13"
+                                           autocomplete="off" checked="">
+                                    <label class="btn px-4 rounded-3" for="option13">
+                                        lg
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="options-two" id="option14"
+                                           autocomplete="off" checked="">
+                                    <label class="btn px-4 rounded-3 " for="option14">
+                                        xl
+                                    </label>
+
+                                </div>
+                            </div> {% endcomment %}
+                            {% comment %} <div class="product-alert">
+                                <i class="bi bi-info-circle-fill me-1"></i>
+                                <span class="text-justify">امکان برگشت کالا با دلیل "انصراف از خرید" تنها در صورتی مورد قبول است که پلمب کالا باز نشده باشد.</span>
+                            </div>
+                            <div class="product-alert mt-2">
+                                <i class="bi bi-check-circle me-1"></i>
+                                <span class="text-justify">
+                                    از سه روش زیر می‌توان با سامانه همتا ارتباط برقرار نموده و فرآیند فعال سازی دستگاه موبایل را انجام داد: 1. کد دستوری #۷۷۷۷* 2. اپلیکشین همتا 3. سایت اینترنتی به آدرس www.hamta.ntsw.ir
+                                </span>
+                            </div> {% endcomment %}
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    {% if product.stock_quantity > 0 %}
+                    <div class="se-cart border-ui">
+                        <div class="se-cart-item pb-0">
+                            <h4 class="font-18 fw-800 mb-4 icon-circle">خرید محصول</h4>
+                        </div>
+                        <div class="se-cart-item">
+                            <i class="bi bi-shield-check me-1 font-20"></i>
+                            <h6 class="d-inline font-16 fw-normal">گارانتی اصالت و سلامت فیزیکی کالا</h6>
+                        </div>
+                        <div class="se-cart-item">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="bi bi-house font-20"></i>
+                                </div>
+                                <div class="text-start ms-3">
+                                    <h6 class="d-inline font-16 fw-normal">موجودی در انبار فروشنده: {{ product.stock_quantity }} عدد</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="se-cart-item d-lg-flex d-none justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-info-circle font-18 me-2"></i>
+                                <span class="font-16">
+                                        قیمت فروشنده
+                                    </span>
+                            </div>
+                            <div class="price d-flex flex-column justify-content-end">
+                                <div class="d-flex align-items-center">
+                                    {% if product.discount != 0 %}
+                                    <span class="fw-bold fs-3 def-color">{{ product.final_price }}</span>
+                                    <span class="badge main-color-one-bg rounded-pill ms-2">{{ product.discount }}%</span>
+                                    {% else %}
+                                    <span class="fw-bold fs-3 def-color">{{ product.price }}</span>
+                                    {% endif%}
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center">
+                                    {% if product.discount != 0 %}
+                                    <span class="text-muted font-14 text-decoration-line-through">{{ product.price }}</span>
+                                    {% endif %}
+                                    <span class="text-muted font-14 ms-2">تومان</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="se-cart-item">
+                            {% if messages %}
+                            <div class="messages">
+                                {% for message in messages %}
+                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            {# فرم اضافه کردن به سبد خرید #}
+                            <form method="post" class="w-100 d-flex flex-column justify-content-center align-items-center mt-3">
+                                {% csrf_token %}
+                                <div class="counter">
+                                    <label>
+                                        <input type="text" name="count" class="counter" value="1">
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn justify-content-center main-color-green w-100 text-center btn-add-to-cart text-white mt-3">
+                                    <i class="bi bi-basket me-3 lh-sm fs-4"></i> افزودن به سبد خرید
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% elif product.stock_quantity == 0 %}
+                    <div class="se-cart border-ui">
+                        <div class="se-cart-item">
+                            <button disabled
+                                    class="btn justify-content-center btn-dark  w-100 text-center btn-add-to-cart text-white  mt-3">
+                                محصول ناموجود
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-12">
+                    <div class="shop-feature">
+                        <div class="container-fluid">
+                            <nav class="navbar">
+                                <ul class="navbar-nav justify-content-md-between justify-content-center">
+                                    <li class="nav-item d-flex align-items-center">
+                                        <img alt="" src="{% static 'image/feature/box.png' %}">
+                                        <span>امکان تحویل اکسپرس</span>
+                                    </li>
+                                    <li class="nav-item d-flex align-items-center">
+                                        <img alt="" src="{% static 'image/feature/headphone.png' %}">
+                                        <span>24 ساعته 7 روز هفته</span>
+                                    </li>
+                                    <li class="nav-item d-flex align-items-center">
+                                        <img alt="" src="{% static 'image/feature/safe.png' %}">
+                                        <span>امکان پرداخت در محل
+                                        </span>
+                                    </li>
+                                    <li class="nav-item d-flex align-items-center">
+                                        <img alt="" src="{% static 'image/feature/seven.png' %}">
+                                        <span>7 روز ضمانت بازگشت کالا
+                                        </span>
+                                    </li>
+                                    <li class="nav-item d-flex align-items-center">
+                                        <img alt="" src="{% static 'image/feature/money.png' %}">
+                                        <span>ضمانت اصالت کالا
+                                        </span>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--============ end main content ==============-->
+
+<!--============ start product description ==============-->
+
+<section class="product-desc" id="product-details">
+    <div class="container-fluid">
+        <div class="product-desc-tab">
+            <ul class="nav justify-content-evenly" id="productTab" role="tablist">
+                <li class="nav-item">
+                    <button aria-selected="true" class="active waves-effect waves-light"
+                            data-bs-target="#productDescLess-pane" data-bs-toggle="tab" id="productDescLess"
+                            role="button" type="button">
+                        توضیحات کالا
+                    </button>
+                </li>
+                {% if product.attributes %}
+                <li class="nav-item">
+                    <button aria-selected="false" class="waves-effect waves-light"
+                            data-bs-target="#productTable-pane" data-bs-toggle="tab" id="productTable"
+                            role="button" type="button">
+                        مشخصات محصول
+                    </button>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <button aria-selected="false" class="d-flex waves-effect waves-light"
+                            data-bs-target="#productComment-pane" data-bs-toggle="tab" id="productComment"
+                            role="button" type="button">
+                        نظرات <span class="badge main-color-one-bg ms-2 lh-sm">{% if product.comments_count > 0 %}{{ product.comments_count }}{% endif %}</span>
+                    </button>
+                </li>
+            </ul>
+            
+        </div>
+        <div class="row mt-4 pt-2">
+            <div class="col-xl-9">
+                <div class="content-box">
+                    <div class="product-descs" id="prodesc">
+                        <div class="product-desc">
+                            <div class="product-desc-tab-content">
+                                <div class="tab-content" id="productTabContent">
+                                    <div class="tab-pane fade show active product-desc-less-contents"
+                                         id="productDescLess-pane">
+                                        <div class="product-desc-content">
+                                            <h6 class="font-22 mb-2 title-font title-line-bottom">معرفی محصول</h6>
+                                            <p>{{ product.description }}</p>
+                                        </div>
+                                    </div>
+                                    {% if product.attributes %}
+                                    <div class="tab-pane fade" id="productTable-pane">
+                                        <div aria-labelledby="#productTable"
+                                             class="tab-pane fade active show" role="tabpanel">
+                                            <h6 class="font-26 mb-2 title-font title-line-bottom">مشخصات محصول</h6>
+                                            <div class="box_list mt-4">
+                                                <div>
+                                                    <ul class="param_list list-inline">
+                                                        {% for attr in product.attributes %}
+                                                        <li class="list-inline-item col-md-3 pe-md-1 pe-md-3 p-0 m-0">
+                                                            <div class="box_params_list">
+                                                                <p class="block border_right_custom1">
+                                                                    {{ attr.attribute_name }}
+                                                                </p>
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-inline-item col-md-8 p-0 m-0">
+                                                            <div class="box_params_list">
+                                                                <p class="block border_right_custom2">
+                                                                    {{ attr.value }}
+                                                                </p>
+                                                            </div>
+                                                        </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="tab-pane fade product-comment-content" id="productComment-pane">
+
+                                        <div class="comment-form">
+                                            <h6 class="font-26 mb-2 title-font title-line-bottom">نظرت در مورد این
+                                                محصول
+                                                چیه؟</h6>
+                                                {% if is_logged_in %}
+                                                <form action="" data-product-id="{{ product.id }}">
+                                                    <div class="row gy-4">
+                                                        <div class="col-md-4">
+                                                            <div class="product-rateing position-sticky top-0">
+                                                                <div class="row gy-2 align-items-center">
+                                                                    <div class="number">
+                                                                        <h4 class="fw-light">متوسط امتیاز ها</h4>
+                                                                        <h2>{{ product.average_rating|floatformat:1 }}</h2>
+                                                                        <div class="star">
+                                                                            {% for i in "12345" %}
+                                                                                {% if product.average_rating >= forloop.counter %}
+                                                                                    <i class="bi bi-star-fill"></i>
+                                                                                {% else %}
+                                                                                    <i class="bi bi-star"></i>
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <div class="row">
+                                                                <div class="col-sm-6">
+                                                                    <div class="form-floating mb-3 form-group">
+                                                                        <input class="form-control"
+                                                                               id="floatingInputEmail1"
+                                                                               placeholder="{{ email }}"
+                                                                               type="email" disabled>
+                                                                        <label for="floatingInputEmail1">{{ email }}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <div class="form-floating mb-3 form-group">
+                                                                        <input class="form-control"
+                                                                               id="floatingInputName"
+                                                                               placeholder="{{ first_name }} {{ last_name }}"
+                                                                               type="text" disabled>
+                                                                        <label for="floatingInputName">{{ first_name }} {{ last_name }}
+                                                                            </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <div class="form-group">
+                                                                        <label class="my-3" for="commentRating">امتیاز
+                                                                            شما</label>
+                                                                        <fieldset class="rating" id="commentRating">
+                                                                            <input id="star5" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="5"/>
+                                                                            <label for="star5">5 stars</label>
+                                                                            <input id="star4" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="4"/>
+                                                                            <label for="star4">4 stars</label>
+                                                                            <input id="star3" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="3"/>
+                                                                            <label for="star3">3 stars</label>
+                                                                            <input id="star2" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="2"/>
+                                                                            <label for="star2">2 stars</label>
+                                                                            <input id="star1" name="rating" required
+                                                                                   type="radio"
+                                                                                   value="1"/>
+                                                                            <label for="star1">1 star</label>
+                                                                        </fieldset>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <div class="form-floating">
+                                                                <textarea class="form-control"
+                                                                          id="floatingTextarea2"
+                                                                          placeholder="Leave a comment here"
+                                                                          style="height: 150px"></textarea>
+                                                                        <label for="floatingTextarea2">متن نظر!</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <button type="submit"
+                                                                            class="btn main-color-two-bg px-5 btn-lg border-0">
+                                                                        ثبت نظر
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>                                                
+                                                {% else %}
+                                                <p class="loginTermsDesc lh-lg mt-3">برای ثبت نظر لطفاً <a href="{% url 'login' %}" class="underlined main-color-one-color fw-bold">وارد حساب کاربری</a> خود شوید.</p>
+                                                {% endif %}                                                
+                                        </div>
+                                        {% if product.comments_count %}
+                                        <div class="box_filter mt-5 pb-3">
+                                            <div class="row align-items-end">
+                                                <div class="col-md-4 bf1">
+                                                    <h4 class="title-font title-line-bottom">نظرات کاربران</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% for comment in product.comments %}
+                                            <div class="box_users_comment mt-3 p-4">
+                                                <div class="row">
+                                                    <div class="col-lg-3 text-center">
+                                                        <img src="{{ comment.customer.profile_image_url }}" alt="{{ comment.customer.full_name }}" class="img-fluid rounded-circle mb-2" style="max-width: 95px;">
+                                                        <div class="user-details text-center">
+                                                            <h5 class="user-name mb-1">{{ comment.customer.full_name }}</h5>
+                                                            <div class="user-rating">
+                                                                {% for i in 5|make_list %}
+                                                                    {% if i < comment.rating %}
+                                                                        <span class="star text-warning">★</span>
+                                                                    {% else %}
+                                                                        <span class="star text-muted">★</span>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <small class="text-muted">({{ comment.rating }}/5)</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-9 pr-5" style="margin-top:-10px">
+                                                        <div class="row mt-4">
+                                                            <div class="col-md-12">
+                                                                <p class="box_text_comment">
+                                                                    {{ comment.comment }}
+                                                                </p>
+                                                            </div>
+                                                            <div class="border-top mt-3">
+                                                                <div class="box_comment_header mt-4 mt-lg-0">
+                                                                    <br>
+                                                                    <span class="span2">
+                                                                        توسط {{ comment.customer.full_name }}
+                                                                        در تاریخ {{ comment.created_at }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% empty %}
+                                            <p class="text-center text-muted mt-4">هنوز نظری ثبت نشده است.</p>
+                                        {% endfor %}
+                                        <style>
+                                            .star {
+                                                font-size: 1.2em;
+                                            }
+                                            .user-details {
+                                                margin-top: 10px;
+                                            }
+                                            .user-name {
+                                                font-weight: bold;
+                                            }
+                                            .box_users_comment {
+                                                background-color: #f8f9fa;
+                                                border-radius: 10px;
+                                                margin-bottom: 15px;
+                                            }
+                                        </style>
+                                    {% endif %}                                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 d-xl-block d-none">
+                <div class="position-sticky top-0">
+                    {% if product.stock_quantity > 0 %}
+                    <div class="se-cart bg-white border-ui">
+                        <div class="se-cart-item">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="bi bi-house font-20"></i>
+                                </div>
+                                <div class="text-start ms-3">
+                                    <h6 class="fw-normal font-16">موجودی در انبار فروشنده: {{ product.stock_quantity }} عدد</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="se-cart-item d-lg-flex d-none justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-info-circle font-18 me-2"></i>
+                                <span class="font-12">
+                                        قیمت فروشنده
+                                    </span>
+                            </div>
+                            <div class="price d-flex flex-column justify-content-end">
+                                <div>
+                                    {% if product.discount != 0 %}
+                                    <span class="fw-bold font-18 def-color">{{ product.final_price }}</span>
+                                    <span class="badge main-color-two-bg rounded-pill">{{ product.discount }}%</span>
+                                    {% else %}
+                                    <span class="fw-bold font-18 def-color">{{ product.price }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center">
+                                    {% if product.discount != 0 %}
+                                    <span class="text-muted font-14 text-decoration-line-through">{{ product.price }}</span>
+                                    {% endif %}
+                                    <span class="text-muted font-14 ms-2">تومان</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="se-cart-item">
+                            <form
+                                  class="w-100 d-flex flex-column justify-content-center align-items-center mt-3">
+                                <div class="counter">
+                                    <label>
+                                        <input type="text" name="count" class="counter" value="1">
+                                    </label>
+                                </div>
+                                <button class="btn justify-content-center main-color-green w-100 text-center btn-add-to-cart text-white  mt-3" data-product-id="{{ product.id }}">
+                                    <i class="bi bi-basket me-3 lh-sm fs-4"></i> افزودن به سبد خرید
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="se-cart border-ui">
+                    <div class="se-cart-item">
+                        <button disabled
+                                class="btn justify-content-center btn-dark  w-100 text-center btn-add-to-cart text-white  mt-3">
+                            محصول ناموجود
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--============ end product description ==============-->
+
+<!--============ start product slider ==============-->
+
+{% if similar_products %}
+<section class="product-slider  site-slider">
+    <div class="container-fluid">
+        <div class="section-title mb-3">
+            <div class="section-title-title">
+                <h2 class="fw-900 h4">محصولات<span class="with-highlight ms-1">مشابه</span>
+                </h2>
+                <div class="Dottedsquare"></div>
+            </div>
+        </div>
+        <div class="swiper pro-slider">
+            <div class="swiper-wrapper">
+                {% for item in similar_products %}
+                <div class="swiper-slide">
+                    <div class="product-box border-ui">
+                        <a href="">
+                            <div class="product-image">
+                                <img src="{{ item.image.url }}" loading="lazy" alt="{{ item.name }}"
+                                     class="img-fluid">
+                            </div>
+                            <div class="product-title mb-3">
+                                <div class="title">
+                                    <p class="text-overflow-1 mt-2">{{ item.name }}</p>
+                                </div>
+                                <div class="rating">
+                                    <div class="number"><span class="text-muted font-12">(15+) 4.8</span></div>
+                                    <div class="icon"><i class="bi bi-star-fill"></i></div>
+                                </div>
+                            </div>
+                            <div class="product-action">
+                                {% if item.discount != 0 %}
+                                <div class="discount">
+                                    <div class="no-hover border-0 rounded-3 main-color-one-bg p-2">
+                                        <span class="text-white">{{ item.discount }}%</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="price">
+                                    {% if item.discount != 0 %}
+                                    <p class="new-price">{{ item.final_price }} تومان</p>
+                                    <p class="old-price">{{ item.price }} تومان</p>
+                                    {% else %}
+                                    <p class="new-price">{{ item.price }} تومان</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
+{% endif %}
+<script>
+    $(document).ready(function () {
+        $('.commentTags').tagify();
+    });
+</script>
+{% block product_quantity_selector %}
+<script>
+    $(document).ready(function () {
+        $("input[name='count']").TouchSpin({
+            min: 1,
+            max: '{{ product.stock_quantity }}',
+            buttondown_class: "btn-counter waves-effect waves-light",
+            buttonup_class: "btn-counter waves-effect waves-light"
+        });
+    });
+</script>
+{% endblock %}
+<script>
+    const maxLength = 250;
+
+    const description = document.getElementById('product-description').innerText;
+
+    if (description.length > maxLength) {
+        const shortenedDescription = description.substring(0, maxLength) + '...';
+
+        document.getElementById('product-description').innerText = shortenedDescription;
+
+        document.getElementById('show-more-link').style.display = 'inline-block';
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const commentForm = document.querySelector('.comment-form form');
+        const submitButton = commentForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+
+        // Get product ID from form's data attribute
+        const productId = commentForm.getAttribute('data-product-id');
+        if (!productId) {
+            console.error('Product ID not found in form data attributes');
+            return;
+        }
+
+        // Create message container
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'alert d-none mt-3';
+        commentForm.insertBefore(messageContainer, commentForm.firstChild);
+
+        commentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Show loading spinner
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                در حال ارسال...
+            `;
+
+            // Get form data
+            const rating = document.querySelector('input[name="rating"]:checked')?.value;
+            const comment = document.querySelector('#floatingTextarea2').value;
+
+            if (!rating || !comment) {
+                showMessage('لطفا تمامی فیلدها را پر کنید.', 'danger');
+                resetButton();
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/products/${productId}/comments/`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        rating: parseInt(rating),
+                        comment: comment
+                    })
+                });
+
+                const data = await response.json();
+                console.log('Response:', data); // Log the response for debugging
+
+                if (response.ok) {
+                    showMessage('نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد.', 'success');
+                    commentForm.reset();
+                } else {
+                    const errorMessage = typeof data === 'object' ? 
+                        JSON.stringify(data, null, 2) : 
+                        data.toString();
+                    showMessage(`خطا: ${errorMessage}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage(`خطا در برقراری ارتباط با سرور: ${error.message}`, 'danger');
+            } finally {
+                resetButton();
+            }
+        });
+
+        function showMessage(message, type) {
+            messageContainer.className = `alert alert-${type} mt-3`;
+            messageContainer.innerHTML = message;
+            messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageContainer.className = 'alert d-none mt-3';
+                }, 5000);
+            }
+        }
+
+        function resetButton() {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+        }
+    });
+</script>
+{% endblock %}

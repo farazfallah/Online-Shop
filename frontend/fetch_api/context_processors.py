@@ -1,0 +1,74 @@
+import requests
+from django.conf import settings
+from fetch_api.request_view.utils import fetch_customer_profile
+
+
+def site_info(request):
+    api_url = f"{settings.API_BASE_URL}site-info"
+
+    try:
+        response = requests.get(api_url, proxies={"http": None, "https": None})
+
+        if response.status_code == 200:
+            data = response.json()
+            site_info = data.get("results", [])[0] if data.get("results") else {}
+            return {"site_info": site_info}
+        else:
+            return {"site_info": None, "error": "Failed to fetch data from API"}
+
+    except requests.exceptions.RequestException as e:
+        return {"site_info": None, "error": f"An error occurred: {str(e)}"}
+
+
+def categories(request):
+    api_url = f"{settings.API_BASE_URL}categories/"
+    
+    try:
+        response = requests.get(api_url, proxies={"http": None, "https": None})
+        
+        if response.status_code == 200:
+            data = response.json()
+            categories = data.get("results", [])
+            
+            full_categories = []
+            for category in categories:
+                if not category.get('parent_category'):
+                    category_detail_url = f"{settings.API_BASE_URL}categories/{category['id']}/"
+                    category_response = requests.get(category_detail_url)
+                    if category_response.status_code == 200:
+                        full_category = category_response.json()
+                        full_categories.append(full_category)
+            
+            return {"category_list": full_categories}
+        else:
+            return {"category_list": []}
+    
+    except requests.exceptions.RequestException as e:
+        return {"category_list": [], "error": f"An error occurred: {str(e)}"}
+    
+
+def user_profile_context(request):
+    profile_data = fetch_customer_profile(request)
+    if profile_data:
+        is_logged_in = True
+        first_name = profile_data.get('first_name', '')
+        last_name = profile_data.get('last_name', '')
+        email = profile_data.get('email', '')
+        image = profile_data.get('image', '')
+        is_otp_verified = profile_data.get('is_otp_verified', False)
+    else:
+        is_logged_in = False
+        first_name = ''
+        last_name = ''
+        email = ''
+        image = ''
+        is_otp_verified = False
+        
+    return {
+        'is_logged_in': is_logged_in,
+        'first_name': first_name,
+        'last_name': last_name,
+        'email': email,
+        'image': f"{settings.BACK_END_URL}{image}",
+        'is_otp_verified': is_otp_verified
+    }

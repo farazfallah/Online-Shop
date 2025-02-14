@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}داشبورد - {% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="content">
+            <div class="row">
+                <div class="col-xl-3">
+                    <!--   start dashboard menu mobile  -->
+                    <div class="custom-filter d-xl-none d-block">
+                        <button class="btn btn-filter-float border-0 btn-dark shadow-box px-4 rounded-3 position-fixed"
+                                style="z-index: 999;bottom:75px;" type="button" data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                            <i class="bi bi-list font-20 fw-bold text-white"></i>
+                            <span class="d-block font-14 text-white">منو</span>
+                        </button>
+                        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasRight"
+                             aria-labelledby="offcanvasRightLabel">
+                            <div class="offcanvas-header">
+                                <h5 class="offcanvas-title" id="offcanvasRightLabel1">منو</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="offcanvas-body">
+                                <div class="panel-side position-sticky top-0">
+                                    <div class="content-box bs-bg-gray-300 pb-0">
+                                        <div class="container-fluid">
+                                            <div class="panel-box bg-white p-3 rounded-4 shadow-md ">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="{{ image }}"
+                                                         class="img-fluid img-profile-panel rounded-circle me-3 shadow-md"
+                                                         alt="">
+                                                    <div class="d-grid gap-2">
+                                                        <h6 class="h6 main-color-one-color">{{first_name}} {{last_name}}</h6>
+                                                        <h6 class="font-14 text-muted">{{email}}<a href="{% url 'profile_page'%}"
+                                                            class="ms-2 text-muted"><i
+                                                                class="bi bi-pencil-square"></i></a><h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="profile-box">
+                                                <nav class="navbar profile-box-nav">
+                                                    <ul class="navbar-nav flex-column">
+                                                        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-home' %}active{% endif %}">
+                                                            <a href="{% url 'dashboard-home'%}" class="nav-link">
+                                                                <i class="bi bi-house-door me-3"></i>خانه
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">
+                                                            <a href="{% url 'order_list'%}" class="nav-link">
+                                                                <i class="bi bi-cart-check me-3"></i>سفارش های من
+                                                                <span class="badge text-dark ms-2 rounded-pill main-color-one-bg">5</span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard_address' %}active{% endif %}">
+                                                            <a href="{% url 'dashboard_address'%}" class="nav-link">
+                                                                <i class="bi bi-pin-map me-3"></i>آدرس های من
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a href="" class="nav-link">
+                                                                <i class="bi bi-chat-dots me-3"></i>نظرات من
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a href="" class="nav-link">
+                                                                <i class="bi bi-gift me-3"></i>کد های تخفیف من
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item {% if request.resolver_match.url_name == 'logout' %}active{% endif %}">
+                                                            <a href="{% url 'logout'%}" class="nav-link">
+                                                                <i class="bi bi-arrow-right-square me-3"></i>خروج از حساب کاربری
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--   end dashboard menu mobile   -->
+                    <div class="panel-side d-xl-block d-none position-sticky top-0">
+                        <div class="content-box bg-white pb-0">
+                            <div class="container-fluid">
+                                <div class="panel-box bs-bg-gray-300 border-ui p-3 rounded-4 shadow-md ">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ image }}"
+                                             class="img-fluid img-profile-panel rounded-circle me-3 shadow-md" alt="">
+                                        <div class="d-grid gap-2">
+                                            <h6 class="h6 main-color-one-color">{{ first_name }} {{ last_name }}</h6>
+                                            <h6 class="font-14 text-muted">{{ email }}<a href="{% url 'profile_page'%}"
+                                                class="ms-2 text-muted"><i
+                                                    class="bi bi-pencil-square"></i></a></h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="profile-box">
+                                    <nav class="navbar profile-box-nav">
+                                        <ul class="navbar-nav flex-column">
+                                            <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-home' %}active{% endif %}">
+                                                <a href="{% url 'dashboard-home'%}" class="nav-link">
+                                                    <i class="bi bi-house-door me-3"></i>خانه
+                                                </a>
+                                            </li>
+                                        
+                                            <li class="nav-item {% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'order_detail' %}active{% endif %}">
+                                                <a href="{% url 'order_list'%}" class="nav-link">
+                                                    <i class="bi bi-cart-check me-3"></i>سفارش های من
+                                                </a>
+                                            </li>
+                                        
+                                            <li class="nav-item {% if request.resolver_match.url_name == 'dashboard_address' %}active{% endif %}">
+                                                <a href="{% url 'dashboard_address'%}" class="nav-link">
+                                                    <i class="bi bi-pin-map me-3"></i>آدرس های من
+                                                </a>
+                                            </li>
+                                            <li class="nav-item {% if request.resolver_match.url_name == 'logout' %}active{% endif %}">
+                                                <a href="{% url 'logout'%}" class="nav-link">
+                                                    <i class="bi bi-arrow-right-square me-3"></i>خروج از حساب کاربری
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% block dashboard_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

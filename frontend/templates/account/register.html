@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="FA-IR" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت نام</title>
+
+    <link rel="stylesheet" href="{% static 'plugin/swiper/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/go-to-top/style.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/rasta-contact/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+
+</head>
+
+<body class="bg-auth">
+
+<section class="content vh-100">
+    <div class="container-fluid h-100">
+        <div class="auth h-100 d-flex align-items-center">
+            <div class="container-fluid">
+                <div class="auth-items">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4">
+                            <div class="auth-form shadow-xl rounded-3  mt-5 bg-white">
+                                <div class="auth-form-title header-logo d-flex align-items-center justify-content-between title-panel mb-4 slider-title-desc-center">
+                                    <h2 class="text-center h4 text-muted title-font">ثبت نام</h2>
+                                    <a href="{% url 'home'%}">
+                                        <img src="{{ site_info.logo }}" class="auth-logo" alt="{{ site_info.name }}">
+                                    </a>
+                                </div>
+                                <form action="" id="form-auth" class="py-3">
+                                    <div id="error-box" class="alert alert-danger mt-3 text-center" style="display: none;"></div>
+                                    <div id="success-box" class="alert alert-success mt-3 text-center" style="display: none;"></div>
+                                    <div class="comment-item mb-4">
+                                        <input type="text" name="first_name" class="form-control" id="first_name" required>
+                                        <label for="first_name" class="form-label label-float">نام</label>
+                                    </div>
+                                    <div class="comment-item mb-4">
+                                        <input type="text" name="last_name" class="form-control" id="last_name" required>
+                                        <label for="last_name" class="form-label label-float">نام خانوادگی</label>
+                                    </div>
+                                    <div class="comment-item mb-4">
+                                        <input type="email" name="email" class="form-control" id="email" required>
+                                        <label for="email" class="form-label label-float">ایمیل خود را وارد کنید</label>
+                                    </div>
+                                    <div class="comment-item mb-4">
+                                        <input type="password" name="password" class="form-control" id="password" required>
+                                        <label for="password" class="form-label label-float">رمز عبور خود را وارد کنید</label>
+                                    </div>
+                                    <div class="comment-item mb-4">
+                                        <input type="password" name="re_password" class="form-control" id="rePassword" required>
+                                        <label for="rePassword" class="form-label label-float">رمز عبور خود را تکرار کنید</label>
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn main-color-one-bg w-100 py-3">ثبت نام</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <p class="loginTermsDesc lh-lg mt-3">حساب کاربری دارید؟ <a
+                                    class="underlined main-color-one-color fw-bold" href="{% url 'login' %}">ورود به سایت
+                                </a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.getElementById("form-auth").addEventListener("submit", async function (event) {
+        event.preventDefault();
+    
+        const form = event.target;
+        const errorBox = document.getElementById("error-box");
+        const successBox = document.getElementById("success-box");
+    
+        errorBox.style.display = "none";
+        successBox.style.display = "none";
+    
+        const formData = {
+            email: form.email.value,
+            password: form.password.value,
+            re_password: form.rePassword.value,
+            first_name: form.first_name.value,
+            last_name: form.last_name.value,
+        };
+    
+        try {
+            const response = await fetch("{{ api_base_url }}register/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify(formData),
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                successBox.textContent = result.message || "ثبت نام با موفقیت انجام شد.";
+                successBox.style.display = "block";
+                form.reset();
+            } else {
+                errorBox.textContent = result.error || "مشکلی رخ داده است.";
+                errorBox.style.display = "block";
+            }
+        } catch (error) {
+            errorBox.textContent = "خطایی در برقراری ارتباط با سرور رخ داد.";
+            errorBox.style.display = "block";
+        }
+    });
+</script>
+<script src="{% static 'js/modernizr-3.11.2.min.js' %}"></script>
+<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle-5.3.2.min.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
+
+</body>
+
+</html>
