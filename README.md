@@ -8,4 +8,4 @@ This branch serves as the primary development branch for the project. All new fe
 - Developers should create feature branches and merge their work into `develop`.
 
 ## Last Update
-- `Second phase`
+- `4th phase`
